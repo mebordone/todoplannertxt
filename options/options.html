@@ -49,6 +49,26 @@
     </div>
   </div>
 
+  <div class="group" id="calendar-group">
+    <span class="label" data-i18n="options_calendar_heading">Calendar (Lightning)</span>
+    <div class="checkbox">
+      <label><input type="checkbox" id="calendar-enabled"> <span data-i18n="options_calendar_enabled">Enable Calendar integration</span></label>
+    </div>
+    <div class="group" id="calendar-options">
+      <label data-i18n="options_calendar_select">Calendar to sync with</label>
+      <div class="row">
+        <select id="calendar-select"></select>
+      </div>
+      <div class="checkbox">
+        <label><input type="checkbox" id="calendar-sync-auto" checked> <span data-i18n="options_calendar_sync_auto">Automatic sync when todo.txt changes</span></label>
+      </div>
+    </div>
+    <p id="calendar-unavailable" class="hint" style="display:none;" data-i18n="options_calendar_unavailable">Calendar API is not available. You can export tasks with due dates to an ICS file and import them manually in Thunderbird.</p>
+    <div id="calendar-export-row" class="row" style="display:none; margin-top: 0.5rem;">
+      <button type="button" id="calendar-export-ics" data-i18n="options_calendar_export_ics">Export to ICS file</button>
+    </div>
+  </div>
+
   <p id="error" class="error" style="display:none;"></p>
   <p class="hint" data-i18n="options_fsa_hint">To choose todo.txt and done.txt files, the File Access Manager add-on must be installed.</p>
 
