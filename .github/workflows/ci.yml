@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main, feature/calendar-integration]
+  pull_request:
+    branches: [main, feature/calendar-integration]
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run CI (tests, coverage, lint, complexity)
+        run: npm run ci
