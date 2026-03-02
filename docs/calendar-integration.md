@@ -13,7 +13,8 @@ Esta extensión puede sincronizar tareas de todo.txt con un calendario local en 
 2. En la sección **Calendario (Lightning)**:
    - Activa **"Habilitar integración con Calendar"**.
    - Elige el calendario con el que sincronizar (por defecto se crea o selecciona el calendario **"Todo.txt"**).
-   - Opcional: desactiva **"Sincronización automática"** si prefieres sincronizar solo manualmente (por ejemplo desde un botón futuro o al abrir la extensión).
+   - Opcional: desactiva **"Sincronización automática"** si prefieres sincronizar solo manualmente.
+   - Usa el botón **"Sincronizar ahora (reload calendar)"** para forzar una recarga de las tareas con `due:` en el calendario sin esperar al siguiente cambio de archivo.
 3. Guarda. La extensión creará el calendario "Todo.txt" si no existe y empezará a rellenarlo con las tareas que tengan `due:`.
 
 ## Mapeo de datos (todo.txt ↔ VTODO)
@@ -28,6 +29,8 @@ Esta extensión puede sincronizar tareas de todo.txt con un calendario local en 
 
 - Las tareas **sin** `due:` no se crean en el calendario; siguen visibles solo en la interfaz de la extensión.
 - Si editas una tarea en el calendario (título, fecha, completado, categoría), los cambios se escriben en todo.txt.
+- En Thunderbird/Lightning las tareas sincronizadas aparecen en la vista **Tareas** (To-do), no en la rejilla día/mes del calendario.
+- Si creas una tarea nueva en Lightning (con fecha de vencimiento), se añadirá a todo.txt; para evitar duplicados se comprueba que no exista ya una tarea con el mismo título y fecha.
 
 ## Arquitectura
 
@@ -77,6 +80,17 @@ Cuando la API de calendario **no** está disponible:
 2. Usa el botón **"Exportar a ICS"** para generar un archivo con todas las tareas que tengan `due:`.
 3. En Thunderbird: **Calendario → Importar** y selecciona el archivo ICS descargado.
 
+## Cómo ver logs (depuración)
+
+Para comprobar qué hace la sincronización con el calendario:
+
+1. Abre la **Consola del navegador** en Thunderbird: **Herramientas → Herramientas de desarrollo → Consola del navegador** (o `Ctrl+Mayús+J` / `Cmd+Mayús+J`).
+2. En el filtro de la consola escribe **`[Todo.txt]`** para ver solo mensajes de la extensión.
+3. Al hacer **"Sincronizar ahora"** en Opciones (o al cambiar todo.txt), deberían aparecer líneas como:
+   - `[Todo.txt] Calendar sync: N task(s) with due date → Todo.txt calendar`
+   - `[Todo.txt] Calendar sync done: N/M synced`
+4. Los errores de la extensión se muestran con el prefijo `[Todo.txt]` y nivel ERROR; las notificaciones también pueden aparecer como notificación del sistema.
+
 ## Cómo validar manualmente (Thunderbird 140.7 ESR)
 
 1. Instala la extensión en un perfil de prueba (o carga temporal).
@@ -85,9 +99,10 @@ Cuando la API de calendario **no** está disponible:
 4. Crea en todo.txt al menos 3 líneas:
    - Una **sin** `due:` (ej. `Tarea sin fecha`).
    - Dos **con** `due:2025-12-01` y `due:2025-12-02` (y opcionalmente `+proyecto`).
-5. Abre la vista de **Calendario** en Thunderbird y comprueba que el calendario "Todo.txt" existe y muestra solo las dos tareas con fecha.
-6. Edita una tarea en el calendario (por ejemplo márcala como completada o cambia la fecha) y comprueba que el cambio se refleja en todo.txt (tras el siguiente polling o al recargar).
-7. Edita todo.txt (añade `due:2025-12-03` a una tarea o crea una nueva con due) y comprueba que en un lapso razonable aparece en el calendario.
+5. Abre la vista de **Calendario** en Thunderbird → pestaña **Tareas** y comprueba que el calendario "Todo.txt" existe y muestra las tareas con fecha.
+6. Usa **Sincronizar ahora** en Opciones para forzar la sincronización; opcionalmente **Copiar último log de sync** para depurar.
+7. Edita una tarea en el calendario (márcala completada o cambia la fecha) y comprueba que el cambio se refleja en todo.txt.
+8. Crea una tarea nueva en la vista Tareas de Lightning (con fecha de vencimiento) y comprueba que se añade a todo.txt.
 
 ## Permisos y revisión en addons.thunderbird.net
 
