@@ -24,7 +24,10 @@ Extensión de **Thunderbird** para administrar archivos [todo.txt](http://todotx
 ## Funcionalidades
 
 - **Opciones**: Rutas para todo.txt y done.txt con el selector de archivos integrado (sin complemento externo). Opciones de comportamiento en Thunderbird, fecha de creación y visualización del título completo.
-- **Popup**: Ver y editar tareas (añadir, completar, editar, actualizar).
+- **Interfaz dual**
+  - **Popup (vista rápida):** Clic en el icono de la barra de herramientas de Thunderbird abre un popup con solo las tareas pendientes; permite añadir una tarea, actualizar la lista, ir a Opciones y abrir la vista completa en pestaña. Los enlaces “Tab” y “Options” están agrupados como acciones secundarias.
+  - **Vista en pestaña:** El enlace “Tab” abre una página completa con todas las tareas (pendientes y completadas), donde puedes añadir, completar, editar y actualizar. Desde esa pestaña, el botón **Quick view** abre el popup de vista rápida cuando la API lo permite; si no, se muestra un texto recordando que el icono de Todo.txt aparece en la barra al estar en la pestaña Correo.
+  - **Visibilidad del icono:** El botón de Todo.txt en la barra de título es visible en la pestaña de correo (Mail). Cuando estás en la vista en pestaña de Todo.txt, usa **Quick view** para abrir el popup sin cambiar de pestaña, o vuelve a la pestaña Correo para ver el icono en la barra.
 - **Calendario (Lightning)**: El experimento intenta registrar un calendario “Todo.txt”. La integración completa depende de que Thunderbird ofrezca una API de proveedor de calendario; si no está el componente legacy XPCOM, el calendario puede no aparecer en Lightning. En builds 140 ESR (p. ej. Linux Mint `140.7.2esr`), el popup y la sincronización de archivos funcionan; la visualización de tareas en el calendario **no** está disponible por ahora.
 
 Ver `ROADMAP.md` para reintroducir la integración con el calendario cuando existan APIs modernas de MailExtension.
@@ -59,7 +62,8 @@ El archivo `.xpi` quedará en `dist/` (p. ej. `dist/todotxt_3.1.0_20250302_14302
 - `manifest.json` – Manifest de la extensión (TB 140, storage, options_ui, browser_action, experiment_apis).
 - `background.js` – Script en segundo plano (FSA, todoclient, polling, manejadores de mensajes).
 - `options/` – Página de opciones (HTML + JS).
-- `popup/` – Interfaz del popup para la lista de tareas.
+- `popup/` – Interfaz del popup (solo pendientes; enlace “Abrir en pestaña”).
+- `tab/` – Página de vista completa (pendientes + completadas) que se abre en una pestaña.
 - `modules/` – todotxt, util, fileUtil, todoclient, logger, exception, md5.
 - `lib/fsa.js` – File System Access: experimento integrado cuando está disponible, fallback opcional al proxy File Access Manager.
 - `experiments/fileAccess/` – Experimento para leer/escribir todo.txt y done.txt (sin complemento externo).
