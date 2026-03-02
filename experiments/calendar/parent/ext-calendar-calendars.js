@@ -3,45 +3,79 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 /* From webext-experiments/calendar - parent script for calendar.calendars API */
 
+var compIfaces = Components.interfaces;
 var { ExtensionCommon: { ExtensionAPI, EventManager } } = ChromeUtils.importESModule("resource://gre/modules/ExtensionCommon.sys.mjs");
 var { ExtensionUtils: { ExtensionError } } = ChromeUtils.importESModule("resource://gre/modules/ExtensionUtils.sys.mjs");
-var { MatchPattern } = ChromeUtils.importESModule("resource://gre/modules/MatchPattern.sys.mjs");
-var { MatchGlob } = ChromeUtils.importESModule("resource://gre/modules/MatchGlob.sys.mjs");
 var { cal } = ChromeUtils.importESModule("resource:///modules/calendar/calUtils.sys.mjs");
+
+function urlMatches(calendarUri, urlPattern) {
+  const spec = calendarUri && calendarUri.spec ? calendarUri.spec : String(calendarUri);
+  if (!urlPattern || typeof urlPattern !== "string") return true;
+  if (urlPattern.indexOf("*") < 0) return spec === urlPattern;
+  const re = new RegExp("^" + urlPattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\\\*/g, ".*") + "$");
+  return re.test(spec);
+}
+
+function nameMatches(calendarName, namePattern) {
+  if (!namePattern || typeof namePattern !== "string") return true;
+  const name = String(calendarName || "");
+  if (namePattern.indexOf("*") < 0) return name === namePattern;
+  const re = new RegExp("^" + namePattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\\\*/g, ".*") + "$");
+  return re.test(name);
+}
+
+function isOwnCalendar(calendar, extension) {
+  return calendar.superCalendar.type == "ext-" + extension.id;
+}
+function unwrapCalendar(calendar) {
+  let unwrapped = calendar.wrappedJSObject;
+  if (unwrapped.mUncachedCalendar) unwrapped = unwrapped.mUncachedCalendar.wrappedJSObject;
+  return unwrapped;
+}
+function getResolvedCalendarById(extension, id) {
+  let calendar;
+  if (id.endsWith("#cache")) {
+    const cached = cal.manager.getCalendarById(id.substring(0, id.length - 6));
+    calendar = cached && isOwnCalendar(cached, extension) && cached.wrappedJSObject.mCachedCalendar;
+  } else {
+    calendar = cal.manager.getCalendarById(id);
+  }
+  if (!calendar) throw new ExtensionError("Invalid calendar: " + id);
+  return calendar;
+}
+function convertCalendar(extension, calendar) {
+  if (!calendar) return null;
+  const props = {
+    id: calendar.id,
+    type: calendar.type,
+    name: calendar.name,
+    url: calendar.uri.spec,
+    readOnly: calendar.readOnly,
+    visible: !!calendar.getProperty("calendar-main-in-composite"),
+    showReminders: !calendar.getProperty("suppressAlarms"),
+    enabled: !calendar.getProperty("disabled"),
+    color: calendar.getProperty("color") || "#A8C2E1",
+  };
+  if (isOwnCalendar(calendar, extension)) {
+    props.cacheId = calendar.superCalendar.id + "#cache";
+    props.capabilities = unwrapCalendar(calendar.superCalendar).capabilities;
+  }
+  return props;
+}
 
 this.calendar_calendars = class extends ExtensionAPI {
   getAPI(context) {
-    const uuid = context.extension.uuid;
-    const root = `experiments-calendar-${uuid}`;
-    const query = context.extension.manifest.version;
-    const {
-      unwrapCalendar,
-      getResolvedCalendarById,
-      isOwnCalendar,
-      convertCalendar,
-    } = ChromeUtils.importESModule(
-      `resource://${root}/experiments/calendar/ext-calendar-utils.sys.mjs?${query}`
-    );
-
     return {
       calendar: {
         calendars: {
           async query({ type, url, name, color, readOnly, enabled, visible }) {
             const calendars = cal.manager.getCalendars();
-            let pattern = null;
-            if (url) {
-              try {
-                pattern = new MatchPattern(url, { restrictSchemes: false });
-              } catch {
-                throw new ExtensionError(`Invalid url pattern: ${url}`);
-              }
-            }
             return calendars
               .filter(calendar => {
                 let matches = true;
                 if (type && calendar.type != type) matches = false;
-                if (url && !pattern.matches(calendar.uri)) matches = false;
-                if (name && !new MatchGlob(name).matches(calendar.name)) matches = false;
+                if (url && !urlMatches(calendar.uri, url)) matches = false;
+                if (name && !nameMatches(calendar.name, name)) matches = false;
                 if (color && color != calendar.getProperty("color")) matches = false;
                 if (enabled != null && calendar.getProperty("disabled") == enabled) matches = false;
                 if (visible != null && calendar.getProperty("calendar-main-in-composite") != visible) matches = false;
@@ -151,7 +185,7 @@ this.calendar_calendars = class extends ExtensionAPI {
                   }
                 },
               };
-              offlineStorage.QueryInterface(Ci.calICalendarProvider).deleteCalendar(offlineStorage, listener);
+              offlineStorage.QueryInterface(compIfaces.calICalendarProvider).deleteCalendar(offlineStorage, listener);
             });
             calendar.wrappedJSObject.mObservers.notify("onLoad", [calendar]);
           },
@@ -197,7 +231,7 @@ this.calendar_calendars = class extends ExtensionAPI {
             context,
             name: "calendar.calendars.onUpdated",
             register: fire => {
-              const observer = cal.createAdapter(Ci.calIObserver, {
+              const observer = cal.createAdapter(compIfaces.calIObserver, {
                 onPropertyChanged(calendar, name, value) {
                   const converted = convertCalendar(context.extension, calendar);
                   switch (name) {

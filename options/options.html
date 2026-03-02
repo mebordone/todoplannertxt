@@ -62,6 +62,14 @@
       <div class="checkbox">
         <label><input type="checkbox" id="calendar-sync-auto" checked> <span data-i18n="options_calendar_sync_auto">Automatic sync when todo.txt changes</span></label>
       </div>
+      <div class="row" style="margin-top: 0.5rem;">
+        <button type="button" id="calendar-sync-now" data-i18n="options_calendar_sync_now">Sync now (reload calendar)</button>
+        <span id="calendar-sync-status" class="hint" style="margin-left: 0.5rem;"></span>
+      </div>
+      <div class="row" style="margin-top: 0.35rem; align-items: center;">
+        <button type="button" id="calendar-copy-log" data-i18n="options_calendar_copy_log">Copy last sync log</button>
+        <span class="hint" style="margin-left: 0.5rem;" data-i18n="options_calendar_copy_log_hint">Paste in chat for debugging.</span>
+      </div>
     </div>
     <p id="calendar-unavailable" class="hint" style="display:none;" data-i18n="options_calendar_unavailable">Calendar API is not available. You can export tasks with due dates to an ICS file and import them manually in Thunderbird.</p>
     <div id="calendar-export-row" class="row" style="display:none; margin-top: 0.5rem;">

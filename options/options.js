@@ -110,11 +110,93 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("use-thunderbird").addEventListener("change", (e) => savePrefs({ useThunderbird: e.target.checked }));
   document.getElementById("use-creation").addEventListener("change", (e) => savePrefs({ useCreation: e.target.checked }));
   document.getElementById("show-full-title").addEventListener("change", (e) => savePrefs({ showFullTitle: e.target.checked }));
-  document.getElementById("calendar-enabled").addEventListener("change", (e) => savePrefs({ calendarIntegrationEnabled: e.target.checked }));
+  document.getElementById("calendar-enabled").addEventListener("change", async (e) => {
+    await savePrefs({ calendarIntegrationEnabled: e.target.checked });
+    await loadPrefs();
+  });
   document.getElementById("calendar-sync-auto").addEventListener("change", (e) => savePrefs({ calendarSyncAuto: e.target.checked }));
   const calSelect = document.getElementById("calendar-select");
   if (calSelect) {
     calSelect.addEventListener("change", () => savePrefs({ calendarId: calSelect.value || null }));
+  }
+  const syncNowBtn = document.getElementById("calendar-sync-now");
+  const syncStatusEl = document.getElementById("calendar-sync-status");
+  if (syncNowBtn && syncStatusEl) {
+    syncNowBtn.addEventListener("click", async () => {
+      syncStatusEl.textContent = "";
+      syncNowBtn.disabled = true;
+      try {
+        const res = await api.runtime.sendMessage({ command: "syncCalendarNow" });
+        if (res && res.ok) {
+          const n = res.syncedCount || 0;
+          const total = res.withDueCount || 0;
+          if (total === 0) {
+            syncStatusEl.textContent = i18n("options_calendar_sync_no_due") || "No tasks with due date in todo.txt.";
+          } else {
+            syncStatusEl.textContent = (i18n("options_calendar_sync_done") || "Synced %d task(s).").replace("%d", String(n));
+          }
+          syncStatusEl.style.color = "";
+        } else {
+          syncStatusEl.textContent = (res && res.error) || "Sync failed.";
+          syncStatusEl.style.color = "#c00";
+        }
+      } catch (e) {
+        syncStatusEl.textContent = (e && e.message) || "Error";
+        syncStatusEl.style.color = "#c00";
+      }
+      syncNowBtn.disabled = false;
+    });
+  }
+  const copyLogBtn = document.getElementById("calendar-copy-log");
+  if (copyLogBtn) {
+    copyLogBtn.addEventListener("click", async () => {
+      try {
+        const log = await api.runtime.sendMessage({ command: "getLastCalendarSyncLog" });
+        const lines = [
+          "[Todo.txt calendar sync log]",
+          "at: " + (log && log.at ? log.at : "never"),
+          "Note: Tasks (VTODO) may appear in Calendar → Task view / To-do list, not only in the day grid.",
+        ];
+        if (log) {
+          lines.push("ok: " + !!log.ok);
+          if (log.error) lines.push("error: " + log.error);
+          if (typeof log.withDueCount === "number") lines.push("withDueCount: " + log.withDueCount);
+          if (typeof log.syncedCount === "number") lines.push("syncedCount: " + log.syncedCount);
+          if (log.calendarId) lines.push("calendarId: " + log.calendarId);
+          if (log.sample) lines.push("sample: title=\"" + (log.sample.title || "") + "\" dueDate=" + (log.sample.dueDate || ""));
+          if (log.errors && log.errors.length) log.errors.forEach((e, i) => lines.push("error[" + i + "]: " + (e.message || e.id || JSON.stringify(e))));
+        } else {
+          lines.push("(no sync run yet)");
+        }
+        if (log && log.debugPushedKeys) {
+          lines.push("--- debug: keys we consider 'pushed' (sample) ---");
+          lines.push("size=" + (log.debugPushedKeys.size || 0));
+          (log.debugPushedKeys.keys || []).forEach(function (k, i) {
+            lines.push("  [" + i + "] " + (k || "").slice(0, 70));
+          });
+        }
+        if (log && log.pullLog && log.pullLog.length) {
+          lines.push("--- calendar→todo (last " + log.pullLog.length + ") ---");
+          log.pullLog.forEach(function (e) {
+            var line = e.at + " " + e.event + " id=" + (e.plainId || "") + " " + e.action;
+            if (e.debug) {
+              line += " key=" + (e.debug.key || "").slice(0, 50);
+              if (e.debug.inPushedSet !== undefined) line += " inPushedSet=" + e.debug.inPushedSet;
+              if (e.debug.pushedSetSize !== undefined) line += " pushedSetSize=" + e.debug.pushedSetSize;
+              if (e.debug.reason) line += " reason=" + e.debug.reason;
+              if (e.debug.todoCount !== undefined) line += " todoCount=" + e.debug.todoCount;
+            }
+            lines.push(line);
+          });
+        }
+        const text = lines.join("\n");
+        await navigator.clipboard.writeText(text);
+        copyLogBtn.textContent = (typeof i18n("options_calendar_copied") !== "undefined" ? i18n("options_calendar_copied") : "Copied.");
+        setTimeout(() => { copyLogBtn.textContent = i18n("options_calendar_copy_log") || "Copy last sync log"; }, 1500);
+      } catch (e) {
+        if (copyLogBtn.nextElementSibling) copyLogBtn.nextElementSibling.textContent = "Copy failed: " + (e && e.message);
+      }
+    });
   }
   const exportIcsBtn = document.getElementById("calendar-export-ics");
   if (exportIcsBtn) {

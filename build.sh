@@ -65,6 +65,7 @@ fi
 zip -qr "$DIST_DIR/$FILE" \
   manifest.json \
   background.js \
+  background/ \
   options/ \
   popup/ \
   tab/ \

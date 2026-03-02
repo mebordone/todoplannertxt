@@ -19,6 +19,33 @@
   let syncFromCalendarInProgress = false;
   let syncToCalendarInProgress = false;
   let calendarChangeUnregister = null;
+  let lastPushedIds = null;
+  let lastPushedTitleDue = null;
+  const PUSHED_IDS_CLEAR_MS = 20000;
+
+  function normalizeTitleForKey(t) {
+    if (!t || typeof t !== "string") return "";
+    return t.trim().replace(/\s+\+\S+(\s+\+\S+)*$/, "").trim();
+  }
+  function keyTitleDue(plain) {
+    return normalizeTitleForKey(plain.title) + "\n" + (plain.dueDate || "");
+  }
+  const lastPullLog = [];
+  const PULL_LOG_MAX = 30;
+  let lastCreatedDebug = null;
+
+  function appendPullLog(event, plainId, action, debugExtra) {
+    lastPullLog.push({ at: new Date().toISOString(), event, plainId: (plainId || "").slice(0, 36), action, debug: debugExtra || null });
+    if (lastPullLog.length > PULL_LOG_MAX) lastPullLog.shift();
+  }
+
+  function getLastPullLog() {
+    return lastPullLog.slice();
+  }
+  function getLastPushedTitleDueSample() {
+    if (!lastPushedTitleDue || lastPushedTitleDue.size === 0) return null;
+    return { size: lastPushedTitleDue.size, keys: Array.from(lastPushedTitleDue).slice(0, 5) };
+  }
 
   async function getCalendarSettings() {
     const raw = await api.storage.local.get([
@@ -53,23 +80,64 @@
     }
   }
 
-  async function handleCalendarCreatedOrUpdated(event, payload) {
-    const icalStr = self.calendarAdapter.getVtodoIcalFromCalendarItem(payload);
-    if (!icalStr) return;
-    const plain = self.calendarAdapter.vtodoIcalToTodoPlain(icalStr);
-    if (!plain.dueDate) return;
+  const lastAddedFromCalendar = new Set();
+  const LAST_ADDED_CLEAR_MS = 8000;
+
+  async function handleCalendarCreated(plain) {
+    const key = keyTitleDue(plain);
+    if (lastAddedFromCalendar.has(key)) {
+      appendPullLog("created", plain.id, "skipped_recently_added");
+      return;
+    }
+    const items = await (typeof self.getCalendarItems === "function" ? self.getCalendarItems() : Promise.resolve([]));
+    const alreadyInTodo = Array.isArray(items) && items.some(function (it) {
+      return it && (normalizeTitleForKey(it.title) + "\n" + (it.dueDate || "")) === key;
+    });
+    if (alreadyInTodo) {
+      appendPullLog("created", plain.id, "skipped_already_in_todo");
+      return;
+    }
     syncFromCalendarInProgress = true;
     try {
-      if (event === "created" && self.addCalendarItem) {
+      if (self.addCalendarItem) {
         await self.addCalendarItem(plain);
-      } else if (event === "updated" && self.modifyCalendarItem) {
+        lastAddedFromCalendar.add(key);
+        setTimeout(function () { lastAddedFromCalendar.delete(key); }, LAST_ADDED_CLEAR_MS);
+        appendPullLog("created", plain.id, "added");
+      }
+    } catch (e) {
+      log("error", "applyCalendarChangeToTodo created: " + (e && e.message));
+    } finally {
+      syncFromCalendarInProgress = false;
+    }
+  }
+
+  async function handleCalendarUpdated(plain) {
+    syncFromCalendarInProgress = true;
+    try {
+      if (self.modifyCalendarItem) {
         const existing = { id: plain.id, title: plain.title, dueDate: plain.dueDate, isCompleted: plain.isCompleted, categories: plain.categories || [] };
         await self.modifyCalendarItem(existing, plain);
+        appendPullLog("updated", plain.id, "updated");
       }
     } catch (e) {
       log("error", "applyCalendarChangeToTodo: " + (e && e.message));
     } finally {
       syncFromCalendarInProgress = false;
+    }
+  }
+
+  async function handleCalendarCreatedOrUpdated(event, payload) {
+    const icalStr = self.calendarAdapter.getVtodoIcalFromCalendarItem(payload);
+    if (!icalStr) return;
+    const plain = self.calendarAdapter.vtodoIcalToTodoPlain(icalStr);
+    if (!plain.dueDate) return;
+    if (event === "created") {
+      await handleCalendarCreated(plain);
+      return;
+    }
+    if (event === "updated") {
+      await handleCalendarUpdated(plain);
     }
   }
 
@@ -85,19 +153,42 @@
     await handleCalendarCreatedOrUpdated(event, payload);
   }
 
+  function canPushToCalendar(settings) {
+    return settings.enabled && settings.calendarId && self.calendarAdapter && self.calendarAdapter.populateCalendarFromTodoTxt;
+  }
+
+  function setPushedSets(withDue) {
+    lastPushedIds = new Set(withDue.map(function (it) { return it.id; }));
+    lastPushedTitleDue = new Set(withDue.map(function (it) { return normalizeTitleForKey(it.title) + "\n" + (it.dueDate || ""); }));
+    setTimeout(function () { lastPushedIds = null; }, PUSHED_IDS_CLEAR_MS);
+  }
+
+  async function doPushToCalendar(settings) {
+    const items = await (typeof self.getCalendarItems === "function" ? self.getCalendarItems() : Promise.resolve([]));
+    const withDue = (items || []).filter(function (it) { return it && it.dueDate; });
+    setPushedSets(withDue);
+    const result = await self.calendarAdapter.populateCalendarFromTodoTxt(settings.calendarId);
+    if (result && typeof result.syncedCount === "number" && typeof console !== "undefined" && console.info) {
+      console.info("[Todo.txt] Calendar sync done: " + result.syncedCount + "/" + (result.withDueCount || 0) + " synced → calendarId=" + settings.calendarId);
+    }
+    if (result) result.calendarId = settings.calendarId;
+    return result || null;
+  }
+
   /**
    * Push todo.txt changes to the calendar (only items with due).
+   * @returns {{ withDueCount: number, syncedCount: number, errors: Array }|null} Result or null if skipped.
    */
   async function pushTodoToCalendar() {
-    if (syncToCalendarInProgress) return;
+    if (syncToCalendarInProgress) return null;
     const settings = await getCalendarSettings();
-    if (!settings.enabled || !settings.calendarId) return;
-    if (!self.calendarAdapter || !self.calendarAdapter.populateCalendarFromTodoTxt) return;
+    if (!canPushToCalendar(settings)) return null;
     syncToCalendarInProgress = true;
     try {
-      await self.calendarAdapter.populateCalendarFromTodoTxt(settings.calendarId);
+      return await doPushToCalendar(settings);
     } catch (e) {
       log("error", "pushTodoToCalendar: " + (e && e.message));
+      return { withDueCount: 0, syncedCount: 0, errors: [{ message: (e && e.message) || String(e) }] };
     } finally {
       syncToCalendarInProgress = false;
     }
@@ -126,6 +217,8 @@
     onTodoTxtFileChanged,
     pushTodoToCalendar,
     getCalendarSettings,
+    getLastPullLog,
+    getLastPushedTitleDueSample,
   };
 
   if (typeof self !== "undefined") self.syncService = syncService;

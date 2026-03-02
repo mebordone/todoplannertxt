@@ -90,32 +90,53 @@
     const ical = todoPlainToVtodoIcal(plain);
     const meta = { todoLineId: plain.id };
     const existing = await api.items.query({ calendarId, id: plain.id }).catch(() => []);
-    if (existing && existing.length > 0) {
-      await api.items.update(calendarId, plain.id, { format: "ical", item: ical, metadata: meta });
-    } else {
-      await api.items.create(calendarId, {
-        id: plain.id,
-        type: "task",
-        format: "ical",
-        item: ical,
-        metadata: meta,
-      });
+    const first = Array.isArray(existing) ? existing.find(function (x) { return x && typeof x.id === "string"; }) : null;
+    if (first && first.id) {
+      await api.items.update(calendarId, first.id, { format: "ical", item: ical, metadata: meta });
+      return;
+    }
+    await api.items.create(calendarId, {
+      id: plain.id,
+      type: "task",
+      format: "ical",
+      item: ical,
+      metadata: meta,
+    });
+  }
+
+  function buildPopulateResult(withDue) {
+    const result = { withDueCount: withDue.length, syncedCount: 0, errors: [], sample: null };
+    if (withDue.length > 0) {
+      result.sample = { title: (withDue[0].title || "").slice(0, 50), dueDate: withDue[0].dueDate || null };
+    }
+    return result;
+  }
+
+  async function runPopulateLoop(api, calendarId, withDue, result) {
+    for (const plain of withDue) {
+      try {
+        await syncOneItemToCalendar(api, calendarId, plain);
+        result.syncedCount++;
+      } catch (e) {
+        const msg = (e && e.message) || String(e);
+        result.errors.push({ id: plain.id, message: msg });
+        if (typeof todotxtLogger !== "undefined") todotxtLogger.debug("calendarAdapter", "populate item error: " + msg);
+      }
     }
   }
 
   async function populateCalendarFromTodoTxt(calendarId) {
     const api = getCalendarApi();
-    if (!api || !calendarId) return;
-    if (typeof self.getCalendarItems !== "function") return;
+    if (!api || !calendarId) return { withDueCount: 0, syncedCount: 0, errors: [] };
+    if (typeof self.getCalendarItems !== "function") return { withDueCount: 0, syncedCount: 0, errors: [] };
     const items = await self.getCalendarItems();
     const withDue = (items || []).filter(it => it.dueDate);
-    for (const plain of withDue) {
-      try {
-        await syncOneItemToCalendar(api, calendarId, plain);
-      } catch (e) {
-        if (typeof todotxtLogger !== "undefined") todotxtLogger.debug("calendarAdapter", "populate item error: " + (e && e.message));
-      }
+    const result = buildPopulateResult(withDue);
+    if (typeof console !== "undefined" && console.info) {
+      console.info("[Todo.txt] Calendar sync: " + withDue.length + " task(s) with due date → calendar " + calendarId);
     }
+    await runPopulateLoop(api, calendarId, withDue, result);
+    return result;
   }
 
   let calendarChangeListeners = [];
@@ -127,7 +148,9 @@
    */
   function onCalendarChange(callback) {
     const api = getCalendarApi();
-    if (!api) return;
+    if (!api || !api.items) return;
+    const events = api.items;
+    if (typeof events.onCreated?.addListener !== "function" || typeof events.onUpdated?.addListener !== "function" || typeof events.onRemoved?.addListener !== "function") return;
     const opts = { returnFormat: "ical" };
     const fire = (event, payload) => {
       if (debounceTimer) clearTimeout(debounceTimer);
@@ -140,9 +163,9 @@
         }
       }, DEBOUNCE_MS);
     };
-    api.items.onCreated.addListener((item) => fire("created", item), opts);
-    api.items.onUpdated.addListener((item) => fire("updated", item), opts);
-    api.items.onRemoved.addListener((calendarId, id) => fire("removed", { calendarId, id }), opts);
+    events.onCreated.addListener((item) => fire("created", item), opts);
+    events.onUpdated.addListener((item) => fire("updated", item), opts);
+    events.onRemoved.addListener((calendarId, id) => fire("removed", { calendarId, id }));
     calendarChangeListeners.push({ callback, fire });
   }
 
