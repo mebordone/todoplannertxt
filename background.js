@@ -12,7 +12,10 @@ const DEFAULT_PREFS = {
   doneFileName: "done.txt",
   useThunderbird: true,
   useCreation: true,
-  showFullTitle: false
+  showFullTitle: false,
+  calendarIntegrationEnabled: false,
+  calendarId: null,
+  calendarSyncAuto: true
 };
 
 let lastMD5 = null;
@@ -36,6 +39,9 @@ async function runPolling() {
     const hash = await fileUtil.calculateMD5(self.fsaApi, prefs);
     if (lastMD5 !== null && hash !== lastMD5) {
       await api.storage.local.set({ lastFileChange: Date.now() });
+      if (self.syncService && typeof self.syncService.onTodoTxtFileChanged === "function") {
+        self.syncService.onTodoTxtFileChanged();
+      }
     }
     lastMD5 = hash;
   } catch (e) {
@@ -132,6 +138,49 @@ async function handlePickFile(type) {
   return pickResultToPrefs(result, type);
 }
 
+async function handleListCalendars() {
+  if (!self.calendarAdapter || !self.calendarAdapter.isCalendarApiAvailable()) {
+    return { calendars: [], apiAvailable: false };
+  }
+  const calendars = await self.calendarAdapter.listCalendars();
+  return { calendars: calendars || [], apiAvailable: true };
+}
+
+async function handleExportTodoToIcs() {
+  if (!self.calendarAdapter || !self.calendarAdapter.exportTodoToIcsAsync) {
+    return { error: "Export not available" };
+  }
+  try {
+    const ics = await self.calendarAdapter.exportTodoToIcsAsync();
+    return { ics: ics || "" };
+  } catch (e) {
+    return { error: (e && e.message) || String(e) };
+  }
+}
+
+async function ensureCalendarIdInPrefs(prefs) {
+  const needCalendar = prefs.calendarIntegrationEnabled && !prefs.calendarId;
+  const apiOk = self.calendarAdapter && self.calendarAdapter.isCalendarApiAvailable();
+  if (!needCalendar || !apiOk) return prefs;
+  try {
+    const calendarId = await self.calendarAdapter.ensureTodoTxtCalendar();
+    if (calendarId) prefs.calendarId = calendarId;
+  } catch (e) {
+    if (todotxtLogger) todotxtLogger.debug("background", "ensureTodoTxtCalendar: " + (e && e.message));
+  }
+  return prefs;
+}
+
+async function handleSavePrefs(msg) {
+  let prefs = msg.prefs || {};
+  prefs = await ensureCalendarIdInPrefs(prefs);
+  await api.storage.local.set(prefs);
+  if (self.syncService && prefs.calendarIntegrationEnabled && self.calendarAdapter && self.calendarAdapter.isCalendarApiAvailable()) {
+    self.syncService.start();
+  }
+  return { ok: true };
+}
+
 const messageHandlers = {
   getItems: (msg) => handleGetItems(msg.refresh, msg.pendingOnly),
   addItem: (msg) => handleAddItem(msg.item),
@@ -140,10 +189,9 @@ const messageHandlers = {
   getPrefs: () => handleGetPrefs(),
   pickTodoFile: () => handlePickFile("todo"),
   pickDoneFile: () => handlePickFile("done"),
-  savePrefs: async (msg) => {
-    await api.storage.local.set(msg.prefs || {});
-    return { ok: true };
-  }
+  listCalendars: () => handleListCalendars(),
+  exportTodoToIcs: () => handleExportTodoToIcs(),
+  savePrefs: (msg) => handleSavePrefs(msg),
 };
 
 api.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -173,6 +221,14 @@ api.runtime.onInstalled?.addListener(() => {
 });
 
 startPolling();
+
+if (self.calendarAdapter && self.calendarAdapter.isCalendarApiAvailable() && self.syncService) {
+  getPrefs().then((prefs) => {
+    if (prefs.calendarIntegrationEnabled) {
+      self.syncService.start();
+    }
+  });
+}
 
 // Expose for experiment (addon_parent) when it needs to fetch items / modify items
 self.getCalendarItems = async () => {
