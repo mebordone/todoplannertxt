@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title data-i18n="options_title">Todo.txt – Options</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 1.5rem; max-width: 40rem; }
+    h1 { font-size: 1.25rem; margin-bottom: 1rem; }
+    .group { margin-bottom: 1.25rem; }
+    .group label { display: block; font-weight: 600; margin-bottom: 0.25rem; }
+    .row { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.25rem; }
+    input[type="text"] { flex: 1; padding: 0.35rem 0.5rem; }
+    button { padding: 0.35rem 0.75rem; }
+    .checkbox { margin: 0.5rem 0; }
+    .checkbox input { margin-right: 0.5rem; }
+    .error { color: #c00; font-size: 0.9rem; margin-top: 0.5rem; }
+    .hint { font-size: 0.85rem; color: #666; margin-top: 0.25rem; }
+  </style>
+</head>
+<body>
+  <h1 data-i18n="options_heading">Todo.txt – Preferences</h1>
+
+  <div class="group">
+    <label data-i18n="options_todoFile_label">Location of Todo.txt</label>
+    <div class="row">
+      <input type="text" id="todo-path" readonly placeholder="Select file…">
+      <button type="button" id="browse-todo" data-i18n="options_browse">Browse</button>
+    </div>
+  </div>
+
+  <div class="group">
+    <label data-i18n="options_doneFile_label">Location of Done.txt</label>
+    <div class="row">
+      <input type="text" id="done-path" readonly placeholder="Select file…">
+      <button type="button" id="browse-done" data-i18n="options_browse">Browse</button>
+    </div>
+  </div>
+
+  <div class="group">
+    <span class="label" data-i18n="options_behavior">Behavior</span>
+    <div class="checkbox">
+      <label><input type="checkbox" id="use-thunderbird" checked> <span data-i18n="options_useThunderbird">Use Thunderbird's functionality</span></label>
+    </div>
+    <div class="checkbox">
+      <label><input type="checkbox" id="use-creation" checked> <span data-i18n="options_useCreation">Use the Todo's creation timestamp</span></label>
+    </div>
+    <div class="checkbox">
+      <label><input type="checkbox" id="show-full-title"> <span data-i18n="options_showFullTitle">Show Projects and Contexts in the title</span></label>
+    </div>
+  </div>
+
+  <p id="error" class="error" style="display:none;"></p>
+  <p class="hint" data-i18n="options_fsa_hint">To choose todo.txt and done.txt files, the File Access Manager add-on must be installed.</p>
+
+  <script src="options.js"></script>
+</body>
+</html>

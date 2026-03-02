@@ -1,0 +1,20 @@
+{
+  "extensionName": { "message": "Todo.txt" },
+  "extensionDescription": { "message": "Todo.txt MailExtension (v3). Nicht abwärtskompatibel mit v2 (Legacy).\n\nKein zusätzliches Add-on nötig: Der Zugriff auf lokale todo.txt- und done.txt-Dateien ist integriert. Nach der Installation über addons.thunderbird.net: Todo.txt → Einstellungen öffnen und mit Durchsuchen die Dateien auswählen.\n\nGrundlegende Nutzung: Auf das Todo.txt-Symbol klicken; Aufgaben anzeigen, hinzufügen, erledigen und bearbeiten. Einstellungen für Dateipfade und Optionen anpassen.\n\nKalenderintegration: Die Erweiterung enthält ein Experiment, das einen „Todo.txt“-Kalender registrieren kann, aber moderne Thunderbird-140-ESR-Builds (z.B. Linux Mint 140.7.2esr mint-001) stellen den von der ursprünglichen Erweiterung verwendeten Legacy-Kalender-Provider nicht mehr bereit. Daher werden Todo.txt-Einträge in der Kalenderansicht möglicherweise nicht angezeigt; die unterstützte und getestete Oberfläche ist das Popup plus Dateisynchronisation. Siehe ROADMAP.md für zukünftige Pläne zur erneuten Einführung der Kalenderintegration mit unterstützten MailExtension-APIs." },
+  "options_title": { "message": "Todo.txt – Einstellungen" },
+  "options_heading": { "message": "Todo.txt – Einstellungen" },
+  "options_todoFile_label": { "message": "Speicherort von Todo.txt" },
+  "options_doneFile_label": { "message": "Speicherort von Done.txt" },
+  "options_browse": { "message": "Durchsuchen" },
+  "options_behavior": { "message": "Verhalten" },
+  "options_useThunderbird": { "message": "Thunderbird-Funktionalität nutzen" },
+  "options_useCreation": { "message": "Erstellungszeitstempel der Todo nutzen" },
+  "options_showFullTitle": { "message": "Projekte und Kontexte im Titel anzeigen" },
+  "options_fsa_hint": { "message": "Mit Durchsuchen todo.txt und done.txt auswählen. Kein zusätzliches Add-on nötig." },
+  "error_fileNotFound": { "message": "Datei kann nicht gelesen werden:" },
+  "error_fileCannotWrite": { "message": "Kann nicht in Datei schreiben:" },
+  "error_filesNotSpecified": { "message": "Bitte legen Sie den Speicherort der Dateien todo.txt und done.txt in den Einstellungen fest." },
+  "error_itemNotFound": { "message": "Todo-Aufgabe konnte in todo.txt nicht gefunden werden" },
+  "error_eventEncountered": { "message": "Dieser Kalender wird für Todo.txt verwendet und akzeptiert nur Aufgaben, nicht Ereignisse!" },
+  "error_unknown": { "message": "Ein unbekannter Fehler ist aufgetreten" }
+}

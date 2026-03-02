@@ -1,0 +1,45 @@
+# Builds
+dist/
+*.xpi
+
+# Dependencies
+node_modules/
+
+# Tests y cobertura
+coverage/
+test/coverage/
+*.lcov
+
+# Logs y depuración
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Backups (build.sh usa .bak temporal)
+*.bak
+*.backup
+*~
+
+# Entorno y secretos
+.env
+.env.local
+.env.*.local
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs y editores
+.idea/
+*.swp
+*.swo
+.vscode/settings.json
+.cursor/
+
+# Temporales
+tmp/
+temp/
+*.tmp
+*.temp

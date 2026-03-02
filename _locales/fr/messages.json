@@ -1,0 +1,20 @@
+{
+  "extensionName": { "message": "Todo.txt" },
+  "extensionDescription": { "message": "Todo.txt MailExtension (v3). Non rétrocompatible avec la v2 (legacy).\n\nInstallation : 1) Installer d’abord l’add-on File Access Manager (addons.thunderbird.net). 2) Installer cette extension. 3) Ouvrir Todo.txt → Options et utiliser Parcourir pour sélectionner vos fichiers todo.txt et done.txt.\n\nUtilisation : Cliquer sur l’icône Todo.txt dans la barre d’outils pour ouvrir la fenêtre ; afficher, ajouter, terminer et modifier les tâches. Utiliser Options pour modifier les chemins et préférences." },
+  "options_title": { "message": "Todo.txt – Options" },
+  "options_heading": { "message": "Todo.txt – Préférences" },
+  "options_todoFile_label": { "message": "Emplacement du fichier Todo.txt" },
+  "options_doneFile_label": { "message": "Emplacement du fichier Done.txt" },
+  "options_browse": { "message": "Parcourir" },
+  "options_behavior": { "message": "Comportement" },
+  "options_useThunderbird": { "message": "Afficher les tâches dans le calendrier de Thunderbird" },
+  "options_useCreation": { "message": "Ajouter la date de création aux tâches" },
+  "options_showFullTitle": { "message": "Voir Projets et Contextes dans le titre" },
+  "options_fsa_hint": { "message": "Utiliser Parcourir pour sélectionner todo.txt et done.txt. Aucun add-on supplémentaire requis." },
+  "error_fileNotFound": { "message": "Impossible de lire le fichier:" },
+  "error_fileCannotWrite": { "message": "Impossible d'écrire le fichier:" },
+  "error_filesNotSpecified": { "message": "Indiquez l'emplacement des fichiers todo.txt et done.txt dans les options." },
+  "error_itemNotFound": { "message": "La tâche Todo est introuvable dans todo.txt" },
+  "error_eventEncountered": { "message": "Ce calendrier est utilisé pour Todo.txt et n'accepte que les tâches, pas les événements!" },
+  "error_unknown": { "message": "Une erreur inconnue s'est produite" }
+}

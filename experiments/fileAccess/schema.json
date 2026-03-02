@@ -1,0 +1,55 @@
+[
+  {
+    "namespace": "todotxtFileAccess",
+    "description": "Built-in file system access for todo.txt and done.txt",
+    "types": [
+      {
+        "id": "PickerOptions",
+        "type": "object",
+        "properties": {
+          "defaultFileName": { "type": "string", "optional": true },
+          "filters": { "type": "array", "items": { "type": "string" }, "optional": true },
+          "displayPath": { "type": "string", "optional": true }
+        }
+      }
+    ],
+    "functions": [
+      {
+        "name": "readFileWithPicker",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          { "name": "options", "$ref": "PickerOptions", "optional": true }
+        ]
+      },
+      {
+        "name": "writeFileWithPicker",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          { "name": "file", "type": "object", "isInstanceOf": "Blob" },
+          { "name": "options", "$ref": "PickerOptions", "optional": true }
+        ]
+      },
+      {
+        "name": "readFile",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          { "name": "folderPath", "type": "string" },
+          { "name": "fileName", "type": "string" }
+        ]
+      },
+      {
+        "name": "writeFile",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          { "name": "file", "type": "object", "isInstanceOf": "Blob" },
+          { "name": "folderPath", "type": "string" },
+          { "name": "fileName", "type": "string" }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,73 @@
+{
+  "manifest_version": 2,
+  "name": "__MSG_extensionName__",
+  "version": "3.1.0",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "en",
+  "author": "Matias Bordone (based on original by Roy Kokkelkoren)",
+  "developer": {
+    "name": "Matias Bordone",
+    "url": "https://github.com/mebordone/todo_txt_thunderbird"
+  },
+  "applications": {
+    "gecko": {
+      "id": "todo.txt@xseth.nl",
+      "strict_min_version": "140.0"
+    }
+  },
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "background": {
+    "scripts": [
+      "modules/todotxt.js",
+      "modules/exception.js",
+      "modules/logger.js",
+      "modules/util.js",
+      "modules/md5.js",
+      "modules/fileUtil.js",
+      "modules/todoclient.js",
+      "lib/fsa.js",
+      "background.js"
+    ]
+  },
+  "browser_action": {
+    "default_title": "Todo.txt",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/16.png",
+      "32": "icons/32.png",
+      "48": "icons/48.png"
+    }
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": false
+  },
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png"
+  },
+  "experiment_apis": {
+    "calendarTodoTxt": {
+      "schema": "experiments/calendarTodoTxt/schema.json",
+      "parent": {
+        "scopes": ["addon_parent"],
+        "script": "experiments/calendarTodoTxt/implementation.js",
+        "paths": [["calendarTodoTxt"]],
+        "events": ["startup"]
+      }
+    },
+    "todotxtFileAccess": {
+      "schema": "experiments/fileAccess/schema.json",
+      "parent": {
+        "scopes": ["addon_parent"],
+        "script": "experiments/fileAccess/implementation.js",
+        "paths": [["todotxtFileAccess"]],
+        "events": []
+      }
+    }
+  }
+}

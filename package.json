@@ -1,0 +1,19 @@
+{
+  "name": "todotxt-webext",
+  "version": "3.1.0",
+  "description": "Todo.txt Thunderbird MailExtension - tests and quality",
+  "author": "Matias Bordone (based on original by Roy Kokkelkoren)",
+  "private": true,
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "complexity": "node scripts/complexity-report.js",
+    "lint": "eslint modules/ lib/ background.js --max-warnings 0",
+    "ci": "npm run test:coverage && npm run lint && npm run complexity"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "eslint": "^8.57.0"
+  }
+}

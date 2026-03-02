@@ -1,0 +1,20 @@
+[
+  {
+    "namespace": "calendarTodoTxt",
+    "description": "Todo.txt calendar integration with Lightning",
+    "functions": [
+      {
+        "name": "onStartup",
+        "type": "function",
+        "async": false,
+        "description": "Called when the extension starts to register the Todo.txt calendar."
+      }
+    ],
+    "events": [
+      {
+        "name": "startup",
+        "description": "Fired when the add-on is loaded."
+      }
+    ]
+  }
+]
