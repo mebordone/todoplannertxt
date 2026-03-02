@@ -67,6 +67,7 @@ zip -qr "$DIST_DIR/$FILE" \
   background.js \
   options/ \
   popup/ \
+  tab/ \
   modules/ \
   lib/ \
   experiments/ \
