@@ -29,6 +29,7 @@
       "modules/fileUtil.js",
       "modules/todoclient.js",
       "lib/fsa.js",
+      "lib/pendingOnlyFilter.js",
       "background.js"
     ]
   },

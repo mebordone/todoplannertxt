@@ -60,16 +60,24 @@ api.storage.onChanged.addListener((changes, areaName) => {
   api.storage.local.set({ lastPrefsChange: Date.now() }).catch(() => {});
 });
 
-async function handleGetItems(refresh) {
+async function computeForceRefresh(refresh) {
+  const stored = await api.storage.local.get(["lastFileChange", "lastPrefsChange"]);
+  const forceRefresh = !!refresh || !!stored.lastFileChange || !!stored.lastPrefsChange;
+  if (forceRefresh) {
+    await api.storage.local.remove(["lastFileChange", "lastPrefsChange"]);
+  }
+  return forceRefresh;
+}
+
+async function handleGetItems(refresh, pendingOnly) {
   const prefs = await getPrefs();
   if (!hasPathsConfigured(prefs)) throw (self.exception || {}).FILES_NOT_SPECIFIED ? (self.exception).FILES_NOT_SPECIFIED() : new Error("Files not configured");
   if (!self.fsaApi) throw new Error("File access is not available. Please restart Thunderbird and try again.");
-  const forceRefresh = !!refresh;
-  const stored = await api.storage.local.get(["lastFileChange", "lastPrefsChange"]);
-  if (forceRefresh || stored.lastFileChange || stored.lastPrefsChange) {
-    await api.storage.local.remove(["lastFileChange", "lastPrefsChange"]);
+  const forceRefresh = await computeForceRefresh(refresh);
+  let items = await todoclient.getItems(self.fsaApi, prefs, forceRefresh);
+  if (pendingOnly && self.filterPendingOnly) {
+    items = self.filterPendingOnly(items);
   }
-  const items = await todoclient.getItems(self.fsaApi, prefs, forceRefresh || !!stored.lastFileChange || !!stored.lastPrefsChange);
   return { items };
 }
 
@@ -125,7 +133,7 @@ async function handlePickFile(type) {
 }
 
 const messageHandlers = {
-  getItems: (msg) => handleGetItems(msg.refresh),
+  getItems: (msg) => handleGetItems(msg.refresh, msg.pendingOnly),
   addItem: (msg) => handleAddItem(msg.item),
   modifyItem: (msg) => handleModifyItem(msg.oldItem, msg.newItem),
   deleteItem: (msg) => handleDeleteItem(msg.item),
