@@ -41,7 +41,7 @@ async function loadItems() {
   const listEl = document.getElementById("list");
   listEl.innerHTML = "<div class=\"empty\">Loading…</div>";
   showError("");
-  const res = await api.runtime.sendMessage({ command: "getItems", refresh: true });
+  const res = await api.runtime.sendMessage({ command: "getItems", refresh: true, pendingOnly: true });
   if (res && res.error) {
     listEl.innerHTML = "";
     showError(res.error);
@@ -100,6 +100,14 @@ document.getElementById("new-task").addEventListener("keydown", (e) => {
     addTask();
   }
 });
+document.getElementById("open-tab").addEventListener("click", (e) => {
+  e.preventDefault();
+  const url = api.runtime.getURL("tab/tab.html");
+  if (api.tabs && api.tabs.create) {
+    api.tabs.create({ url });
+  }
+});
+
 document.getElementById("open-options").addEventListener("click", (e) => {
   e.preventDefault();
   const url = api.runtime.getURL("options/options.html");
