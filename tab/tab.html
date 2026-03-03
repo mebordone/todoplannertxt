@@ -23,6 +23,11 @@
     .empty { color: #888; padding: 2rem; text-align: center; }
     .error { color: #c00; padding: 12px; font-size: 12px; }
     a { color: #0a84ff; }
+    .toolbar-filters { flex-wrap: wrap; gap: 6px; }
+    .toolbar-filters label { display: inline-flex; align-items: center; gap: 4px; }
+    .filter-label { font-size: 11px; color: #666; white-space: nowrap; }
+    .toolbar-filters select { padding: 4px 6px; font-size: 12px; min-width: 0; }
+    .filter-search { padding: 4px 8px; font-size: 12px; }
   </style>
 </head>
 <body>
@@ -37,11 +42,24 @@
         <span class="toolbar-hint" id="toolbar-hint">Toolbar icon is visible in the Mail tab.</span>
       </div>
     </div>
+    <div class="toolbar toolbar-filters" id="filters-bar">
+      <span class="filter-label" id="label-filters">Filters & view</span>
+      <input type="text" id="search" placeholder="Search…" class="filter-search" style="min-width: 120px;">
+      <label><span class="filter-label" id="label-project">Project</span><select id="filter-project"></select></label>
+      <label><span class="filter-label" id="label-context">Context</span><select id="filter-context"></select></label>
+      <label><span class="filter-label" id="label-priority">Priority</span><select id="filter-priority"></select></label>
+      <label><span class="filter-label" id="label-due">Due</span><select id="filter-due"></select></label>
+      <label><span class="filter-label" id="label-completion">Status</span><select id="filter-completion"></select></label>
+      <label><span class="filter-label" id="label-sort">Sort by</span><select id="sort-by"></select></label>
+      <label><select id="sort-dir"><option value="asc">Asc</option><option value="desc">Desc</option></select></label>
+      <label><span class="filter-label" id="label-group">Group by</span><select id="group-by"></select></label>
+    </div>
     <div id="error" class="error" style="display:none;"></div>
     <div id="list" class="list">
       <div class="empty">Loading…</div>
     </div>
   </div>
+  <script src="filterSort.js"></script>
   <script src="tab.js"></script>
 </body>
 </html>
