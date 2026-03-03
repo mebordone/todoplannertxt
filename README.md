@@ -23,7 +23,8 @@ Extensión de **Thunderbird** para administrar archivos [todo.txt](http://todotx
 
 ## Funcionalidades
 
-- **Opciones**: Rutas para todo.txt y done.txt con el selector de archivos integrado (sin complemento externo). Opciones de comportamiento en Thunderbird, fecha de creación y visualización del título completo.
+- **Configuración inicial**: En la primera ejecución (o si no hay rutas configuradas), en Opciones o en la pestaña de inicio puedes **Elegir carpeta** (donde se crearán o usarán `todo.txt` y `done.txt`) o **Seleccionar todo.txt** (archivo existente; en la misma carpeta se usa o crea `done.txt`). Sin complementos externos.
+- **Opciones**: Rutas para todo.txt y done.txt con el selector de archivos o de carpeta integrado. Opciones de comportamiento en Thunderbird, fecha de creación y visualización del título completo.
 - **Interfaz dual**
   - **Popup (vista rápida):** Clic en el icono de la barra abre un popup con título, solo las tareas pendientes (solo el título de cada tarea) y barra de herramientas con iconos: actualizar (⟳), campo nueva tarea, añadir (+), abrir vista completa (⧉) y opciones (⚙). Doble clic en una tarea para editar; checkbox para completar; botón × para eliminar (si no está en solo lectura).
   - **Vista en pestaña:** El enlace “Tab” abre una página completa con todas las tareas (pendientes y completadas), donde puedes añadir, completar, editar y actualizar. Desde esa pestaña, el botón **Quick view** abre el popup de vista rápida cuando la API lo permite; si no, se muestra un texto recordando que el icono de Todo.txt aparece en la barra al estar en la pestaña Correo.

@@ -22,7 +22,7 @@ This document outlines planned and potential future work for the Todo.txt MailEx
 
 Phases **0a** and **0b** can be done in parallel.
 
-**Implemented so far:** §1 (dual UI: popup + tab), §2 Phase 1 (calendar sync), §3 (read-only mode + error reporting), §4 Phase A (filters, search, sort, group in tab), §8.1 (multi-language EN + ES, display language selector), §8.2 (UX recommendations: empty state, reset filters, task-added feedback, loading state, sort labels, options “Saved”, delete task, in-place edit / dialog, collapsible filters, tooltips, task count, accessibility, first-run). See each section for details.
+**Implemented so far:** §1 (dual UI: popup + tab), §2 Phase 1 (calendar sync), §3 (read-only mode + error reporting), §4 Phase A (filters, search, sort, group in tab), §8.1 (multi-language EN + ES, display language selector), §8.2 (UX recommendations: empty state, reset filters, task-added feedback, loading state, sort labels, options “Saved”, delete task, in-place edit / dialog, collapsible filters, tooltips, task count, accessibility, first-run). **Initial setup:** Folder picker ("Elegir carpeta") and file picker ("Seleccionar todo.txt"); if the chosen folder has no todo.txt/done.txt, they are created automatically; on reinstall, selecting the same folder reuses existing files. See each section for details.
 
 ---
 
@@ -105,7 +105,7 @@ This depends on § 2 (calendar integration) and on the full tab page (§ 1) exis
 
 ### 8.2 UX recommendations (from usability analysis) — **implemented**
 
-**Implemented:** All 12 items: (1) empty state when no tasks match + "Reset filters" button; (2) "Task added" feedback in popup/tab; (3) loading state (Refresh/Add disabled during load); (4) sort direction labels (Asc/Desc) via i18n; (5) options hint consistency + "Saved" feedback; (6) delete button per task in popup/tab with confirm, respect read-only; (7) tab: in-place edit on double-click, popup: custom dialog instead of `prompt()`; (8) collapsible "Filters & view" + Reset filters in bar; (9) tooltips for Tab / Quick view; (10) "Showing X of Y tasks"; (11) ARIA roles, aria-label, aria-live; (12) first-run message + "Open Options" when paths not set.
+**Implemented:** All 12 items: (1) empty state when no tasks match + "Reset filters" button; (2) "Task added" feedback in popup/tab; (3) loading state (Refresh/Add disabled during load); (4) sort direction labels (Asc/Desc) via i18n; (5) options hint consistency + "Saved" feedback; (6) delete button per task in popup/tab with confirm, respect read-only; (7) tab: in-place edit on double-click, popup: custom dialog instead of `prompt()`; (8) collapsible "Filters & view" + Reset filters in bar; (9) tooltips for Tab / Quick view; (10) "Showing X of Y tasks"; (11) ARIA roles, aria-label, aria-live; (12) first-run: "Elegir carpeta" (folder picker; creates or uses todo.txt/done.txt) or "Seleccionar todo.txt" (file picker); "Open Options" link.
 
 Original list (for reference):
 
@@ -120,7 +120,7 @@ Original list (for reference):
 9. **Naming consistency:** Clarify "Tab" vs "Quick view" with tooltips.
 10. **Task count:** Show "Showing X of Y tasks" when filters are active.
 11. **Accessibility:** ARIA roles, keyboard focus, screen-reader announcements.
-12. **First-run:** Friendlier empty state when paths are not set, with "Open Options to choose your todo.txt file".
+12. **First-run:** Friendlier empty state when paths are not set: "Elegir carpeta" (folder picker; creates or uses todo.txt/done.txt in that folder) or "Seleccionar todo.txt" (file picker); "Open Options" link.
 
 ### 8.3 UX inspired by sleek + filter toggles (evaluation and phases)
 
