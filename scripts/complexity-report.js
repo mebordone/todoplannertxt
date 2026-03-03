@@ -8,7 +8,7 @@ const path = require("path");
 const { ESLint } = require("eslint");
 
 const ROOT = path.join(__dirname, "..");
-const GLOB = ["modules/*.js", "lib/*.js", "background.js", "background/*.js", "tab/*.js"];
+const GLOB = ["modules/*.js", "lib/*.js", "background.js", "background/*.js", "tab/*.js", "options/*.js", "popup/*.js"];
 
 async function main() {
   const eslint = new ESLint({
@@ -51,6 +51,9 @@ async function main() {
   });
   const max = Math.max(...entries.map((e) => e.complexity));
   console.log(`\nMáximo: ${max}. Límite: 10.\n`);
+  if (max > 10) {
+    process.exit(1);
+  }
 }
 
 main().catch((err) => {
