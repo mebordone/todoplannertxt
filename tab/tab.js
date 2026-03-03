@@ -204,28 +204,73 @@ function resetFiltersAndRefresh() {
   refreshView();
 }
 
+function getTaskRowClass(item) {
+  const pd = typeof priorityDisplay !== "undefined" ? priorityDisplay : null;
+  let rowClass = "task" + (item.isCompleted ? " completed" : "");
+  if (pd && pd.isOverdue(item.dueDate)) rowClass += " task--overdue";
+  else if (pd && item.priority === 1) rowClass += " task--priority-high";
+  return rowClass;
+}
+
+function createPriorityBadge(item) {
+  const pd = typeof priorityDisplay !== "undefined" ? priorityDisplay : null;
+  if (!pd || !item.priority) return null;
+  const letter = pd.priorityToLetter(item.priority);
+  const cssClass = pd.priorityToCssClass(item.priority);
+  if (!letter || !cssClass) return null;
+  const badge = document.createElement("span");
+  badge.className = "task-priority-badge " + cssClass;
+  badge.textContent = letter;
+  badge.setAttribute("aria-hidden", "true");
+  return badge;
+}
+
+function getTaskMetaParts(item) {
+  const pd = typeof priorityDisplay !== "undefined" ? priorityDisplay : null;
+  const parts = [];
+  if (item.priority) {
+    const letter = pd ? pd.priorityToLetter(item.priority) : "";
+    parts.push(i18n("tab_meta_priority") + " " + (letter || item.priority));
+  }
+  if (item.dueDate) parts.push(i18n("tab_meta_due") + " " + item.dueDate);
+  if (item.categories && item.categories.length) parts.push(item.categories.join(", "));
+  return parts;
+}
+
+function createTaskMeta(item) {
+  const parts = getTaskMetaParts(item);
+  if (parts.length === 0) return null;
+  const meta = document.createElement("div");
+  meta.className = "task-meta";
+  if (item.dueDate) {
+    const dueIcon = document.createElement("span");
+    dueIcon.className = "task-due-icon";
+    dueIcon.setAttribute("aria-hidden", "true");
+    dueIcon.textContent = "\uD83D\uDCC5 ";
+    meta.appendChild(dueIcon);
+  }
+  meta.appendChild(document.createTextNode(parts.join(" · ")));
+  return meta;
+}
+
 function renderTask(item) {
   const div = document.createElement("div");
-  div.className = "task" + (item.isCompleted ? " completed" : "");
+  div.className = getTaskRowClass(item);
   div.setAttribute("role", "listitem");
   div.dataset.id = item.id;
   const cb = document.createElement("input");
   cb.type = "checkbox";
   cb.checked = !!item.isCompleted;
   cb.addEventListener("change", () => toggleTask(item));
+  div.appendChild(cb);
+  const badge = createPriorityBadge(item);
+  if (badge) div.appendChild(badge);
   const title = document.createElement("span");
   title.className = "task-title";
   title.textContent = item.title || "";
-  const meta = document.createElement("div");
-  meta.className = "task-meta";
-  const parts = [];
-  if (item.priority) parts.push(i18n("tab_meta_priority") + " " + item.priority);
-  if (item.dueDate) parts.push(i18n("tab_meta_due") + " " + item.dueDate);
-  if (item.categories && item.categories.length) parts.push(item.categories.join(", "));
-  meta.textContent = parts.join(" · ");
-  div.appendChild(cb);
   div.appendChild(title);
-  if (parts.length) div.appendChild(meta);
+  const meta = createTaskMeta(item);
+  if (meta) div.appendChild(meta);
   if (!readOnlyMode) {
     const delBtn = document.createElement("button");
     delBtn.type = "button";

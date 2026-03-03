@@ -42,20 +42,54 @@ function showError(msg, showOptionsLink) {
   el.style.display = msg ? "block" : "none";
 }
 
+function getTaskRowClass(item) {
+  const pd = typeof priorityDisplay !== "undefined" ? priorityDisplay : null;
+  let rowClass = "task" + (item.isCompleted ? " completed" : "");
+  if (pd && pd.isOverdue(item.dueDate)) rowClass += " task--overdue";
+  else if (pd && item.priority === 1) rowClass += " task--priority-high";
+  return rowClass;
+}
+
+function createPriorityBadge(item) {
+  const pd = typeof priorityDisplay !== "undefined" ? priorityDisplay : null;
+  if (!pd || !item.priority) return null;
+  const letter = pd.priorityToLetter(item.priority);
+  const cssClass = pd.priorityToCssClass(item.priority);
+  if (!letter || !cssClass) return null;
+  const badge = document.createElement("span");
+  badge.className = "task-priority-badge " + cssClass;
+  badge.textContent = letter;
+  badge.setAttribute("aria-hidden", "true");
+  return badge;
+}
+
+function createDueSpan(item) {
+  if (!item.dueDate) return null;
+  const dueSpan = document.createElement("span");
+  dueSpan.className = "task-due";
+  dueSpan.setAttribute("aria-hidden", "true");
+  dueSpan.textContent = "\uD83D\uDCC5 " + String(item.dueDate).slice(0, 10);
+  return dueSpan;
+}
+
 function renderTask(item) {
   const div = document.createElement("div");
-  div.className = "task" + (item.isCompleted ? " completed" : "");
+  div.className = getTaskRowClass(item);
   div.setAttribute("role", "listitem");
   div.dataset.id = item.id;
   const cb = document.createElement("input");
   cb.type = "checkbox";
   cb.checked = !!item.isCompleted;
   cb.addEventListener("change", () => toggleTask(item));
+  div.appendChild(cb);
+  const badge = createPriorityBadge(item);
+  if (badge) div.appendChild(badge);
   const title = document.createElement("span");
   title.className = "task-title";
   title.textContent = item.title || "";
-  div.appendChild(cb);
   div.appendChild(title);
+  const dueSpan = createDueSpan(item);
+  if (dueSpan) div.appendChild(dueSpan);
   if (!readOnlyMode) {
     const delBtn = document.createElement("button");
     delBtn.type = "button";
