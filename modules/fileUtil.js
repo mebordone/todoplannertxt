@@ -33,12 +33,23 @@ const fileUtil = {
     return (typeof self !== "undefined" && self.exception) || (typeof globalThis !== "undefined" && globalThis.exception) || null;
   },
 
+  _getErrorRaw(err) {
+    if (!err) return "";
+    const msg = err.message != null ? err.message : String(err);
+    return String(msg).toLowerCase();
+  },
+
   _classifyFsaError(err) {
-    const msg = (err && err.message) ? String(err.message).toLowerCase() : "";
+    const raw = this._getErrorRaw(err);
     const name = (err && err.name) ? String(err.name) : "";
-    if (/not found|no such file|enoent/i.test(msg) || name === "NotFoundError") return "FILE_NOT_FOUND";
-    if (/permission|locked|access denied|ebusy|eacces/i.test(msg) || name === "SecurityError") return "FILE_ACCESS";
-    if (/network|remote|ns_error|unreachable/i.test(msg)) return "FILE_NETWORK_OR_REMOTE";
+    const checks = [
+      { pattern: /not found|no such file|enoent|ns_error_file_not_found|0x80520012/i, nameVal: "NotFoundError", kind: "FILE_NOT_FOUND" },
+      { pattern: /permission|locked|access denied|ebusy|eacces/i, nameVal: "SecurityError", kind: "FILE_ACCESS" },
+      { pattern: /network|remote|ns_error|unreachable/i, nameVal: null, kind: "FILE_NETWORK_OR_REMOTE" }
+    ];
+    for (const { pattern, nameVal, kind } of checks) {
+      if (pattern.test(raw) || (nameVal && name === nameVal)) return kind;
+    }
     return null;
   },
 
