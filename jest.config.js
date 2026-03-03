@@ -4,6 +4,7 @@ module.exports = {
   testEnvironment: "node",
   testMatch: ["**/test/**/*.test.js"],
   collectCoverageFrom: [
+    "lib/priorityDisplay.js",
     "modules/todotxt.js",
     "modules/util.js",
     "modules/exception.js",
