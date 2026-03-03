@@ -6,54 +6,36 @@ This document outlines planned and potential future work for the Todo.txt MailEx
 
 ## Recommended order of implementation
 
-| Phase | Focus | Sections below |
-|-------|--------|----------------|
-| **0a** | Repository migration (own repo, URLs, structure) | § 6 |
-| **0b** | Legacy / dead code cleanup | § 7 |
-| **1** | Dual UI: popup (pending only) + “Open in tab” (full page) | § 1 |
-| **2** | Full tab page: pending + done, same actions, no filters yet | § 1 |
-| **3** | Full tab: filters, search, sort, grouping (power view) | § 4 (first part) |
-| **4** | Configuration and portability (read-only, errors) | § 3 |
-| **5** | Calendar integration Phase 1 done; Phase 2 (conflict resolution, etc.) planned | § 2 |
-| **6** | Planning window (backlog + calendar drag‑drop) | § 5 |
-| **7** | Sleek-style advanced (recurrence, archiving, file watch, i18n) | § 4 (rest) |
+| Phase | Focus | Status | Sections below |
+|-------|--------|--------|----------------|
+| **0a** | Repository migration (own repo, URLs, structure) | Optional | § 6 |
+| **0b** | Legacy / dead code cleanup | Optional | § 7 |
+| **1** | Dual UI: popup (pending only) + “Open in tab” (full page) | **Done** | § 1 |
+| **2** | Full tab: pending + done, same actions | **Done** | § 1 |
+| **3** | Full tab: filters, search, sort, grouping | **Done** | § 4 Phase A |
+| **4** | Configuration and portability (read-only, errors) | **Done** | § 3 |
+| **5** | Calendar integration Phase 1 | **Done** | § 2 |
+| **6** | Multi-language (EN + ES), sync with Thunderbird locale | Planned | § 8 |
+| **7** | UX improvements (feedback, empty states, form add-task) | Planned | § 8, § 4 |
+| **8** | Form-based "Add task" (Todoist-style) | Planned | § 4 Phase B |
+| **9** | Calendar Phase 2; planning window; sleek-style advanced | Backlog | § 2, § 5, § 4 (rest) |
 
-Phases **0a** (repository migration) and **0b** (legacy/dead code cleanup) are listed in sections § 6 and § 7 below; they are recommended before or in parallel with phase 1.
+Phases **0a** and **0b** can be done in parallel.
+
+**Implemented so far:** §1 (dual UI: popup + tab), §2 Phase 1 (calendar sync), §3 (read-only mode + error reporting), §4 Phase A (filters, search, sort, group in tab). See each section for details.
 
 ---
 
-## 1. Dual UI: popup (quick) + tab (full page)
+## 1. Dual UI: popup (quick) + tab (full page) — **implemented**
 
 **Goal:** Keep the toolbar button for a fast glance, and add an explicit way to open a full page. Split responsibilities so the popup stays minimal and the tab becomes the “power” interface.
 
-**Current state:** One popup shows all tasks (pending + done), add, complete, edit, refresh, options.
+**Implemented:** Popup shows only **pending** tasks (Add, Refresh, Tab link, Options). Tab (`tab/tab.html`, `tab/tab.js`) shows **all tasks**, add/complete/edit/refresh, Options, and **Filters & view** (search, project/context/priority/due/status, sort, group). Preferences in `tabViewPrefs`. Default: all tasks; filter dropdowns include "All". **Optional (not done):** Menu entry "Open Todo.txt in tab"; README note.
 
-**Target state:**
-
-- **Popup (quick view)**
-  - Shows **only pending** tasks (no items from `done.txt`).
-  - Add task, Refresh, link to Options.
-  - Optional: “Open in tab” link/button that opens the full page in a new tab.
-  - Purpose: answer “what’s left?” and add one thing in a couple of seconds.
-
-- **Full page (tab)**
-  - Opened via “Open in tab” (from popup or from a menu). Same page can be the target of a future sidebar if Thunderbird supports it.
-  - **Phase 1 (recommended first):** Same content as today but in a tab: pending + done (e.g. two sub-tabs or one list with a toggle), add / complete / edit / refresh / options. No new features yet.
-  - **Phase 2 (after § 4 first part):** This tab becomes the “power” view: filters, search, sort, grouping, and later the planning window (§ 5).
-
-**Planned steps:**
-
-1. Add a dedicated full-page HTML/JS (e.g. `tab/tab.html`) or reuse popup HTML in a tab via `browser.tabs.create({ url: ... })`. Prefer a dedicated page so the popup can be simplified without sharing layout constraints.
-2. In the popup, request only **pending** items from the backend (e.g. filter by `isComplete === false` or equivalent API).
-3. Add an “Open in tab” control in the popup that opens the full page (same list as today: pending + done).
-4. Optionally add a menu entry or secondary action “Open Todo.txt in tab” so the full page is discoverable without opening the popup first.
-5. Document in README: toolbar click = quick popup (pending only); “Open in tab” = full page (pending + done, later with filters and planning).
-
-This establishes the foundation for all later UX work: popup = quick, tab = powerful.
 
 ---
 
-## 2. Calendar integration (Lightning)
+## 2. Calendar integration (Lightning) — Phase 1 **implemented**
 
 **Phase 1 (done – Thunderbird 140.7 ESR):**
 
@@ -68,7 +50,7 @@ This establishes the foundation for all later UX work: popup = quick, tab = powe
 
 ---
 
-## 3. Configuration and portability
+## 3. Configuration and portability — **implemented**
 
 **Done:**
 
@@ -77,15 +59,15 @@ This establishes the foundation for all later UX work: popup = quick, tab = powe
 
 ---
 
-## 4. Feature parity with sleek-style todo.txt managers
+## 4. Feature parity with sleek-style todo.txt managers — Phase A **implemented**
 
 Long-term goal: approach the UX and power of dedicated managers like [sleek](https://github.com/ransome1/sleek), within Thunderbird’s constraints. These features belong primarily in the **full tab page** (§ 1), not in the popup.
 
-**Phase A – Filters, search, sort (recommended after dual UI and basic tab):**
+**Phase A (done):**
 
-- **Rich filtering:** By project (`+project`), context (`@context`), priority, due date, completed/open; combine multiple filters.
-- **Full-text search:** Search box in the tab that filters as you type (title, projects, contexts, add-ons).
-- **Sorting and grouping:** Sort by priority, due date, creation date, completion date, etc.; group by project, context, priority, or completion. Persist sort/group preferences in `storage.local`.
+- **Rich filtering:** In the full tab page: by project (`+project`), context (`@context`), priority, due (overdue / today / this week / no date), completed/open; filters are combinable. Options populated from current tasks.
+- **Full-text search:** Search box in the tab filters as you type over title, projects, and contexts.
+- **Sorting and grouping:** Sort by priority, due date, created, completed, or title (asc/desc). Group by none, project, context, priority, or completion. Preferences persisted in `browser.storage.local` under `tabViewPrefs`. Implemented in `tab/filterSort.js` (pure logic) and `tab/tab.js` (UI and pipeline).
 
 **Phase B – Advanced behaviour and housekeeping:**
 
@@ -93,7 +75,8 @@ Long-term goal: approach the UX and power of dedicated managers like [sleek](htt
 - **Due dates and reminders:** First-class handling of `due:` in the tab UI; optional reminders/alarms when Thunderbird APIs allow (aligned with § 2).
 - **Archiving and housekeeping:** Smarter `done.txt` handling (archiving, truncation, split by year, etc.); tools to clean or normalize tasks (e.g. merge duplicate tags, normalize priorities).
 - **File watching:** Complement or replace polling so changes from external apps (sleek, CLI) are reflected quickly when the platform allows.
-- **Multi-language UX:** Extend localized strings (EN/DE/ES) and use localized date formatting and labels for filters/groups.
+- **Multi-language UX:** See § 8 (locale selection, EN + ES dictionaries, sync with Thunderbird language).
+- **Form-based "Add task" (Todoist-style):** A dialog or inline form to add a task without typing raw todo.txt syntax. Fields: task description (main input), **Priority** (dropdown A–Z or 1–9), **Due date** (date picker), **Threshold date** (optional start date), **Recurrence** (optional, e.g. daily/weekly/monthly), and optionally **Project** / **Context** as dropdowns or chips. A help button (?) can explain the format for power users who prefer typing. On submit, the extension builds the todo.txt line (e.g. `(A) 2025-12-01 task description +project @context due:2025-12-15`). Implementable in popup and/or tab; respects read-only mode.
 
 All of the above must respect `AGENTS.md` (tests, complexity, no regression of current popup + file sync).
 
@@ -110,6 +93,68 @@ Provide a **planning view** that combines the Todo.txt backlog with a calendar, 
 - **Sync:** Dragging to a date updates Todo.txt; dragging to a time slot creates/updates a calendar event with clear conflict rules when APIs exist.
 
 This depends on § 2 (calendar integration) and on the full tab page (§ 1) existing. First iteration can use a custom calendar-like UI and only `due:` dates; deeper integration with Thunderbird’s native calendar follows once stable MailExtension APIs are available.
+
+---
+
+## 8. Multi-language and UX improvements (planned)
+
+### 8.1 Multi-language (EN + ES, sync with Thunderbird)
+
+- **Goal:** Support English and Spanish as UI languages; optionally let the user select the display language.
+- **Sync with Thunderbird:** Use the same locale as Thunderbird when possible (e.g. `browser.i18n.getUILanguage()` or manifest `default_locale` and `_locales`). If the app language is Spanish, the extension UI (popup, tab, options) should show Spanish without extra configuration.
+- **Dictionaries:** Maintain `_locales/en/messages.json` and `_locales/es/messages.json` (add Spanish if not present). All user-facing strings use `__MSG_*` in HTML and `browser.i18n.getMessage()` in JS. Existing locales (e.g. `de`, `fr`) can be kept; priority is EN + ES and sync with Thunderbird UI language.
+- **Optional:** In Options, a dropdown "Display language" with "Use Thunderbird language", "English", "Español", so users can force a language.
+
+### 8.2 UX recommendations (from usability analysis)
+
+Ordered from **simple + high impact** to **more complex + lower impact**:
+
+1. **Empty state (tab):** When no tasks match filters, show an i18n message suggesting Project, Context and Status "All", plus a "Reset filters" button.
+2. **Feedback when adding a task:** Brief "Task added" (toast or inline) after successful add in popup/tab.
+3. **Loading state:** Spinner or skeleton while loading; disable Refresh/Add during load.
+4. **Sort direction labels:** Clearer labels for Asc/Desc (e.g. "Earlier first" / "Later first" for dates) in the tab.
+5. **Options consistency:** Unify hint text; optional "Saved" feedback after auto-save.
+6. **Delete task from UI:** Expose delete (trash icon or context menu) in popup and tab; confirm before delete; respect read-only.
+7. **Edit without prompt():** In-place edit or custom modal for task title in tab; in popup, a proper dialog instead of `prompt()`.
+8. **Filters bar (tab):** Collapsible "Filters & view"; "Reset filters" button.
+9. **Naming consistency:** Clarify "Tab" vs "Quick view" with tooltips.
+10. **Task count:** Show "Showing X of Y tasks" when filters are active.
+11. **Accessibility:** ARIA roles, keyboard focus, screen-reader announcements.
+12. **First-run:** Friendlier empty state when paths are not set, with "Open Options to choose your todo.txt file".
+
+### 8.3 UX inspired by sleek + filter toggles (evaluation and phases)
+
+Ideas taken from sleek and similar UIs, with **impact (1–5) vs difficulty (1–5)** and a phased implementation proposal.
+
+**Matrix (impact / difficulty):**
+
+| Idea | Impact | Difficulty | Ratio |
+|------|--------|------------|-------|
+| Contadores en filtros (número por proyecto/prioridad/contexto) | 5 | 2 | 2.5 |
+| Prioridad con color y letra (A=rojo, B, C…) | 4 | 1–2 | 2.5 |
+| Icono calendario en tareas con due | 3 | 1 | 3 |
+| Separadores entre tareas (líneas) | 2 | 1 | 2 |
+| Botón "+" destacado para añadir tarea | 3 | 1 | 3 |
+| **Toggles: completadas / due en el futuro** | **4** | **2** | **2** |
+| Pills/chips de proyectos y contextos en la fila (clic = filtrar) | 4 | 3 | 1.3 |
+| Filtros colapsables (Prioridad, Proyectos, etc.) | 3 | 2 | 1.5 |
+| **Tooltip (?) en filtros** | **3** | **1** | **3** |
+| Nombre "Todo.txt" visible en cabecera | 1–2 | 1 | 1.5 |
+| Pestañas Atributos / Filtros / Ordenación | 3 | 3 | 1 |
+| Toggle "Fecha umbral en el futuro" | 2–3 | 2–3* | ~1 |
+| Toggle "Tareas ocultas" | 1–2* | 3* | ~0.5 |
+| Flechas historial de vista (atrás/adelante) | 2 | 3 | 0.7 |
+
+\* Threshold: requiere soporte de threshold en parser/modelo. Tareas ocultas: requiere definir y persistir "hidden".
+
+**Filter toggles (sleek-style):** Sustituir o complementar el dropdown Status por **switches** tipo: "Tareas completadas" (mostrar/ocultar hechas), "Fecha de vencimiento en el futuro" (solo due > hoy). Opcional: "Fecha umbral en el futuro" (cuando exista `t:` en el modelo), "Tareas ocultas" (cuando se defina ese concepto). Icono **?** en opciones que necesiten explicación (tooltip con i18n).
+
+**Phased proposal:**
+
+- **Fase A (quick wins):** Separadores entre tareas, icono calendario en tareas con due, botón "+" destacado, prioridad con letra y color.
+- **Fase B (alto impacto):** Contadores en filtros, **toggles "Tareas completadas" y "Due en el futuro"**, pills/chips en la fila con clic para filtrar.
+- **Fase C:** Filtros colapsables, **tooltip (?) en filtros**, nombre "Todo.txt" en cabecera.
+- **Fase D (avanzado):** Toggle "Fecha umbral" (cuando haya threshold), "Tareas ocultas" (cuando esté definido), pestañas Atributos/Filtros/Ordenación, flechas historial.
 
 ---
 
@@ -146,6 +191,6 @@ Recommended after or in parallel with repo migration (phase 0a). Cleanup is easi
 
 ## Summary
 
-- **Popup** = quick view, **pending only**; “Open in tab” opens the **full page**.
-- **Full page (tab)** = main place for power features: pending + done, then filters/search/sort, then planning window, then sleek-style advanced features.
-- Implementation order: **repo migration (0a)** and **legacy/dead code cleanup (0b)** first, then dual UI and basic tab (1–2) → filters/search/sort (3) → config/portability (4) → calendar (5) → planning window (6) → recurrence/archiving/file watch/i18n (7).
+- **Popup** = quick view, **pending only**; "Tab" opens the **full page**.
+- **Full page (tab)** = power view: all tasks, filters/search/sort/group; implemented.
+- **Done:** Dual UI, filters/search/sort/group, read-only and error reporting, calendar Phase 1. **Planned:** Multi-language (EN + ES, sync with Thunderbird), UX improvements (§ 8), form-based Add task (Todoist-style). **Backlog:** Calendar Phase 2, planning window, recurrence/archiving; repo migration and legacy cleanup optional.
