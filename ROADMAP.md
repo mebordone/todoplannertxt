@@ -70,10 +70,10 @@ This establishes the foundation for all later UX work: popup = quick, tab = powe
 
 ## 3. Configuration and portability
 
-- **Read-only mode:** Option to never write to `todo.txt`/`done.txt` (for users who sync or edit files with other tools).
-- **Error reporting:** Clearer messages when files are missing, locked, or on remote/network locations.
+**Done:**
 
-Can be implemented in parallel with UI work (§ 1) once the dual popup/tab is in place.
+- **Read-only mode:** Option in Options → Behavior to never write to `todo.txt`/`done.txt` (preference `readOnly`). When enabled, add/modify/complete/delete and calendar→todo sync skip writing; sync todo→calendar (read) still works.
+- **Error reporting:** Clearer, localized messages for missing files, locked files, and network/remote locations. FSA errors are mapped to `FILE_NOT_FOUND`, `FILE_CANNOT_WRITE`, `FILE_LOCKED`, `FILE_NETWORK_OR_REMOTE`; existing messages (e.g. `error_filesNotSpecified`) improved in _locales.
 
 ---
 
