@@ -34,6 +34,20 @@
     .filters-bar-header .chevron { font-size: 10px; transition: transform 0.2s; }
     .filters-section.collapsed .chevron { transform: rotate(-90deg); }
     .filters-section.collapsed .toolbar-filters { display: none; }
+    .syntax-hint-bar { padding: 4px 8px 2px; font-size: 11px; color: #777; display: flex; align-items: center; gap: 6px; }
+    .syntax-hint-text { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .syntax-toggle { border: none; background: transparent; cursor: pointer; font-size: 11px; padding: 0 4px; color: #666; border-radius: 3px; }
+    .syntax-toggle:hover { background: #f0f0f0; }
+    .syntax-section { border-bottom: 1px solid #eee; }
+    .syntax-section.collapsed .syntax-content { display: none; }
+    .syntax-content { padding: 6px 8px 8px; font-size: 11px; color: #555; background: #fafafa; }
+    .syntax-title { font-weight: 600; margin-bottom: 4px; }
+    .syntax-list { margin: 0 0 4px; padding-left: 16px; }
+    .syntax-list li { margin: 0 0 2px; }
+    .syntax-example { margin: 2px 0 4px; }
+    .syntax-example-label { font-weight: 600; margin-right: 4px; }
+    .syntax-content code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 11px; background: #f0f0f0; padding: 1px 3px; border-radius: 3px; }
+    .syntax-more-link { font-size: 11px; }
   </style>
 </head>
 <body>
@@ -47,6 +61,29 @@
         <button type="button" id="quick-view" class="toolbar-link" title="">Quick view</button>
         <a href="#" id="open-options" class="toolbar-link">Options</a>
         <span class="toolbar-hint" id="toolbar-hint">Toolbar icon is visible in the Mail tab.</span>
+      </div>
+    </div>
+    <div id="syntax-hint-bar" class="syntax-hint-bar">
+      <span id="syntax-hint-text" class="syntax-hint-text"></span>
+      <button type="button" id="syntax-toggle" class="syntax-toggle" aria-expanded="false" aria-controls="syntax-section">
+        ▼
+      </button>
+    </div>
+    <div id="syntax-section" class="syntax-section collapsed">
+      <div class="syntax-content">
+        <div id="syntax-title" class="syntax-title"></div>
+        <ul class="syntax-list">
+          <li id="syntax-line-priority"></li>
+          <li id="syntax-line-created"></li>
+          <li id="syntax-line-project-context"></li>
+          <li id="syntax-line-due"></li>
+          <li id="syntax-line-completed"></li>
+        </ul>
+        <div class="syntax-example">
+          <span id="syntax-example-label" class="syntax-example-label"></span>
+          <code id="syntax-example-text"></code>
+        </div>
+        <a href="https://github.com/todotxt/todo.txt" target="_blank" rel="noopener noreferrer" id="syntax-more-link" class="syntax-more-link"></a>
       </div>
     </div>
     <div id="filters-section" class="filters-section">

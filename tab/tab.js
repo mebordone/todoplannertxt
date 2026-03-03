@@ -572,10 +572,53 @@ function setToolbarI18n() {
   if (hintEl) hintEl.textContent = i18n("tab_toolbar_hint");
 }
 
+function initSyntaxUi() {
+  const hintText = document.getElementById("syntax-hint-text");
+  if (hintText) hintText.textContent = i18n("tab_syntax_hint");
+  const titleEl = document.getElementById("syntax-title");
+  if (titleEl) titleEl.textContent = i18n("tab_syntax_title");
+  const linePriority = document.getElementById("syntax-line-priority");
+  if (linePriority) linePriority.textContent = i18n("tab_syntax_line_priority");
+  const lineCreated = document.getElementById("syntax-line-created");
+  if (lineCreated) lineCreated.textContent = i18n("tab_syntax_line_created");
+  const lineProjCtx = document.getElementById("syntax-line-project-context");
+  if (lineProjCtx) lineProjCtx.textContent = i18n("tab_syntax_line_project_context");
+  const lineDue = document.getElementById("syntax-line-due");
+  if (lineDue) lineDue.textContent = i18n("tab_syntax_line_due");
+  const lineCompleted = document.getElementById("syntax-line-completed");
+  if (lineCompleted) lineCompleted.textContent = i18n("tab_syntax_line_completed");
+  const exLabel = document.getElementById("syntax-example-label");
+  if (exLabel) exLabel.textContent = i18n("tab_syntax_example_label");
+  const exText = document.getElementById("syntax-example-text");
+  if (exText) exText.textContent = i18n("tab_syntax_example_text");
+  const moreLink = document.getElementById("syntax-more-link");
+  if (moreLink) {
+    moreLink.textContent = i18n("tab_syntax_more_link");
+    moreLink.setAttribute("title", i18n("tab_syntax_more_link"));
+  }
+  const toggle = document.getElementById("syntax-toggle");
+  const section = document.getElementById("syntax-section");
+  if (toggle && section) {
+    const updateToggle = () => {
+      const collapsed = section.classList.contains("collapsed");
+      toggle.textContent = collapsed ? "▼" : "▲";
+      toggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+      section.style.display = collapsed ? "" : "";
+    };
+    toggle.setAttribute("aria-label", i18n("tab_syntax_toggle_aria"));
+    updateToggle();
+    toggle.addEventListener("click", () => {
+      section.classList.toggle("collapsed");
+      updateToggle();
+    });
+  }
+}
+
 (async function initTab() {
   try {
     if (typeof i18nHelper !== "undefined" && i18nHelper.init) await i18nHelper.init();
   } catch (_) {}
   setToolbarI18n();
+  initSyntaxUi();
   loadItems();
 })();
