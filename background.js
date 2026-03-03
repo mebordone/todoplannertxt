@@ -224,6 +224,101 @@ async function handleGetLastCalendarSyncLog() {
   return out;
 }
 
+function buildSyncLogLines(log) {
+  const lines = [
+    "[Todo.txt calendar sync log]",
+    "at: " + (log && log.at ? log.at : "never"),
+    "Note: Tasks (VTODO) may appear in Calendar → Task view / To-do list, not only in the day grid.",
+  ];
+  if (!log) {
+    lines.push("(no sync run yet)");
+    return lines;
+  }
+  lines.push("ok: " + !!log.ok);
+  if (log.error) lines.push("error: " + log.error);
+  if (typeof log.withDueCount === "number") lines.push("withDueCount: " + log.withDueCount);
+  if (typeof log.syncedCount === "number") lines.push("syncedCount: " + log.syncedCount);
+  if (log.calendarId) lines.push("calendarId: " + log.calendarId);
+  if (log.sample) lines.push("sample: title=\"" + (log.sample.title || "") + "\" dueDate=" + (log.sample.dueDate || ""));
+  if (log.errors && log.errors.length) log.errors.forEach((e, i) => lines.push("error[" + i + "]: " + (e.message || e.id || JSON.stringify(e))));
+  if (log.pullLog && log.pullLog.length) {
+    lines.push("--- calendar→todo (last " + log.pullLog.length + ") ---");
+    log.pullLog.forEach((e) => {
+      const line = (e.at || "") + " " + (e.event || "") + " id=" + (e.plainId || "") + " " + (e.action || "");
+      lines.push(line);
+    });
+  }
+  return lines;
+}
+
+function formatError(e) {
+  if (!e) return "(no error details)";
+  const name = (e.name && String(e.name)) || "";
+  const msg = (e.message && String(e.message)) || (typeof e.toString === "function" ? e.toString() : String(e));
+  let out = (name ? name + ": " : "") + msg;
+  if (e.stack && typeof e.stack === "string") {
+    const stackLines = e.stack.trim().split("\n").slice(0, 8);
+    out += "\n  stack: " + stackLines.join("\n  ");
+  }
+  return out;
+}
+
+async function handleGetExtensionDebugLog() {
+  const manifest = api.runtime.getManifest();
+  const version = (manifest && manifest.version) || "?";
+  const build = (typeof self.buildInfo !== "undefined" && self.buildInfo) ? self.buildInfo : {};
+  const buildId = (build.buildId && String(build.buildId)) || "dev";
+  const buildDate = (build.buildDate && String(build.buildDate)) || "";
+  const buildTime = (build.buildTime && String(build.buildTime)) || "";
+  const prefs = await getPrefs();
+  const lines = [
+    "=== Todo.txt extension debug log ===",
+    "at: " + new Date().toISOString(),
+    "version: " + version,
+    "buildId: " + buildId + (buildDate && buildTime ? " (" + buildDate + " " + buildTime + ")" : ""),
+    "",
+    "--- File access ---",
+    "fsa: " + (self.fsaUsesBuiltIn ? "built-in" : "proxy"),
+    "getDefaultSearchPaths available: " + (self.fsaApi && typeof self.fsaApi.getDefaultSearchPaths === "function"),
+    "paths configured: " + (hasPathsConfigured(prefs) ? "yes" : "no"),
+  ];
+  if (prefs.todoFolderPath) lines.push("todo folder: " + (String(prefs.todoFolderPath).slice(0, 80) + (prefs.todoFolderPath.length > 80 ? "…" : "")));
+  if (prefs.doneFolderPath) lines.push("done folder: " + (String(prefs.doneFolderPath).slice(0, 80) + (prefs.doneFolderPath.length > 80 ? "…" : "")));
+  if (prefs.todoFolderId && !prefs.todoFolderPath) lines.push("todo: folderId (path not stored)");
+  if (prefs.doneFolderId && !prefs.doneFolderPath) lines.push("done: folderId (path not stored)");
+  lines.push("");
+  lines.push("--- Prefs ---");
+  lines.push("readOnly: " + !!prefs.readOnly);
+  lines.push("displayLanguage: " + (prefs.displayLanguage || "browser"));
+  lines.push("calendarIntegrationEnabled: " + !!prefs.calendarIntegrationEnabled);
+  lines.push("calendarId: " + (prefs.calendarId || "(none)"));
+  lines.push("");
+  lines.push("--- Default search paths (when paths not configured) ---");
+  lines.push("  (fetched from Options page when you open it; calling from background can throw InvalidStateError)");
+  if (self.fsaApi && typeof self.fsaApi.getDefaultSearchPaths === "function") {
+    try {
+      const res = await self.fsaApi.getDefaultSearchPaths();
+      if (res && res.error) {
+        lines.push("  error: " + (res.error || ""));
+        if (res.errorName) lines.push("  errorName: " + res.errorName);
+      } else if (res && Array.isArray(res.paths) && res.paths.length) {
+        res.paths.forEach((p, i) => lines.push("  [" + i + "] " + String(p).slice(0, 100)));
+      }
+    } catch (_) {
+      lines.push("  (background call skipped to avoid InvalidStateError)");
+    }
+  }
+  lines.push("");
+  lines.push("--- Last calendar sync log ---");
+  try {
+    const syncLog = await handleGetLastCalendarSyncLog();
+    lines.push(...buildSyncLogLines(syncLog));
+  } catch (e) {
+    lines.push("  error getting sync log: " + formatError(e));
+  }
+  return { log: lines.join("\n") };
+}
+
 async function ensureCalendarIdInPrefs(prefs) {
   const needCalendar = prefs.calendarIntegrationEnabled && !prefs.calendarId;
   const apiOk = self.calendarAdapter && self.calendarAdapter.isCalendarApiAvailable();
@@ -262,6 +357,8 @@ const messageHandlers = {
   exportTodoToIcs: () => handleExportTodoToIcs(),
   syncCalendarNow: () => handleSyncCalendarNow(),
   getLastCalendarSyncLog: () => handleGetLastCalendarSyncLog(),
+  getExtensionDebugLog: () => handleGetExtensionDebugLog(),
+  trySetDefaultPathsWithPaths: (msg) => trySetDefaultPathsWithPaths(msg.paths || []).then((ok) => ({ ok })),
   savePrefs: (msg) => handleSavePrefs(msg),
 };
 
@@ -283,26 +380,101 @@ api.runtime.onMessage.addListener((message, sender, sendResponse) => {
   return true;
 });
 
+function trySetDefaultPathsWithPaths(paths) {
+  if (!self.fsaUsesBuiltIn || !self.fsaApi || !Array.isArray(paths) || paths.length === 0) return Promise.resolve(false);
+  const emptyBlob = "";
+  return (async () => {
+    for (const folderPath of paths) {
+      try {
+        const prefsForPath = {
+          todoFolderPath: folderPath,
+          doneFolderPath: folderPath,
+          todoFileName: "todo.txt",
+          doneFileName: "done.txt"
+        };
+        try {
+          await fileUtil.readTodo(self.fsaApi, prefsForPath);
+        } catch (_) {
+          await fileUtil.writeFile(self.fsaApi, { folderPath, fileName: "todo.txt" }, emptyBlob);
+          await fileUtil.writeFile(self.fsaApi, { folderPath, fileName: "done.txt" }, emptyBlob);
+        }
+        await api.storage.local.set({
+          todoFolderPath: folderPath,
+          doneFolderPath: folderPath,
+          todoFileName: "todo.txt",
+          doneFileName: "done.txt"
+        });
+        if (todotxtLogger) todotxtLogger.debug("background", "Default paths set: " + folderPath);
+        return true;
+      } catch (e) {
+        if (todotxtLogger) todotxtLogger.debug("background", "trySetDefaultPaths skip " + folderPath + ": " + (e && e.message));
+      }
+    }
+    return false;
+  })();
+}
+
+async function trySetDefaultPaths() {
+  if (!self.fsaUsesBuiltIn || !self.fsaApi || typeof self.fsaApi.getDefaultSearchPaths !== "function") return;
+  const prefs = await getPrefs();
+  if (hasPathsConfigured(prefs)) return;
+  let paths = [];
+  try {
+    const res = await self.fsaApi.getDefaultSearchPaths();
+    paths = (res && Array.isArray(res.paths)) ? res.paths : [];
+  } catch (e) {
+    if (todotxtLogger) todotxtLogger.debug("background", "getDefaultSearchPaths: " + (e && e.message));
+    return;
+  }
+  if (paths.length === 0) return;
+  await trySetDefaultPathsWithPaths(paths);
+}
+
 api.runtime.onStartup?.addListener(() => {
   startPolling();
 });
 
 api.runtime.onInstalled?.addListener(() => {
   startPolling();
+  setTimeout(() => {
+    if (typeof self.ensureBuiltInApi === "function") self.ensureBuiltInApi();
+    getPrefs().then(async (prefs) => {
+      if (!hasPathsConfigured(prefs) && self.fsaUsesBuiltIn) {
+        await trySetDefaultPaths();
+      }
+    });
+  }, 2500);
 });
 
 startPolling();
 
-if (self.calendarAdapter && self.calendarAdapter.isCalendarApiAvailable() && self.syncService) {
-  getPrefs().then((prefs) => {
-    if (prefs.calendarIntegrationEnabled) {
-      self.syncService.start();
-      if (prefs.calendarId && hasPathsConfigured(prefs) && typeof self.syncService.pushTodoToCalendar === "function") {
-        setTimeout(() => self.syncService.pushTodoToCalendar().catch(() => {}), 1000);
+function scheduleTrySetDefaultPaths() {
+  getPrefs().then(async (prefs) => {
+    if (!hasPathsConfigured(prefs) && self.fsaUsesBuiltIn) {
+      await trySetDefaultPaths();
+      prefs = await getPrefs();
+    }
+    if (self.calendarAdapter && self.calendarAdapter.isCalendarApiAvailable() && self.syncService) {
+      if (prefs.calendarIntegrationEnabled) {
+        self.syncService.start();
+        if (prefs.calendarId && hasPathsConfigured(prefs) && typeof self.syncService.pushTodoToCalendar === "function") {
+          setTimeout(() => self.syncService.pushTodoToCalendar().catch(() => {}), 1000);
+        }
       }
     }
   });
 }
+
+scheduleTrySetDefaultPaths();
+// Retry default paths after delay so experiment API is ready (e.g. after install)
+setTimeout(() => {
+  if (typeof self.ensureBuiltInApi === "function") self.ensureBuiltInApi();
+  getPrefs().then(async (prefs) => {
+    if (!hasPathsConfigured(prefs) && self.fsaUsesBuiltIn) {
+      await trySetDefaultPaths();
+    }
+  });
+}, 2500);
 
 // Expose for experiment (addon_parent) when it needs to fetch items / modify items.
 // If todo/done paths are not configured, return [] so calendar sync does not throw or log ERROR.
