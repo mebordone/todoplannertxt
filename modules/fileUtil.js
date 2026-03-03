@@ -29,6 +29,36 @@ const fileUtil = {
     return path && path.folderPath !== undefined && path.folderPath !== null;
   },
 
+  _getException() {
+    return (typeof self !== "undefined" && self.exception) || (typeof globalThis !== "undefined" && globalThis.exception) || null;
+  },
+
+  _classifyFsaError(err) {
+    const msg = (err && err.message) ? String(err.message).toLowerCase() : "";
+    const name = (err && err.name) ? String(err.name) : "";
+    if (/not found|no such file|enoent/i.test(msg) || name === "NotFoundError") return "FILE_NOT_FOUND";
+    if (/permission|locked|access denied|ebusy|eacces/i.test(msg) || name === "SecurityError") return "FILE_ACCESS";
+    if (/network|remote|ns_error|unreachable/i.test(msg)) return "FILE_NETWORK_OR_REMOTE";
+    return null;
+  },
+
+  _mapFsaError(err, fileName, isWrite) {
+    const exc = this._getException();
+    if (!exc) return err;
+    const kind = this._classifyFsaError(err);
+    if (kind === "FILE_NOT_FOUND") return exc.FILE_NOT_FOUND(fileName);
+    if (kind === "FILE_ACCESS") return isWrite ? exc.FILE_CANNOT_WRITE(fileName) : exc.FILE_LOCKED(fileName);
+    if (kind === "FILE_NETWORK_OR_REMOTE") return exc.FILE_NETWORK_OR_REMOTE(err && err.message ? String(err.message) : undefined);
+    return err;
+  },
+
+  _validatePath(path) {
+    if (!path || !path.fileName) throw new Error("Invalid path");
+    const usePath = this._usesFolderPath(path);
+    if (usePath && !path.folderPath) throw new Error("Invalid path");
+    if (!usePath && !path.folderId) throw new Error("Invalid path");
+  },
+
   async _textFromResult(result) {
     if (!result) return "";
     if (result.file && typeof result.file.text === "function") return await result.file.text();
@@ -38,27 +68,30 @@ const fileUtil = {
   },
 
   async readFile(fsaApi, path) {
-    if (!path || !path.fileName) return Promise.reject(new Error("Invalid path"));
+    this._validatePath(path);
     const usePath = this._usesFolderPath(path);
-    if (usePath && !path.folderPath) return Promise.reject(new Error("Invalid path"));
-    if (!usePath && !path.folderId) return Promise.reject(new Error("Invalid path"));
-    const result = usePath
-      ? await fsaApi.readFile(path.folderPath, path.fileName)
-      : await fsaApi.readFile(path.folderId, path.fileName);
-    const str = String(await this._textFromResult(result) || "");
-    return str.endsWith("\n") ? str : str + "\n";
+    const fileName = path.fileName || "";
+    try {
+      const result = usePath
+        ? await fsaApi.readFile(path.folderPath, path.fileName)
+        : await fsaApi.readFile(path.folderId, path.fileName);
+      const str = String(await this._textFromResult(result) || "");
+      return str.endsWith("\n") ? str : str + "\n";
+    } catch (err) {
+      throw this._mapFsaError(err, fileName, false);
+    }
   },
 
   async writeFile(fsaApi, path, content) {
-    if (!path || !path.fileName) return Promise.reject(new Error("Invalid path"));
+    this._validatePath(path);
     const usePath = this._usesFolderPath(path);
-    if (usePath && !path.folderPath) return Promise.reject(new Error("Invalid path"));
-    if (!usePath && !path.folderId) return Promise.reject(new Error("Invalid path"));
+    const fileName = path.fileName || "";
     const blob = typeof content === "string" ? new Blob([content], { type: "text/plain;charset=utf-8" }) : content;
-    if (usePath) {
-      await fsaApi.writeFile(blob, path.folderPath, path.fileName);
-    } else {
-      await fsaApi.writeFile(blob, path.folderId, path.fileName);
+    try {
+      if (usePath) await fsaApi.writeFile(blob, path.folderPath, path.fileName);
+      else await fsaApi.writeFile(blob, path.folderId, path.fileName);
+    } catch (err) {
+      throw this._mapFsaError(err, fileName, true);
     }
   },
 
@@ -73,7 +106,9 @@ const fileUtil = {
   },
 
   async writeTodo(fsaApi, prefs, todo) {
-    const exc = (typeof self !== "undefined" && self.exception) || (typeof globalThis !== "undefined" && globalThis.exception);
+    const exc = this._getException();
+    if (!exc) throw new Error("Exception module not available");
+    if (prefs && prefs.readOnly === true) throw exc.READ_ONLY_MODE();
     const todoPath = this.getTodoPath(prefs);
     const donePath = this.getDonePath(prefs);
     if (!todoPath || !donePath) throw exc.FILES_NOT_SPECIFIED();

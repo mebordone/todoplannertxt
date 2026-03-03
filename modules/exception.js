@@ -20,8 +20,30 @@ const exception = {
   FILES_NOT_SPECIFIED: () => {
     const message = typeof browser !== "undefined" && browser.i18n
       ? browser.i18n.getMessage("error_filesNotSpecified")
-      : "Please specify the location of the todo.txt & done.txt files in the properties.";
+      : "Please specify the location of the todo.txt & done.txt files in the options.";
     return Object.assign(new Error(message), { code: "FILES_NOT_SPECIFIED" });
+  },
+
+  READ_ONLY_MODE: () => {
+    const message = typeof browser !== "undefined" && browser.i18n
+      ? browser.i18n.getMessage("error_readOnlyMode")
+      : "Read-only mode is enabled. Disable it in Options to write to todo.txt/done.txt.";
+    return Object.assign(new Error(message), { code: "READ_ONLY_MODE" });
+  },
+
+  FILE_LOCKED: (fileName) => {
+    const message = (typeof browser !== "undefined" && browser.i18n
+      ? browser.i18n.getMessage("error_fileLocked")
+      : "The file is in use or locked:") + " " + (fileName || "");
+    return Object.assign(new Error(message), { code: "FILE_LOCKED" });
+  },
+
+  FILE_NETWORK_OR_REMOTE: (msg) => {
+    const fallback = "The file is on a network or remote location and cannot be accessed.";
+    const message = typeof browser !== "undefined" && browser.i18n
+      ? (browser.i18n.getMessage("error_fileNetworkOrRemote") || fallback)
+      : (msg || fallback);
+    return Object.assign(new Error(message), { code: "FILE_NETWORK_OR_REMOTE" });
   },
 
   ITEM_NOT_FOUND: () => {

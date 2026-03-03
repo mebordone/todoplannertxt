@@ -21,8 +21,12 @@ describe("fileUtil (functional with mocked FSA)", () => {
   };
 
   beforeEach(() => {
-    mockFsa.readFile.mockClear();
-    mockFsa.writeFile.mockClear();
+    mockFsa.readFile.mockReset();
+    mockFsa.writeFile.mockReset();
+    mockFsa.readFile.mockImplementation(() =>
+      Promise.resolve({ file: { text: () => Promise.resolve("(A) Task 1\n") } })
+    );
+    mockFsa.writeFile.mockImplementation(() => Promise.resolve());
   });
 
   test("getTodoPath returns null when prefs missing", () => {
@@ -132,6 +136,40 @@ describe("fileUtil (functional with mocked FSA)", () => {
     await expect(fileUtil.writeTodo(mockFsa, {}, { render: () => "" })).rejects.toMatchObject({
       code: "FILES_NOT_SPECIFIED"
     });
+  });
+
+  test("writeTodo throws READ_ONLY_MODE when prefs.readOnly is true", async () => {
+    const prefsReadOnly = { ...prefs, readOnly: true };
+    await expect(fileUtil.writeTodo(mockFsa, prefsReadOnly, { render: () => "" })).rejects.toMatchObject({
+      code: "READ_ONLY_MODE"
+    });
+    expect(mockFsa.writeFile).not.toHaveBeenCalled();
+  });
+
+  test("readFile maps FSA 'not found' error to FILE_NOT_FOUND", async () => {
+    mockFsa.readFile.mockRejectedValue(new Error("No such file or directory"));
+    const path = { folderId: "f1", fileName: "todo.txt" };
+    await expect(fileUtil.readFile(mockFsa, path)).rejects.toMatchObject({ code: "FILE_NOT_FOUND" });
+  });
+
+  test("readFile maps ENOENT to FILE_NOT_FOUND", async () => {
+    const err = new Error("ENOENT");
+    err.code = "ENOENT";
+    mockFsa.readFile.mockRejectedValue(err);
+    const path = { folderId: "f1", fileName: "todo.txt" };
+    await expect(fileUtil.readFile(mockFsa, path)).rejects.toMatchObject({ code: "FILE_NOT_FOUND" });
+  });
+
+  test("writeFile maps permission error to FILE_CANNOT_WRITE", async () => {
+    mockFsa.writeFile.mockRejectedValue(new Error("Permission denied"));
+    const path = { folderId: "f1", fileName: "done.txt" };
+    await expect(fileUtil.writeFile(mockFsa, path, "content")).rejects.toMatchObject({ code: "FILE_CANNOT_WRITE" });
+  });
+
+  test("readFile maps locked/access error to FILE_LOCKED", async () => {
+    mockFsa.readFile.mockRejectedValue(new Error("File is locked"));
+    const path = { folderId: "f1", fileName: "todo.txt" };
+    await expect(fileUtil.readFile(mockFsa, path)).rejects.toMatchObject({ code: "FILE_LOCKED" });
   });
 
   test("calculateMD5 returns hash string", async () => {

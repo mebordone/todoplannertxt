@@ -13,6 +13,7 @@ const DEFAULT_PREFS = {
   useThunderbird: true,
   useCreation: true,
   showFullTitle: false,
+  readOnly: false,
   calendarIntegrationEnabled: false,
   calendarId: null,
   calendarSyncAuto: true

@@ -38,6 +38,8 @@ async function loadPrefs() {
   document.getElementById("use-thunderbird").checked = prefs.useThunderbird !== false;
   document.getElementById("use-creation").checked = prefs.useCreation !== false;
   document.getElementById("show-full-title").checked = !!prefs.showFullTitle;
+  const readOnlyEl = document.getElementById("read-only");
+  if (readOnlyEl) readOnlyEl.checked = prefs.readOnly === true;
   document.getElementById("calendar-enabled").checked = prefs.calendarIntegrationEnabled === true;
   document.getElementById("calendar-sync-auto").checked = prefs.calendarSyncAuto !== false;
   const calSelect = document.getElementById("calendar-select");
@@ -110,6 +112,8 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("use-thunderbird").addEventListener("change", (e) => savePrefs({ useThunderbird: e.target.checked }));
   document.getElementById("use-creation").addEventListener("change", (e) => savePrefs({ useCreation: e.target.checked }));
   document.getElementById("show-full-title").addEventListener("change", (e) => savePrefs({ showFullTitle: e.target.checked }));
+  const readOnlyEl = document.getElementById("read-only");
+  if (readOnlyEl) readOnlyEl.addEventListener("change", (e) => savePrefs({ readOnly: e.target.checked }));
   document.getElementById("calendar-enabled").addEventListener("change", async (e) => {
     await savePrefs({ calendarIntegrationEnabled: e.target.checked });
     await loadPrefs();

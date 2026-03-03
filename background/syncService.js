@@ -70,6 +70,11 @@
   async function handleCalendarRemoved(payload, settings) {
     const { calendarId, id } = payload;
     if (calendarId !== settings.calendarId) return;
+    const prefs = await (typeof self.getCalendarPrefs === "function" ? self.getCalendarPrefs() : Promise.resolve({}));
+    if (prefs && prefs.readOnly === true) {
+      log("debug", "readOnly: skip calendar→todo delete");
+      return;
+    }
     syncFromCalendarInProgress = true;
     try {
       if (self.deleteCalendarItem) await self.deleteCalendarItem({ id });
@@ -83,11 +88,16 @@
   const lastAddedFromCalendar = new Set();
   const LAST_ADDED_CLEAR_MS = 8000;
 
-  async function handleCalendarCreated(plain) {
+  async function shouldSkipCalendarAdd(plain) {
+    const prefs = await (typeof self.getCalendarPrefs === "function" ? self.getCalendarPrefs() : Promise.resolve({}));
+    if (prefs && prefs.readOnly === true) {
+      log("debug", "readOnly: skip calendar→todo add");
+      return true;
+    }
     const key = keyTitleDue(plain);
     if (lastAddedFromCalendar.has(key)) {
       appendPullLog("created", plain.id, "skipped_recently_added");
-      return;
+      return true;
     }
     const items = await (typeof self.getCalendarItems === "function" ? self.getCalendarItems() : Promise.resolve([]));
     const alreadyInTodo = Array.isArray(items) && items.some(function (it) {
@@ -95,8 +105,14 @@
     });
     if (alreadyInTodo) {
       appendPullLog("created", plain.id, "skipped_already_in_todo");
-      return;
+      return true;
     }
+    return false;
+  }
+
+  async function handleCalendarCreated(plain) {
+    if (await shouldSkipCalendarAdd(plain)) return;
+    const key = keyTitleDue(plain);
     syncFromCalendarInProgress = true;
     try {
       if (self.addCalendarItem) {
@@ -113,6 +129,11 @@
   }
 
   async function handleCalendarUpdated(plain) {
+    const prefs = await (typeof self.getCalendarPrefs === "function" ? self.getCalendarPrefs() : Promise.resolve({}));
+    if (prefs && prefs.readOnly === true) {
+      log("debug", "readOnly: skip calendar→todo update");
+      return;
+    }
     syncFromCalendarInProgress = true;
     try {
       if (self.modifyCalendarItem) {
