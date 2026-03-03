@@ -7,3 +7,4 @@ Recordar enviar factura due:2025-12-05 +admin
 Tarea sin fecha de vencimiento +personal
 (D) Revisar PR de calendar-integration due:2025-12-03 +dev +review
 Tarea sin fecha de vencimiento 2+personal
+2026-03-02 revisar
