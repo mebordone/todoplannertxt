@@ -49,6 +49,11 @@
           { "name": "folderPath", "type": "string" },
           { "name": "fileName", "type": "string" }
         ]
+      },
+      {
+        "name": "getDefaultSearchPaths",
+        "type": "function",
+        "async": true
       }
     ]
   }

@@ -59,6 +59,43 @@ function joinPath(folderPath, fileName) {
   return folderPath.replace(/[/\\]+$/, "") + sep + fileName.replace(/^[/\\]+/, "");
 }
 
+function getDefaultSearchPaths() {
+  const paths = [];
+  try {
+    if (typeof Components === "undefined" || !Components.classes || !Components.interfaces) {
+      return { paths: [] };
+    }
+    const Ci = Components.interfaces;
+    const dirSvc = Components.classes["@mozilla.org/file/directory_service;1"]
+      .getService(Ci.nsIProperties);
+    if (!dirSvc) return { paths: [] };
+    let base = null;
+    try {
+      const home = dirSvc.get("Home", Ci.nsIFile);
+      if (home && home.path) base = String(home.path);
+    } catch (_) {}
+    if (!base) {
+      try {
+        const profD = dirSvc.get("ProfD", Ci.nsIFile);
+        if (profD && profD.path) base = String(profD.path);
+      } catch (_) {}
+    }
+    if (!base) return { paths: [] };
+    paths.push(base);
+    const subdirs = ["Documents", "Documentos", "Desktop"];
+    for (const sub of subdirs) {
+      paths.push(String(joinPath(base, sub)));
+    }
+  } catch (e) {
+    return {
+      paths: [],
+      error: (e && (e.message || (typeof e.toString === "function" ? e.toString() : String(e)))) || String(e),
+      errorName: (e && e.name) ? e.name : ""
+    };
+  }
+  return { paths };
+}
+
 function makeTask() {
   let resolve;
   let reject;
@@ -183,6 +220,19 @@ var todotxtFileAccess = class extends ExtensionCommon.ExtensionAPI {
             folderPath: nativeFile.parent.path,
             fileName: nativeFile.leafName
           };
+        },
+
+        getDefaultSearchPaths() {
+          try {
+            const result = getDefaultSearchPaths();
+            return Promise.resolve(result && typeof result === "object" ? result : { paths: [] });
+          } catch (e) {
+            return Promise.resolve({
+              paths: [],
+              error: (e && (e.message || (typeof e.toString === "function" ? e.toString() : String(e)))) || String(e),
+              errorName: (e && e.name) ? e.name : ""
+            });
+          }
         }
       }
     };
