@@ -59,14 +59,14 @@ function getPrefsFromUI() {
   const section = document.getElementById("filters-section");
   const filtersBarCollapsed = section ? section.classList.contains("collapsed") : false;
   return {
-    sortBy: getElValue("sort-by") || "priority",
+    sortBy: getElValue("sort-by") || "entryDate",
     sortDir: getElValue("sort-dir") || "asc",
-    groupBy: getElValue("group-by") || "",
+    groupBy: getElValue("group-by") || "project",
     filterProject: getElValue("filter-project") || "",
     filterContext: getElValue("filter-context") || "",
     filterPriority: getFilterPriorityFromUI(),
     filterDue: getElValue("filter-due") || "",
-    filterCompleted: getElValue("filter-completion") || "all",
+    filterCompleted: getElValue("filter-completion") || "open",
     filtersBarCollapsed
   };
 }
@@ -281,7 +281,7 @@ function fillPriorityDueCompletionOptions() {
     compEl.appendChild(makeOpt("all", i18n("tab_filter_all")));
     compEl.appendChild(makeOpt("open", i18n("tab_filter_open")));
     compEl.appendChild(makeOpt("done", i18n("tab_filter_done")));
-    compEl.value = prefs.filterCompleted || "all";
+    compEl.value = prefs.filterCompleted || "open";
   }
 }
 
@@ -293,7 +293,7 @@ function fillSortGroupOptions() {
   if (sortEl) {
     sortEl.innerHTML = "";
     sortKeys.forEach((k, i) => sortEl.appendChild(makeOpt(k, sortLabels[i])));
-    sortEl.value = prefs.sortBy || "priority";
+    sortEl.value = prefs.sortBy || "entryDate";
   }
   const groupEl = document.getElementById("group-by");
   if (groupEl) {
@@ -303,7 +303,7 @@ function fillSortGroupOptions() {
     groupEl.appendChild(makeOpt("context", i18n("tab_filter_context")));
     groupEl.appendChild(makeOpt("priority", i18n("tab_filter_priority")));
     groupEl.appendChild(makeOpt("completion", i18n("tab_filter_completion")));
-    groupEl.value = prefs.groupBy || "";
+    groupEl.value = prefs.groupBy || "project";
   }
   const sortDirEl = document.getElementById("sort-dir");
   if (sortDirEl && sortDirEl.options.length >= 2) {

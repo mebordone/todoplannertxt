@@ -22,9 +22,9 @@ describe("filterSort", () => {
 
   describe("DEFAULT_PREFS", () => {
     test("has expected keys", () => {
-      expect(DEFAULT_PREFS.sortBy).toBe("priority");
-      expect(DEFAULT_PREFS.filterCompleted).toBe("all");
-      expect(DEFAULT_PREFS.groupBy).toBe("");
+expect(DEFAULT_PREFS.sortBy).toBe("entryDate");
+    expect(DEFAULT_PREFS.filterCompleted).toBe("open");
+    expect(DEFAULT_PREFS.groupBy).toBe("project");
     });
   });
 

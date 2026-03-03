@@ -8,14 +8,14 @@
  */
 
 const DEFAULT_PREFS = {
-  sortBy: "priority",
+  sortBy: "entryDate",
   sortDir: "asc",
-  groupBy: "",
+  groupBy: "project",
   filterProject: "",
   filterContext: "",
   filterPriority: "",
   filterDue: "",
-  filterCompleted: "all"
+  filterCompleted: "open"
 };
 
 function normalizeLocation(loc) {
