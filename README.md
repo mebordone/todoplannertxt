@@ -55,6 +55,18 @@ Los builds se generan en la carpeta `dist/`. Desde la raíz del proyecto:
 
 El archivo `.xpi` quedará en `dist/` (p. ej. `dist/todotxt_3.1.0_20250302_143022.xpi`). Opción `-d` para build con logs de depuración; `-h` para ayuda.
 
+## Depuración remota
+
+Para usar la conexión de depuración de Thunderbird (puerto que muestra la ventana “Depuración del navegador”) y listar objetivos depurables (popup, background, opciones) y sus URLs WebSocket:
+
+```bash
+npm run debug:remote [puerto]
+# Ej.: npm run debug:remote 6000   (tras arrancar thunderbird -start-debugger-server 6000)
+#      npm run debug:remote 33321 (si Thunderbird ya mostró ese puerto en la ventana de depuración)
+```
+
+Ver `docs/debug-remote.md` para habilitar el servidor y usar las URLs con Chrome DevTools u otras herramientas CDP.
+
 ## Estructura del proyecto
 
 - `manifest.json` – Manifest de la extensión (TB 140, storage, options_ui, browser_action, experiment_apis).
