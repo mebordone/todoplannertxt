@@ -21,6 +21,7 @@
   ],
   "background": {
     "scripts": [
+      "lib/build-info.js",
       "modules/todotxt.js",
       "modules/exception.js",
       "modules/logger.js",
