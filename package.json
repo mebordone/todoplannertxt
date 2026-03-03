@@ -9,7 +9,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "complexity": "node scripts/complexity-report.js",
-    "lint": "eslint modules/ lib/ background.js background/*.js --max-warnings 0",
+    "lint": "eslint modules/ lib/ background.js background/*.js tab/*.js --max-warnings 0",
     "ci": "npm run test:coverage && npm run lint && npm run complexity"
   },
   "devDependencies": {

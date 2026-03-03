@@ -8,7 +8,7 @@ const path = require("path");
 const { ESLint } = require("eslint");
 
 const ROOT = path.join(__dirname, "..");
-const GLOB = ["modules/*.js", "lib/*.js", "background.js", "background/*.js"];
+const GLOB = ["modules/*.js", "lib/*.js", "background.js", "background/*.js", "tab/*.js"];
 
 async function main() {
   const eslint = new ESLint({
