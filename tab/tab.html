@@ -6,9 +6,9 @@
   <style>
     body { margin: 0; font-family: system-ui, sans-serif; font-size: 13px; display: flex; flex-direction: column; min-height: 100vh; }
     .container { max-width: 800px; margin: 0 auto; width: 100%; padding: 0 1rem; display: flex; flex-direction: column; flex: 1; }
-    .toolbar { padding: 12px 8px; border-bottom: 1px solid #ccc; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .toolbar { padding: 8px 8px; border-bottom: 1px solid #ccc; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .toolbar button { padding: 6px 12px; border-radius: 4px; cursor: pointer; }
-    .toolbar-secondary { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .toolbar-secondary { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-left: auto; }
     .toolbar-link { display: inline-block; border: 1px solid #ccc; border-radius: 4px; padding: 6px 12px; font-size: 13px; text-decoration: none; color: inherit; background: transparent; cursor: pointer; }
     .toolbar-link:hover { background: #f0f0f0; border-color: #aaa; }
     .toolbar-hint { font-size: 11px; color: #888; margin-left: 8px; }
@@ -36,7 +36,7 @@
     .empty { color: #888; padding: 2rem; text-align: center; }
     .error { color: #c00; padding: 12px; font-size: 12px; }
     a { color: #0a84ff; }
-    .toolbar-filters { flex-wrap: wrap; gap: 6px; }
+    .toolbar-filters { flex-wrap: wrap; gap: 6px; padding-top: 6px; padding-bottom: 6px; }
     .toolbar-filters label { display: inline-flex; align-items: center; gap: 4px; }
     .filter-label { font-size: 11px; color: #666; white-space: nowrap; }
     .toolbar-filters select { padding: 4px 6px; font-size: 12px; min-width: 0; }
@@ -66,14 +66,14 @@
 <body>
   <div class="container">
     <div class="toolbar">
-      <button type="button" id="refresh" aria-label="Refresh task list">Refresh</button>
       <input type="text" id="new-task" placeholder="New task…" style="flex:1; min-width: 200px; padding: 6px 8px; font-size: 13px;">
       <button type="button" id="add-task" class="btn-primary" aria-label="Add task">Add</button>
       <span id="add-feedback" class="toolbar-hint" style="display:none;" aria-live="polite"></span>
       <div class="toolbar-secondary">
+        <button type="button" id="view-today" class="toolbar-link" aria-label="View today">Today</button>
+        <button type="button" id="refresh" aria-label="Refresh task list">Refresh</button>
         <button type="button" id="quick-view" class="toolbar-link" title="">Quick view</button>
         <a href="#" id="open-options" class="toolbar-link">Options</a>
-        <span class="toolbar-hint" id="toolbar-hint">Toolbar icon is visible in the Mail tab.</span>
       </div>
     </div>
     <div id="syntax-hint-bar" class="syntax-hint-bar">
@@ -99,6 +99,7 @@
         <a href="https://github.com/todotxt/todo.txt" target="_blank" rel="noopener noreferrer" id="syntax-more-link" class="syntax-more-link"></a>
       </div>
     </div>
+    <div id="today-summary" class="toolbar-hint" style="display:none; padding: 4px 0;"></div>
     <div id="filters-section" class="filters-section">
       <div id="filters-bar-header" class="filters-bar-header" role="button" tabindex="0">
         <span class="filter-label" id="label-filters">Filters & view</span>
@@ -115,12 +116,10 @@
         <label><select id="sort-dir"><option value="asc"></option><option value="desc"></option></select></label>
         <label><span class="filter-label" id="label-group">Group by</span><select id="group-by"></select></label>
         <label><span class="filter-label" id="label-default-view">Default view</span><select id="default-view-preset"></select></label>
-        <button type="button" id="view-today" class="toolbar-link" aria-label="View today">Today</button>
         <button type="button" id="reset-filters-btn" class="toolbar-link" style="margin-left:4px;" aria-label="Reset filters">Reset filters</button>
       </div>
     </div>
     <div id="error" class="error" style="display:none;" role="alert" aria-live="polite"></div>
-    <div id="today-summary" class="toolbar-hint" style="display:none; padding: 4px 0;"></div>
     <div id="task-count" class="toolbar-hint" style="display:none; padding: 4px 0;"></div>
     <div id="list" class="list" role="list" aria-label="Task list">
       <div class="empty">Loading…</div>
