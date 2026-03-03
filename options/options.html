@@ -50,6 +50,15 @@
     <div class="checkbox">
       <label><input type="checkbox" id="read-only"> <span data-i18n="options_readOnly">Read-only mode (do not write to todo.txt/done.txt)</span></label>
     </div>
+    <div class="row" style="margin-top: 0.5rem;">
+      <label for="display-language" data-i18n="options_displayLanguage">Display language</label>
+      <select id="display-language" style="margin-left: 0.5rem;">
+        <option value="browser" data-i18n="options_displayLanguage_browser">Use Thunderbird language</option>
+        <option value="en" data-i18n="options_displayLanguage_en">English</option>
+        <option value="es" data-i18n="options_displayLanguage_es">Español</option>
+      </select>
+    </div>
+    <p class="hint" style="margin-top: 0.25rem;" data-i18n="options_displayLanguage_hint">Takes effect after reopening the popup/tab or reloading this page.</p>
   </div>
 
   <div class="group" id="calendar-group">
@@ -84,6 +93,7 @@
   <p id="options-saved" class="hint" style="display:none; color:#080;"></p>
   <p class="hint" data-i18n="options_fsa_hint">Use Browse to select your todo.txt and done.txt files. No extra add-on required.</p>
 
+  <script src="../lib/i18nHelper.js"></script>
   <script src="options.js"></script>
 </body>
 </html>

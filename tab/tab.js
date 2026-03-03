@@ -11,9 +11,10 @@ let savePrefsTimer = null;
 let fullItems = [];
 let readOnlyMode = false;
 
-function i18n(id) {
+function i18n(id, subs) {
   try {
-    return api.i18n.getMessage(id) || id;
+    if (typeof i18nHelper !== "undefined" && i18nHelper.getMessage) return i18nHelper.getMessage(id, subs) || id;
+    return api.i18n.getMessage(id, subs) || id;
   } catch (_) {
     return id;
   }
@@ -155,8 +156,8 @@ function renderTask(item) {
   const meta = document.createElement("div");
   meta.className = "task-meta";
   const parts = [];
-  if (item.priority) parts.push("Priority " + item.priority);
-  if (item.dueDate) parts.push("Due: " + item.dueDate);
+  if (item.priority) parts.push(i18n("tab_meta_priority") + " " + item.priority);
+  if (item.dueDate) parts.push(i18n("tab_meta_due") + " " + item.dueDate);
   if (item.categories && item.categories.length) parts.push(item.categories.join(", "));
   meta.textContent = parts.join(" · ");
   div.appendChild(cb);
@@ -372,7 +373,7 @@ async function applyTabSetupAfterLoad() {
 
 async function loadItems() {
   const listEl = document.getElementById("list");
-  listEl.innerHTML = "<div class=\"empty\">Loading…</div>";
+  listEl.innerHTML = "<div class=\"empty\">" + i18n("tab_loading") + "</div>";
   showError("");
   setLoading(true);
   try {
@@ -548,6 +549,33 @@ if (filtersHeader) {
 document.getElementById("reset-filters-btn")?.addEventListener("click", resetFiltersAndRefresh);
 
 const quickViewEl = document.getElementById("quick-view");
-if (quickViewEl) quickViewEl.title = i18n("tab_quick_view_tooltip");
+function setToolbarI18n() {
+  const refreshEl = document.getElementById("refresh");
+  if (refreshEl) {
+    refreshEl.textContent = i18n("tab_refresh");
+    refreshEl.setAttribute("aria-label", i18n("tab_refresh_aria"));
+  }
+  const newTaskEl = document.getElementById("new-task");
+  if (newTaskEl) newTaskEl.placeholder = i18n("tab_new_task_placeholder");
+  const addEl = document.getElementById("add-task");
+  if (addEl) {
+    addEl.textContent = i18n("tab_add");
+    addEl.setAttribute("aria-label", i18n("tab_add_aria"));
+  }
+  if (quickViewEl) {
+    quickViewEl.textContent = i18n("tab_quick_view");
+    quickViewEl.title = i18n("tab_quick_view_tooltip");
+  }
+  const optionsEl = document.getElementById("open-options");
+  if (optionsEl) optionsEl.textContent = i18n("tab_options");
+  const hintEl = document.getElementById("toolbar-hint");
+  if (hintEl) hintEl.textContent = i18n("tab_toolbar_hint");
+}
 
-loadItems();
+(async function initTab() {
+  try {
+    if (typeof i18nHelper !== "undefined" && i18nHelper.init) await i18nHelper.init();
+  } catch (_) {}
+  setToolbarI18n();
+  loadItems();
+})();

@@ -6,9 +6,10 @@ const api = typeof browser !== "undefined" ? browser : chrome;
 let readOnlyMode = false;
 let editDialogItem = null;
 
-function i18n(id) {
+function i18n(id, subs) {
   try {
-    return api.i18n.getMessage(id) || id;
+    if (typeof i18nHelper !== "undefined" && i18nHelper.getMessage) return i18nHelper.getMessage(id, subs) || id;
+    return api.i18n.getMessage(id, subs) || id;
   } catch (_) {
     return id;
   }
@@ -53,16 +54,8 @@ function renderTask(item) {
   const title = document.createElement("span");
   title.className = "task-title";
   title.textContent = item.title || "";
-  const meta = document.createElement("div");
-  meta.className = "task-meta";
-  const parts = [];
-  if (item.priority) parts.push("Priority " + item.priority);
-  if (item.dueDate) parts.push("Due: " + item.dueDate);
-  if (item.categories && item.categories.length) parts.push(item.categories.join(", "));
-  meta.textContent = parts.join(" · ");
   div.appendChild(cb);
   div.appendChild(title);
-  if (parts.length) div.appendChild(meta);
   if (!readOnlyMode) {
     const delBtn = document.createElement("button");
     delBtn.type = "button";
@@ -89,7 +82,7 @@ function setLoading(loading) {
 
 async function loadItems() {
   const listEl = document.getElementById("list");
-  listEl.innerHTML = "<div class=\"empty\">Loading…</div>";
+  listEl.innerHTML = "<div class=\"empty\">" + i18n("popup_loading") + "</div>";
   showError("");
   setLoading(true);
   try {
@@ -244,6 +237,42 @@ if (editInput) {
 }
 
 const openTabEl = document.getElementById("open-tab");
-if (openTabEl) openTabEl.title = i18n("popup_tab_tooltip");
+function setPopupToolbarI18n() {
+  const titleEl = document.getElementById("popup-title");
+  if (titleEl) titleEl.textContent = i18n("extensionName");
+  const refreshEl = document.getElementById("refresh");
+  if (refreshEl) {
+    refreshEl.setAttribute("aria-label", i18n("popup_refresh_aria"));
+    refreshEl.setAttribute("title", i18n("popup_refresh"));
+  }
+  const newTaskEl = document.getElementById("new-task");
+  if (newTaskEl) newTaskEl.placeholder = i18n("popup_new_task_placeholder");
+  const addEl = document.getElementById("add-task");
+  if (addEl) {
+    addEl.setAttribute("aria-label", i18n("popup_add_aria"));
+    addEl.setAttribute("title", i18n("popup_add"));
+  }
+  if (openTabEl) {
+    openTabEl.setAttribute("title", i18n("popup_tab_tooltip"));
+    openTabEl.setAttribute("aria-label", i18n("popup_tab_tooltip"));
+  }
+  const optionsEl = document.getElementById("open-options");
+  if (optionsEl) {
+    optionsEl.setAttribute("title", i18n("popup_options"));
+    optionsEl.setAttribute("aria-label", i18n("popup_options"));
+  }
+  const editTitleEl = document.getElementById("edit-dialog-title");
+  if (editTitleEl) editTitleEl.textContent = i18n("popup_edit_task");
+  const editCancelBtn = document.getElementById("edit-cancel");
+  if (editCancelBtn) editCancelBtn.textContent = i18n("popup_edit_cancel");
+  const editSaveBtn = document.getElementById("edit-save");
+  if (editSaveBtn) editSaveBtn.textContent = i18n("popup_edit_save");
+}
 
-loadItems();
+(async function initPopup() {
+  try {
+    if (typeof i18nHelper !== "undefined" && i18nHelper.init) await i18nHelper.init();
+  } catch (_) {}
+  setPopupToolbarI18n();
+  loadItems();
+})();

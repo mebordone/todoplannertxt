@@ -4,9 +4,10 @@
 
 const api = typeof browser !== "undefined" ? browser : chrome;
 
-function i18n(id) {
+function i18n(id, subs) {
   try {
-    return api.i18n.getMessage(id) || id;
+    if (typeof i18nHelper !== "undefined" && i18nHelper.getMessage) return i18nHelper.getMessage(id, subs) || id;
+    return api.i18n.getMessage(id, subs) || id;
   } catch (_) {
     return id;
   }
@@ -36,6 +37,8 @@ function applyBasicPrefsToUI(prefs) {
   document.getElementById("show-full-title").checked = !!prefs.showFullTitle;
   const readOnlyEl = document.getElementById("read-only");
   if (readOnlyEl) readOnlyEl.checked = prefs.readOnly === true;
+  const displayLangEl = document.getElementById("display-language");
+  if (displayLangEl) displayLangEl.value = prefs.displayLanguage === "en" || prefs.displayLanguage === "es" ? prefs.displayLanguage : "browser";
   document.getElementById("calendar-enabled").checked = prefs.calendarIntegrationEnabled === true;
   document.getElementById("calendar-sync-auto").checked = prefs.calendarSyncAuto !== false;
 }
@@ -204,7 +207,57 @@ function handleSyncNowClick(syncNowBtn, syncStatusEl) {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+function bindOptionListeners() {
+  document.getElementById("browse-todo").addEventListener("click", () => pickFile("todo"));
+  document.getElementById("browse-done").addEventListener("click", () => pickFile("done"));
+  document.getElementById("use-thunderbird").addEventListener("change", (e) => savePrefs({ useThunderbird: e.target.checked }));
+  document.getElementById("use-creation").addEventListener("change", (e) => savePrefs({ useCreation: e.target.checked }));
+  document.getElementById("show-full-title").addEventListener("change", (e) => savePrefs({ showFullTitle: e.target.checked }));
+  const readOnlyEl = document.getElementById("read-only");
+  if (readOnlyEl) readOnlyEl.addEventListener("change", (e) => savePrefs({ readOnly: e.target.checked }));
+  const displayLangEl = document.getElementById("display-language");
+  if (displayLangEl) displayLangEl.addEventListener("change", (e) => savePrefs({ displayLanguage: e.target.value || "browser" }));
+  document.getElementById("calendar-enabled").addEventListener("change", async (e) => {
+    await savePrefs({ calendarIntegrationEnabled: e.target.checked });
+    await loadPrefs();
+  });
+  document.getElementById("calendar-sync-auto").addEventListener("change", (e) => savePrefs({ calendarSyncAuto: e.target.checked }));
+  const calSelect = document.getElementById("calendar-select");
+  if (calSelect) calSelect.addEventListener("change", () => savePrefs({ calendarId: calSelect.value || null }));
+  const syncNowBtn = document.getElementById("calendar-sync-now");
+  const syncStatusEl = document.getElementById("calendar-sync-status");
+  if (syncNowBtn && syncStatusEl) syncNowBtn.addEventListener("click", () => handleSyncNowClick(syncNowBtn, syncStatusEl));
+  const copyLogBtn = document.getElementById("calendar-copy-log");
+  if (copyLogBtn) copyLogBtn.addEventListener("click", () => handleCopyLogClick(copyLogBtn));
+  const exportIcsBtn = document.getElementById("calendar-export-ics");
+  if (exportIcsBtn) exportIcsBtn.addEventListener("click", handleExportIcsClick);
+}
+
+async function handleExportIcsClick() {
+  const res = await api.runtime.sendMessage({ command: "exportTodoToIcs" });
+  if (res && res.error) {
+    showError(res.error);
+    return;
+  }
+  const ics = (res && res.ics) || "";
+  if (!ics) {
+    showError("No tasks with due date to export.");
+    return;
+  }
+  const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "todo-due.ics";
+  a.click();
+  URL.revokeObjectURL(url);
+  showError("");
+}
+
+async function initOptionsPage() {
+  try {
+    if (typeof i18nHelper !== "undefined" && i18nHelper.init) await i18nHelper.init();
+  } catch (_) {}
   try {
     document.title = i18n("options_title") || document.title;
   } catch (_) {}
@@ -212,54 +265,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const id = el.getAttribute("data-i18n");
     if (id) el.textContent = i18n(id);
   });
-
   loadPrefs();
+  bindOptionListeners();
+}
 
-  document.getElementById("browse-todo").addEventListener("click", () => pickFile("todo"));
-  document.getElementById("browse-done").addEventListener("click", () => pickFile("done"));
-
-  document.getElementById("use-thunderbird").addEventListener("change", (e) => savePrefs({ useThunderbird: e.target.checked }));
-  document.getElementById("use-creation").addEventListener("change", (e) => savePrefs({ useCreation: e.target.checked }));
-  document.getElementById("show-full-title").addEventListener("change", (e) => savePrefs({ showFullTitle: e.target.checked }));
-  const readOnlyEl = document.getElementById("read-only");
-  if (readOnlyEl) readOnlyEl.addEventListener("change", (e) => savePrefs({ readOnly: e.target.checked }));
-  document.getElementById("calendar-enabled").addEventListener("change", async (e) => {
-    await savePrefs({ calendarIntegrationEnabled: e.target.checked });
-    await loadPrefs();
-  });
-  document.getElementById("calendar-sync-auto").addEventListener("change", (e) => savePrefs({ calendarSyncAuto: e.target.checked }));
-  const calSelect = document.getElementById("calendar-select");
-  if (calSelect) {
-    calSelect.addEventListener("change", () => savePrefs({ calendarId: calSelect.value || null }));
-  }
-  const syncNowBtn = document.getElementById("calendar-sync-now");
-  const syncStatusEl = document.getElementById("calendar-sync-status");
-  if (syncNowBtn && syncStatusEl) {
-    syncNowBtn.addEventListener("click", () => handleSyncNowClick(syncNowBtn, syncStatusEl));
-  }
-  const copyLogBtn = document.getElementById("calendar-copy-log");
-  if (copyLogBtn) copyLogBtn.addEventListener("click", () => handleCopyLogClick(copyLogBtn));
-  const exportIcsBtn = document.getElementById("calendar-export-ics");
-  if (exportIcsBtn) {
-    exportIcsBtn.addEventListener("click", async () => {
-      const res = await api.runtime.sendMessage({ command: "exportTodoToIcs" });
-      if (res && res.error) {
-        showError(res.error);
-        return;
-      }
-      const ics = (res && res.ics) || "";
-      if (!ics) {
-        showError("No tasks with due date to export.");
-        return;
-      }
-      const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "todo-due.ics";
-      a.click();
-      URL.revokeObjectURL(url);
-      showError("");
-    });
-  }
+document.addEventListener("DOMContentLoaded", () => {
+  initOptionsPage().catch(() => {});
 });
