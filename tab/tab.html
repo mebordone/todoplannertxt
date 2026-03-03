@@ -114,10 +114,13 @@
         <label><span class="filter-label" id="label-sort">Sort by</span><select id="sort-by"></select></label>
         <label><select id="sort-dir"><option value="asc"></option><option value="desc"></option></select></label>
         <label><span class="filter-label" id="label-group">Group by</span><select id="group-by"></select></label>
+        <label><span class="filter-label" id="label-default-view">Default view</span><select id="default-view-preset"></select></label>
+        <button type="button" id="view-today" class="toolbar-link" aria-label="View today">Today</button>
         <button type="button" id="reset-filters-btn" class="toolbar-link" style="margin-left:4px;" aria-label="Reset filters">Reset filters</button>
       </div>
     </div>
     <div id="error" class="error" style="display:none;" role="alert" aria-live="polite"></div>
+    <div id="today-summary" class="toolbar-hint" style="display:none; padding: 4px 0;"></div>
     <div id="task-count" class="toolbar-hint" style="display:none; padding: 4px 0;"></div>
     <div id="list" class="list" role="list" aria-label="Task list">
       <div class="empty">Loading…</div>

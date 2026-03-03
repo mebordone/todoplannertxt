@@ -118,5 +118,12 @@
   "popup_meta_due": { "message": "Échéance\u00a0:" },
   "popup_loading": { "message": "Chargement…" },
   "popup_edit_cancel": { "message": "Annuler" },
-  "popup_edit_save": { "message": "Enregistrer" }
+  "popup_edit_save": { "message": "Enregistrer" },
+  "tab_view_today": { "message": "Aujourd'hui" },
+  "tab_view_today_aria": { "message": "Afficher uniquement les tâches qui arrivent à échéance aujourd'hui" },
+  "tab_default_view": { "message": "Vue par défaut" },
+  "tab_default_view_all": { "message": "Toutes les tâches" },
+  "tab_default_view_today": { "message": "Aujourd'hui seulement" },
+  "tab_summary_today": { "message": "%d tâches aujourd'hui" },
+  "tab_summary_overdue": { "message": "%d en retard" }
 }

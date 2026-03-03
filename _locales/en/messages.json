@@ -118,5 +118,12 @@
   "popup_meta_due": { "message": "Due:" },
   "popup_loading": { "message": "Loading…" },
   "popup_edit_cancel": { "message": "Cancel" },
-  "popup_edit_save": { "message": "Save" }
+  "popup_edit_save": { "message": "Save" },
+  "tab_view_today": { "message": "Today" },
+  "tab_view_today_aria": { "message": "Show tasks due today" },
+  "tab_default_view": { "message": "Default view" },
+  "tab_default_view_all": { "message": "All tasks" },
+  "tab_default_view_today": { "message": "Today only" },
+  "tab_summary_today": { "message": "%d tasks today" },
+  "tab_summary_overdue": { "message": "%d overdue" }
 }

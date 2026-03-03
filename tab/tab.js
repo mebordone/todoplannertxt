@@ -130,7 +130,8 @@ function getPrefsFromUI() {
     filterPriority: getFilterPriorityFromUI(),
     filterDue: getElValue("filter-due") || "",
     filterCompleted: getElValue("filter-completion") || "open",
-    filtersBarCollapsed
+    filtersBarCollapsed,
+    defaultViewPreset: getElValue("default-view-preset") || "all"
   };
 }
 
@@ -147,6 +148,8 @@ function applyPrefsToUI(prefs) {
   set("filter-priority", prefs.filterPriority);
   set("filter-due", prefs.filterDue);
   set("filter-completion", prefs.filterCompleted);
+  const defViewEl = document.getElementById("default-view-preset");
+  if (defViewEl) defViewEl.value = prefs.defaultViewPreset || "all";
   const section = document.getElementById("filters-section");
   if (section) {
     if (prefs.filtersBarCollapsed) section.classList.add("collapsed");
@@ -155,7 +158,9 @@ function applyPrefsToUI(prefs) {
 }
 
 function getDefaultTabPrefs() {
-  return fs && fs.DEFAULT_PREFS ? { ...fs.DEFAULT_PREFS } : {};
+  const base = fs && fs.DEFAULT_PREFS ? { ...fs.DEFAULT_PREFS } : {};
+  if (!Object.prototype.hasOwnProperty.call(base, "defaultViewPreset")) base.defaultViewPreset = "all";
+  return base;
 }
 
 function mergeStoredWithDefault(stored) {
@@ -202,6 +207,102 @@ function resetFiltersAndRefresh() {
   applyPrefsToUI(defaultPrefs);
   saveTabPrefs(defaultPrefs);
   refreshView();
+}
+
+function applyTodayView() {
+  const dueEl = document.getElementById("filter-due");
+  if (dueEl) dueEl.value = "today";
+  const compEl = document.getElementById("filter-completion");
+  if (compEl) compEl.value = "open";
+  const sortByEl = document.getElementById("sort-by");
+  if (sortByEl) sortByEl.value = "dueDate";
+  const sortDirEl = document.getElementById("sort-dir");
+  if (sortDirEl) sortDirEl.value = "asc";
+  const searchEl = document.getElementById("search");
+  if (searchEl) searchEl.value = "";
+  const prefs = getPrefsFromUI();
+  saveTabPrefs(prefs);
+  refreshView();
+}
+
+function applyOverdueView() {
+  const dueEl = document.getElementById("filter-due");
+  if (dueEl) dueEl.value = "overdue";
+  const compEl = document.getElementById("filter-completion");
+  if (compEl) compEl.value = "open";
+  const sortByEl = document.getElementById("sort-by");
+  if (sortByEl) sortByEl.value = "dueDate";
+  const sortDirEl = document.getElementById("sort-dir");
+  if (sortDirEl) sortDirEl.value = "asc";
+  const prefs = getPrefsFromUI();
+  saveTabPrefs(prefs);
+  refreshView();
+}
+
+function getTodayString() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function getSummaryBaseItems() {
+  if (!fs) return fullItems;
+  const prefs = getPrefsFromUI();
+  const baseFilters = {
+    ...prefs,
+    filterDue: "",
+    filterCompleted: "open"
+  };
+  return fs.applyFilters(fullItems, baseFilters);
+}
+
+function updateTodaySummary() {
+  const summaryEl = document.getElementById("today-summary");
+  if (!summaryEl || fullItems.length === 0) {
+    if (summaryEl) {
+      summaryEl.style.display = "none";
+      summaryEl.textContent = "";
+    }
+    return;
+  }
+  const base = getSummaryBaseItems();
+  if (!base || base.length === 0) {
+    summaryEl.style.display = "none";
+    summaryEl.textContent = "";
+    return;
+  }
+  const todayStr = getTodayString();
+  let countToday = 0;
+  let countOverdue = 0;
+  base.forEach((item) => {
+    if (!item.dueDate) return;
+    const dueStr = String(item.dueDate).slice(0, 10);
+    if (dueStr === todayStr) countToday++;
+    else if (dueStr < todayStr) countOverdue++;
+  });
+  if (!countToday && !countOverdue) {
+    summaryEl.style.display = "none";
+    summaryEl.textContent = "";
+    return;
+  }
+  summaryEl.innerHTML = "";
+  const todayBtn = document.createElement("button");
+  todayBtn.type = "button";
+  todayBtn.className = "toolbar-link";
+  todayBtn.textContent = i18n("tab_summary_today").replace("%d", String(countToday));
+  todayBtn.addEventListener("click", () => applyTodayView());
+  summaryEl.appendChild(todayBtn);
+  const sep = document.createTextNode(" · ");
+  summaryEl.appendChild(sep);
+  const overdueBtn = document.createElement("button");
+  overdueBtn.type = "button";
+  overdueBtn.className = "toolbar-link";
+  overdueBtn.textContent = i18n("tab_summary_overdue").replace("%d", String(countOverdue));
+  overdueBtn.addEventListener("click", () => applyOverdueView());
+  summaryEl.appendChild(overdueBtn);
+  summaryEl.style.display = "block";
 }
 
 function getTaskRowClass(item) {
@@ -335,6 +436,7 @@ function refreshView() {
     }
   }
   renderList(sorted, prefs.groupBy);
+  updateTodaySummary();
 }
 
 function makeOpt(val, label) {
@@ -468,15 +570,36 @@ async function applyTabSetupAfterLoad() {
   fillFilterOptions(fullItems);
   const searchEl = document.getElementById("search");
   if (searchEl) searchEl.placeholder = i18n("tab_search_placeholder");
-  const labels = ["label-filters", "label-project", "label-context", "label-priority", "label-due", "label-completion", "label-sort", "label-group"];
-  const i18nIds = ["tab_filters_view", "tab_filter_project", "tab_filter_context", "tab_filter_priority", "tab_filter_due", "tab_filter_completion", "tab_sort_by", "tab_group_by"];
+  const labels = ["label-filters", "label-project", "label-context", "label-priority", "label-due", "label-completion", "label-sort", "label-group", "label-default-view"];
+  const i18nIds = ["tab_filters_view", "tab_filter_project", "tab_filter_context", "tab_filter_priority", "tab_filter_due", "tab_filter_completion", "tab_sort_by", "tab_group_by", "tab_default_view"];
   labels.forEach((id, i) => {
     const el = document.getElementById(id);
     if (el && i18nIds[i]) el.textContent = i18n(i18nIds[i]);
   });
   const resetFiltersBtn = document.getElementById("reset-filters-btn");
   if (resetFiltersBtn) resetFiltersBtn.textContent = i18n("tab_reset_filters");
-  refreshView();
+  const defViewEl = document.getElementById("default-view-preset");
+  if (defViewEl) {
+    defViewEl.innerHTML = "";
+    const options = [
+      { value: "all", label: i18n("tab_default_view_all") },
+      { value: "today", label: i18n("tab_default_view_today") }
+    ];
+    options.forEach((opt) => {
+      const o = document.createElement("option");
+      o.value = opt.value;
+      o.textContent = opt.label;
+      defViewEl.appendChild(o);
+    });
+    defViewEl.value = prefs.defaultViewPreset || "all";
+    defViewEl.addEventListener("change", () => {
+      const currentPrefs = getPrefsFromUI();
+      currentPrefs.defaultViewPreset = defViewEl.value || "all";
+      saveTabPrefs(currentPrefs);
+    });
+  }
+  if (prefs.defaultViewPreset === "today") applyTodayView();
+  else refreshView();
 }
 
 async function loadItems() {
@@ -638,6 +761,9 @@ document.getElementById("open-options").addEventListener("click", (e) => {
   }
 });
 
+const viewTodayEl = document.getElementById("view-today");
+if (viewTodayEl) viewTodayEl.addEventListener("click", () => applyTodayView());
+
 const filtersHeader = document.getElementById("filters-bar-header");
 if (filtersHeader) {
   filtersHeader.addEventListener("click", () => {
@@ -673,6 +799,11 @@ function setToolbarI18n() {
   if (quickViewEl) {
     quickViewEl.textContent = i18n("tab_quick_view");
     quickViewEl.title = i18n("tab_quick_view_tooltip");
+  }
+  const viewTodayEl = document.getElementById("view-today");
+  if (viewTodayEl) {
+    viewTodayEl.textContent = i18n("tab_view_today");
+    viewTodayEl.setAttribute("aria-label", i18n("tab_view_today_aria"));
   }
   const optionsEl = document.getElementById("open-options");
   if (optionsEl) optionsEl.textContent = i18n("tab_options");

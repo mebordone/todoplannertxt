@@ -118,5 +118,12 @@
   "popup_meta_due": { "message": "Fällig:" },
   "popup_loading": { "message": "Laden…" },
   "popup_edit_cancel": { "message": "Abbrechen" },
-  "popup_edit_save": { "message": "Speichern" }
+  "popup_edit_save": { "message": "Speichern" },
+  "tab_view_today": { "message": "Heute" },
+  "tab_view_today_aria": { "message": "Nur Aufgaben mit Fälligkeitsdatum heute anzeigen" },
+  "tab_default_view": { "message": "Standardansicht" },
+  "tab_default_view_all": { "message": "Alle Aufgaben" },
+  "tab_default_view_today": { "message": "Nur heute" },
+  "tab_summary_today": { "message": "%d Aufgaben heute" },
+  "tab_summary_overdue": { "message": "%d überfällig" }
 }

@@ -118,5 +118,12 @@
   "popup_meta_due": { "message": "Vencimiento:" },
   "popup_loading": { "message": "Cargando…" },
   "popup_edit_cancel": { "message": "Cancelar" },
-  "popup_edit_save": { "message": "Guardar" }
+  "popup_edit_save": { "message": "Guardar" },
+  "tab_view_today": { "message": "Hoy" },
+  "tab_view_today_aria": { "message": "Mostrar solo las tareas que vencen hoy" },
+  "tab_default_view": { "message": "Vista por defecto" },
+  "tab_default_view_all": { "message": "Todas las tareas" },
+  "tab_default_view_today": { "message": "Solo hoy" },
+  "tab_summary_today": { "message": "%d tareas para hoy" },
+  "tab_summary_overdue": { "message": "%d vencidas" }
 }
