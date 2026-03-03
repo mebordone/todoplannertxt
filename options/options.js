@@ -69,6 +69,28 @@ async function loadCalendarSection(calSelect, prefs) {
   if (apiAvailable && calSelect) populateCalendarSelect(calSelect, prefs, listRes);
 }
 
+function hasPathsConfigured(prefs) {
+  if (!prefs) return false;
+  return !!(prefs.todoFolderPath && prefs.doneFolderPath) || !!(prefs.todoFolderId && prefs.doneFolderId);
+}
+
+async function tryFetchAndSetDefaultPaths() {
+  const res = await api.runtime.sendMessage({ command: "getPrefs" });
+  const prefs = (res && !res.error) ? res : {};
+  if (hasPathsConfigured(prefs)) return;
+  const fsa = api.todotxtFileAccess;
+  if (!fsa || typeof fsa.getDefaultSearchPaths !== "function") return;
+  let result;
+  try {
+    result = await fsa.getDefaultSearchPaths();
+  } catch (_) {
+    return;
+  }
+  if (!result || result.error || !Array.isArray(result.paths) || result.paths.length === 0) return;
+  const setRes = await api.runtime.sendMessage({ command: "trySetDefaultPathsWithPaths", paths: result.paths });
+  if (setRes && setRes.ok) await loadPrefs();
+}
+
 async function loadPrefs() {
   const res = await api.runtime.sendMessage({ command: "getPrefs" });
   if (res && res.error) {
@@ -79,6 +101,7 @@ async function loadPrefs() {
   applyBasicPrefsToUI(prefs);
   const calSelect = document.getElementById("calendar-select");
   if (calSelect) await loadCalendarSection(calSelect, prefs);
+  await tryFetchAndSetDefaultPaths();
 }
 
 function showSavedFeedback() {
@@ -174,11 +197,12 @@ function buildSyncLogLines(log) {
 
 async function handleCopyLogClick(copyLogBtn) {
   try {
-    const log = await api.runtime.sendMessage({ command: "getLastCalendarSyncLog" });
-    const text = buildSyncLogLines(log).join("\n");
+    const res = await api.runtime.sendMessage({ command: "getExtensionDebugLog" });
+    const text = (res && res.log) ? res.log : "";
+    if (!text) throw new Error("Empty log");
     await navigator.clipboard.writeText(text);
     copyLogBtn.textContent = i18n("options_calendar_copied") || "Copied.";
-    setTimeout(() => { copyLogBtn.textContent = i18n("options_calendar_copy_log") || "Copy last sync log"; }, 1500);
+    setTimeout(() => { copyLogBtn.textContent = i18n("options_calendar_copy_log") || "Copy extension debug log"; }, 1500);
   } catch (e) {
     if (copyLogBtn.nextElementSibling) copyLogBtn.nextElementSibling.textContent = "Copy failed: " + (e && e.message);
   }
