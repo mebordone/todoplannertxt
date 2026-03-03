@@ -1,0 +1,9 @@
+(A) Revisar documentación del calendario due:2025-12-15 +docs
+(B) Llamar al cliente por el proyecto Alpha due:2025-12-10 +work +cliente
+Escribir tests de integración para sync due:2025-12-20 +dev
+Comprar leche @casa
+(C) Preparar presentación Q1 due:2026-01-15 +work +presentaciones
+Recordar enviar factura due:2025-12-05 +admin
+Tarea sin fecha de vencimiento +personal
+(D) Revisar PR de calendar-integration due:2025-12-03 +dev +review
+Tarea sin fecha de vencimiento 2+personal

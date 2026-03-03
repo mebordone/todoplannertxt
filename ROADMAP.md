@@ -14,7 +14,7 @@ This document outlines planned and potential future work for the Todo.txt MailEx
 | **2** | Full tab page: pending + done, same actions, no filters yet | § 1 |
 | **3** | Full tab: filters, search, sort, grouping (power view) | § 4 (first part) |
 | **4** | Configuration and portability (read-only, errors) | § 3 |
-| **5** | Calendar integration (when Thunderbird APIs allow) | § 2 |
+| **5** | Calendar integration Phase 1 done; Phase 2 (conflict resolution, etc.) planned | § 2 |
 | **6** | Planning window (backlog + calendar drag‑drop) | § 5 |
 | **7** | Sleek-style advanced (recurrence, archiving, file watch, i18n) | § 4 (rest) |
 
@@ -55,21 +55,16 @@ This establishes the foundation for all later UX work: popup = quick, tab = powe
 
 ## 2. Calendar integration (Lightning)
 
-**Status today (Thunderbird 140.7 ESR, e.g. Linux Mint `140.7.2esr mint-001`):**
+**Phase 1 (done – Thunderbird 140.7 ESR):**
 
-- The extension successfully reads/writes `todo.txt` and `done.txt` via a built-in Experiment API and provides a popup UI to view, add, edit and complete tasks.
-- The `calendarTodoTxt` experiment can attempt to register a “Todo.txt” calendar, but modern Thunderbird builds no longer load the legacy XPCOM calendar provider. Calendar views usually do **not** show items from `todo.txt`/`done.txt`.
+- **Experiment API:** Integration uses the webext-experiments calendar API (`calendar.calendars`, `calendar.items`) shipped in the extension (`experiments/calendar/`). A local calendar "Todo.txt" is created when the user enables integration in Options.
+- **Sync:** Only tasks with `due:YYYY-MM-DD` are synced. Bidirectional sync: todo.txt → calendar (push on file change / "Sync now") and calendar → todo.txt (onCreated/onUpdated/onRemoved). Deduplication avoids loops (normalized title+due key).
+- **Options:** Toggle to enable/disable integration, calendar selector, "Sync now" button, "Export to ICS" fallback when the API is unavailable, "Copy last sync log" for debugging.
+- **Docs:** `docs/calendar-integration.md`, `docs/experiments-calendar-analysis.md`. Tasks appear in Lightning **Tasks** view, not the day grid.
 
-**Goal:** Reintroduce calendar integration using supported, modern APIs so that tasks can be visualized and (ideally) manipulated from the Calendar view again.
+**Phase 2 (planned):**
 
-**Planned steps (subject to Thunderbird API availability):**
-
-1. Monitor Thunderbird MailExtension calendar APIs and examples to identify a supported way to expose Todo.txt items as calendar tasks/events or to synchronize a dedicated tasks calendar with `todo.txt`/`done.txt`.
-2. Prototype a new calendar adapter using only documented MailExtension APIs, reusing existing business logic (`todotxt.js`, `todoclient.js`, `fileUtil.js`).
-3. Add user-facing options (e.g. in Options page) to enable/disable calendar integration and choose which calendar (if any) mirrors Todo.txt items.
-4. Add integration tests for calendar population and round-trip changes where APIs allow.
-
-Until these APIs are available and stable, calendar integration remains **experimental / disabled** on most Thunderbird 140 ESR builds.
+- Richer conflict resolution (e.g. timestamps), optional recurrence mapping, and further UX/performance improvements once the Experiment API is stable and widely available.
 
 ---
 

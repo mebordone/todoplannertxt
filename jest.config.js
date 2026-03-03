@@ -10,7 +10,8 @@ module.exports = {
     "modules/md5.js",
     "modules/fileUtil.js",
     "modules/todoclient.js",
-    "lib/pendingOnlyFilter.js"
+    "lib/pendingOnlyFilter.js",
+    "background/calendarMappings.js"
   ],
   coverageDirectory: "test/coverage",
   coverageReporters: ["text", "text-summary", "html", "lcov"],
