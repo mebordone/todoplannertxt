@@ -66,15 +66,28 @@ function applyPrefsToUI(prefs) {
   set("filter-completion", prefs.filterCompleted);
 }
 
+function getDefaultTabPrefs() {
+  return fs && fs.DEFAULT_PREFS ? { ...fs.DEFAULT_PREFS } : {};
+}
+
+function mergeStoredWithDefault(stored) {
+  if (stored && typeof stored === "object") return { ...getDefaultTabPrefs(), ...stored };
+  return getDefaultTabPrefs();
+}
+
+function normalizeFilterCompleted(prefs) {
+  if (prefs && prefs.filterCompleted !== "open" && prefs.filterCompleted !== "done") prefs.filterCompleted = "all";
+}
+
 async function loadTabPrefs() {
   try {
     const raw = await api.storage.local.get(TAB_PREFS_KEY);
-    const p = raw && raw[TAB_PREFS_KEY];
-    const merged = p && typeof p === "object" ? { ...fs.DEFAULT_PREFS, ...p } : (fs && fs.DEFAULT_PREFS ? { ...fs.DEFAULT_PREFS } : {});
-    if (merged && merged.filterCompleted !== "open" && merged.filterCompleted !== "done") merged.filterCompleted = "all";
+    const stored = raw && raw[TAB_PREFS_KEY];
+    const merged = mergeStoredWithDefault(stored);
+    normalizeFilterCompleted(merged);
     return merged;
   } catch (_) {
-    return fs && fs.DEFAULT_PREFS ? { ...fs.DEFAULT_PREFS } : {};
+    return getDefaultTabPrefs();
   }
 }
 
