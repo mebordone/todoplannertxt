@@ -25,7 +25,7 @@ Extensión de **Thunderbird** para administrar archivos [todo.txt](http://todotx
 
 - **Opciones**: Rutas para todo.txt y done.txt con el selector de archivos integrado (sin complemento externo). Opciones de comportamiento en Thunderbird, fecha de creación y visualización del título completo.
 - **Interfaz dual**
-  - **Popup (vista rápida):** Clic en el icono de la barra de herramientas de Thunderbird abre un popup con solo las tareas pendientes; permite añadir una tarea, actualizar la lista, ir a Opciones y abrir la vista completa en pestaña. Los enlaces “Tab” y “Options” están agrupados como acciones secundarias.
+  - **Popup (vista rápida):** Clic en el icono de la barra abre un popup con título, solo las tareas pendientes (solo el título de cada tarea) y barra de herramientas con iconos: actualizar (⟳), campo nueva tarea, añadir (+), abrir vista completa (⧉) y opciones (⚙). Doble clic en una tarea para editar; checkbox para completar; botón × para eliminar (si no está en solo lectura).
   - **Vista en pestaña:** El enlace “Tab” abre una página completa con todas las tareas (pendientes y completadas), donde puedes añadir, completar, editar y actualizar. Desde esa pestaña, el botón **Quick view** abre el popup de vista rápida cuando la API lo permite; si no, se muestra un texto recordando que el icono de Todo.txt aparece en la barra al estar en la pestaña Correo.
   - **Visibilidad del icono:** El botón de Todo.txt en la barra de título es visible en la pestaña de correo (Mail). Cuando estás en la vista en pestaña de Todo.txt, usa **Quick view** para abrir el popup sin cambiar de pestaña, o vuelve a la pestaña Correo para ver el icono en la barra.
 - **Calendario (Lightning)**: El experimento intenta registrar un calendario “Todo.txt”. Solo las tareas con `due:YYYY-MM-DD` se sincronizan; aparecen en la vista **Tareas** de Lightning. Opciones: activar/desactivar integración, elegir calendario, "Sincronizar ahora", exportar a ICS si la API no está disponible. Ver `docs/calendar-integration.md`.
@@ -68,7 +68,7 @@ El archivo `.xpi` quedará en `dist/` (p. ej. `dist/todotxt_3.1.0_20250302_14302
 - `experiments/calendarTodoTxt/` – Experimento legacy para registrar el calendario en Lightning.
 - `experiments/calendar/` – Experiment API de calendario (webext-experiments): calendarios e ítems.
 - `background/calendarAdapter.js`, `background/syncService.js`, `background/calendarMappings.js` – Integración todo.txt ↔ Lightning.
-- `_locales/` – Mensajes en en, de, fr.
+- `_locales/` – Mensajes en en, es, de, fr (multiidioma; selector en Opciones).
 - `icons/` – Iconos 16, 32, 48 px.
 - `dist/` – Salida de builds (archivos .xpi); no se versiona (véase `.gitignore`).
 

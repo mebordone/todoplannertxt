@@ -15,14 +15,14 @@ This document outlines planned and potential future work for the Todo.txt MailEx
 | **3** | Full tab: filters, search, sort, grouping | **Done** | § 4 Phase A |
 | **4** | Configuration and portability (read-only, errors) | **Done** | § 3 |
 | **5** | Calendar integration Phase 1 | **Done** | § 2 |
-| **6** | Multi-language (EN + ES), sync with Thunderbird locale | Planned | § 8 |
-| **7** | UX improvements (feedback, empty states, form add-task) | Planned | § 8, § 4 |
+| **6** | Multi-language (EN + ES), sync with Thunderbird locale | **Done** | § 8.1 |
+| **7** | UX recommendations (§8.2: empty state, feedback, loading, delete, edit, filters, a11y, first-run) | **Done** | § 8.2 |
 | **8** | Form-based "Add task" (Todoist-style) | Planned | § 4 Phase B |
 | **9** | Calendar Phase 2; planning window; sleek-style advanced | Backlog | § 2, § 5, § 4 (rest) |
 
 Phases **0a** and **0b** can be done in parallel.
 
-**Implemented so far:** §1 (dual UI: popup + tab), §2 Phase 1 (calendar sync), §3 (read-only mode + error reporting), §4 Phase A (filters, search, sort, group in tab). See each section for details.
+**Implemented so far:** §1 (dual UI: popup + tab), §2 Phase 1 (calendar sync), §3 (read-only mode + error reporting), §4 Phase A (filters, search, sort, group in tab), §8.1 (multi-language EN + ES, display language selector), §8.2 (UX recommendations: empty state, reset filters, task-added feedback, loading state, sort labels, options “Saved”, delete task, in-place edit / dialog, collapsible filters, tooltips, task count, accessibility, first-run). See each section for details.
 
 ---
 
@@ -30,7 +30,7 @@ Phases **0a** and **0b** can be done in parallel.
 
 **Goal:** Keep the toolbar button for a fast glance, and add an explicit way to open a full page. Split responsibilities so the popup stays minimal and the tab becomes the “power” interface.
 
-**Implemented:** Popup shows only **pending** tasks (Add, Refresh, Tab link, Options). Tab (`tab/tab.html`, `tab/tab.js`) shows **all tasks**, add/complete/edit/refresh, Options, and **Filters & view** (search, project/context/priority/due/status, sort, group). Preferences in `tabViewPrefs`. Default: all tasks; filter dropdowns include "All". **Optional (not done):** Menu entry "Open Todo.txt in tab"; README note.
+**Implemented:** Popup shows only **pending** tasks with title-only list; toolbar with icons (refresh ⟳, add +, full view ⧉, options ⚙). Tab (`tab/tab.html`, `tab/tab.js`) shows **all tasks**, add/complete/edit/refresh, Options, and **Filters & view** (search, project/context/priority/due/status, sort, group). Preferences in `tabViewPrefs`. Default: all tasks; filter dropdowns include "All". **Optional (not done):** Menu entry "Open Todo.txt in tab"; README note.
 
 
 ---
@@ -96,18 +96,18 @@ This depends on § 2 (calendar integration) and on the full tab page (§ 1) exis
 
 ---
 
-## 8. Multi-language and UX improvements (planned)
+## 8. Multi-language and UX improvements
 
-### 8.1 Multi-language (EN + ES, sync with Thunderbird)
+### 8.1 Multi-language (EN + ES, sync with Thunderbird) — **implemented**
 
-- **Goal:** Support English and Spanish as UI languages; optionally let the user select the display language.
-- **Sync with Thunderbird:** Use the same locale as Thunderbird when possible (e.g. `browser.i18n.getUILanguage()` or manifest `default_locale` and `_locales`). If the app language is Spanish, the extension UI (popup, tab, options) should show Spanish without extra configuration.
-- **Dictionaries:** Maintain `_locales/en/messages.json` and `_locales/es/messages.json` (add Spanish if not present). All user-facing strings use `__MSG_*` in HTML and `browser.i18n.getMessage()` in JS. Existing locales (e.g. `de`, `fr`) can be kept; priority is EN + ES and sync with Thunderbird UI language.
-- **Optional:** In Options, a dropdown "Display language" with "Use Thunderbird language", "English", "Español", so users can force a language.
+- **Implemented:** Added `_locales/es/messages.json` with all UI strings in Spanish; when Thunderbird language is Spanish, the extension UI uses Spanish automatically. In Options, "Display language" dropdown: "Use Thunderbird language", "English", "Español"; when a fixed language is chosen, popup, tab and options use that locale (after reopen/reload). Helper `lib/i18nHelper.js` loads the chosen locale JSON and overrides `getMessage` in popup, tab and options.
+- **Goal (done):** Support English and Spanish; sync with Thunderbird locale by default; optional display language selector.
 
-### 8.2 UX recommendations (from usability analysis)
+### 8.2 UX recommendations (from usability analysis) — **implemented**
 
-Ordered from **simple + high impact** to **more complex + lower impact**:
+**Implemented:** All 12 items: (1) empty state when no tasks match + "Reset filters" button; (2) "Task added" feedback in popup/tab; (3) loading state (Refresh/Add disabled during load); (4) sort direction labels (Asc/Desc) via i18n; (5) options hint consistency + "Saved" feedback; (6) delete button per task in popup/tab with confirm, respect read-only; (7) tab: in-place edit on double-click, popup: custom dialog instead of `prompt()`; (8) collapsible "Filters & view" + Reset filters in bar; (9) tooltips for Tab / Quick view; (10) "Showing X of Y tasks"; (11) ARIA roles, aria-label, aria-live; (12) first-run message + "Open Options" when paths not set.
+
+Original list (for reference):
 
 1. **Empty state (tab):** When no tasks match filters, show an i18n message suggesting Project, Context and Status "All", plus a "Reset filters" button.
 2. **Feedback when adding a task:** Brief "Task added" (toast or inline) after successful add in popup/tab.
@@ -193,4 +193,4 @@ Recommended after or in parallel with repo migration (phase 0a). Cleanup is easi
 
 - **Popup** = quick view, **pending only**; "Tab" opens the **full page**.
 - **Full page (tab)** = power view: all tasks, filters/search/sort/group; implemented.
-- **Done:** Dual UI, filters/search/sort/group, read-only and error reporting, calendar Phase 1. **Planned:** Multi-language (EN + ES, sync with Thunderbird), UX improvements (§ 8), form-based Add task (Todoist-style). **Backlog:** Calendar Phase 2, planning window, recurrence/archiving; repo migration and legacy cleanup optional.
+- **Done:** Dual UI, filters/search/sort/group, read-only and error reporting, calendar Phase 1, multi-language (EN + ES, display language selector), §8.2 UX recommendations (empty state, feedback, loading, delete, edit, collapsible filters, tooltips, task count, a11y, first-run). **Planned:** Form-based Add task (Todoist-style) (§ 4 Phase B). **Backlog:** Calendar Phase 2, planning window, recurrence/archiving; §8.3 sleek-style and filter toggles; repo migration and legacy cleanup optional.
