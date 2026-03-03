@@ -9,6 +9,7 @@ const TAB_PREFS_KEY = "tabViewPrefs";
 const SAVE_DEBOUNCE_MS = 300;
 let savePrefsTimer = null;
 let fullItems = [];
+let readOnlyMode = false;
 
 function i18n(id) {
   try {
@@ -18,12 +19,27 @@ function i18n(id) {
   }
 }
 
-function showError(msg) {
+function showError(msg, showOptionsLink) {
   const el = document.getElementById("error");
-  if (el) {
-    el.textContent = msg || "";
-    el.style.display = msg ? "block" : "none";
+  if (!el) return;
+  el.innerHTML = "";
+  if (msg) {
+    el.appendChild(document.createTextNode(msg));
+    if (showOptionsLink) {
+      const link = document.createElement("a");
+      link.href = "#";
+      link.textContent = i18n("tab_open_options");
+      link.style.marginLeft = "8px";
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        const url = api.runtime.getURL("options/options.html");
+        if (api.tabs && api.tabs.create) api.tabs.create({ url });
+        else api.runtime.openOptionsPage?.();
+      });
+      el.appendChild(link);
+    }
   }
+  el.style.display = msg ? "block" : "none";
 }
 
 function getElValue(id) {
@@ -39,6 +55,8 @@ function getFilterPriorityFromUI() {
 }
 
 function getPrefsFromUI() {
+  const section = document.getElementById("filters-section");
+  const filtersBarCollapsed = section ? section.classList.contains("collapsed") : false;
   return {
     sortBy: getElValue("sort-by") || "priority",
     sortDir: getElValue("sort-dir") || "asc",
@@ -47,7 +65,8 @@ function getPrefsFromUI() {
     filterContext: getElValue("filter-context") || "",
     filterPriority: getFilterPriorityFromUI(),
     filterDue: getElValue("filter-due") || "",
-    filterCompleted: getElValue("filter-completion") || "all"
+    filterCompleted: getElValue("filter-completion") || "all",
+    filtersBarCollapsed
   };
 }
 
@@ -64,6 +83,11 @@ function applyPrefsToUI(prefs) {
   set("filter-priority", prefs.filterPriority);
   set("filter-due", prefs.filterDue);
   set("filter-completion", prefs.filterCompleted);
+  const section = document.getElementById("filters-section");
+  if (section) {
+    if (prefs.filtersBarCollapsed) section.classList.add("collapsed");
+    else section.classList.remove("collapsed");
+  }
 }
 
 function getDefaultTabPrefs() {
@@ -107,9 +131,19 @@ function runPipeline(items, searchQuery, prefs) {
   return out;
 }
 
+function resetFiltersAndRefresh() {
+  const defaultPrefs = getDefaultTabPrefs();
+  const searchEl = document.getElementById("search");
+  if (searchEl) searchEl.value = "";
+  applyPrefsToUI(defaultPrefs);
+  saveTabPrefs(defaultPrefs);
+  refreshView();
+}
+
 function renderTask(item) {
   const div = document.createElement("div");
   div.className = "task" + (item.isCompleted ? " completed" : "");
+  div.setAttribute("role", "listitem");
   div.dataset.id = item.id;
   const cb = document.createElement("input");
   cb.type = "checkbox";
@@ -128,6 +162,18 @@ function renderTask(item) {
   div.appendChild(cb);
   div.appendChild(title);
   if (parts.length) div.appendChild(meta);
+  if (!readOnlyMode) {
+    const delBtn = document.createElement("button");
+    delBtn.type = "button";
+    delBtn.textContent = i18n("tab_delete_task");
+    delBtn.className = "task-delete";
+    delBtn.style.cssText = "flex-shrink:0; font-size:11px; padding:2px 6px;";
+    delBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      deleteTask(item);
+    });
+    div.appendChild(delBtn);
+  }
   div.addEventListener("dblclick", () => editTask(item));
   return div;
 }
@@ -136,7 +182,17 @@ function renderList(sortedItems, groupBy) {
   const listEl = document.getElementById("list");
   listEl.innerHTML = "";
   if (sortedItems.length === 0) {
-    listEl.innerHTML = "<div class=\"empty\">No tasks match the filters. Change filters or add tasks.</div>";
+    const emptyWrap = document.createElement("div");
+    emptyWrap.className = "empty";
+    emptyWrap.appendChild(document.createTextNode(i18n("tab_empty_no_match")));
+    const resetBtn = document.createElement("button");
+    resetBtn.type = "button";
+    resetBtn.textContent = i18n("tab_reset_filters");
+    resetBtn.style.marginTop = "8px";
+    resetBtn.addEventListener("click", resetFiltersAndRefresh);
+    emptyWrap.appendChild(document.createElement("br"));
+    emptyWrap.appendChild(resetBtn);
+    listEl.appendChild(emptyWrap);
     return;
   }
   if (fs && groupBy) {
@@ -159,6 +215,16 @@ function refreshView() {
   const searchQuery = searchEl ? searchEl.value : "";
   const prefs = getPrefsFromUI();
   const sorted = runPipeline(fullItems, searchQuery, prefs);
+  const countEl = document.getElementById("task-count");
+  if (countEl) {
+    if (fullItems.length > 0) {
+      const msg = i18n("tab_showing_count");
+      countEl.textContent = msg.replace(/%d/, String(sorted.length)).replace(/%d/, String(fullItems.length));
+      countEl.style.display = "block";
+    } else {
+      countEl.style.display = "none";
+    }
+  }
   renderList(sorted, prefs.groupBy);
 }
 
@@ -238,6 +304,11 @@ function fillSortGroupOptions() {
     groupEl.appendChild(makeOpt("completion", i18n("tab_filter_completion")));
     groupEl.value = prefs.groupBy || "";
   }
+  const sortDirEl = document.getElementById("sort-dir");
+  if (sortDirEl && sortDirEl.options.length >= 2) {
+    sortDirEl.options[0].textContent = i18n("tab_sort_asc");
+    sortDirEl.options[1].textContent = i18n("tab_sort_desc");
+  }
 }
 
 function fillFilterOptions(items) {
@@ -253,24 +324,36 @@ function onFilterOrSortChange() {
   refreshView();
 }
 
-async function loadItems() {
-  const listEl = document.getElementById("list");
-  listEl.innerHTML = "<div class=\"empty\">Loading…</div>";
-  showError("");
-  const res = await api.runtime.sendMessage({ command: "getItems", refresh: true, pendingOnly: false });
-  if (res && res.error) {
-    listEl.innerHTML = "";
-    showError(res.error);
-    fullItems = [];
-    return;
-  }
-  fullItems = (res && res.items) || [];
+function setLoading(loading) {
+  const refreshBtn = document.getElementById("refresh");
+  const addBtn = document.getElementById("add-task");
+  if (refreshBtn) refreshBtn.disabled = !!loading;
+  if (addBtn) addBtn.disabled = !!loading;
+}
+
+function renderEmptyNoConfig(listEl) {
+  const emptyWrap = document.createElement("div");
+  emptyWrap.className = "empty";
+  emptyWrap.appendChild(document.createTextNode(i18n("tab_empty_no_config") + " "));
+  const optionsLink = document.createElement("a");
+  optionsLink.href = "#";
+  optionsLink.textContent = i18n("tab_open_options");
+  optionsLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    const url = api.runtime.getURL("options/options.html");
+    if (api.tabs && api.tabs.create) api.tabs.create({ url });
+    else api.runtime.openOptionsPage?.();
+  });
+  emptyWrap.appendChild(optionsLink);
   listEl.innerHTML = "";
-  if (fullItems.length === 0) {
-    listEl.innerHTML = "<div class=\"empty\">No tasks. Configure todo.txt/done.txt in Options.</div>";
-    if (document.getElementById("filters-bar")) document.getElementById("filters-bar").style.display = "none";
-    return;
-  }
+  listEl.appendChild(emptyWrap);
+  const filtersSection = document.getElementById("filters-section");
+  if (filtersSection) filtersSection.style.display = "none";
+}
+
+async function applyTabSetupAfterLoad() {
+  const filtersSection = document.getElementById("filters-section");
+  if (filtersSection) filtersSection.style.display = "";
   const prefs = await loadTabPrefs();
   applyPrefsToUI(prefs);
   fillFilterOptions(fullItems);
@@ -282,7 +365,45 @@ async function loadItems() {
     const el = document.getElementById(id);
     if (el && i18nIds[i]) el.textContent = i18n(i18nIds[i]);
   });
+  const resetFiltersBtn = document.getElementById("reset-filters-btn");
+  if (resetFiltersBtn) resetFiltersBtn.textContent = i18n("tab_reset_filters");
   refreshView();
+}
+
+async function loadItems() {
+  const listEl = document.getElementById("list");
+  listEl.innerHTML = "<div class=\"empty\">Loading…</div>";
+  showError("");
+  setLoading(true);
+  try {
+    const res = await api.runtime.sendMessage({ command: "getItems", refresh: true, pendingOnly: false });
+    if (res && res.error) {
+      listEl.innerHTML = "";
+      showError(res.error, true);
+      fullItems = [];
+      return;
+    }
+    fullItems = (res && res.items) || [];
+    const prefsRes = await api.runtime.sendMessage({ command: "getPrefs" });
+    readOnlyMode = (prefsRes && prefsRes.readOnly) === true;
+    listEl.innerHTML = "";
+    if (fullItems.length === 0) {
+      renderEmptyNoConfig(listEl);
+      return;
+    }
+    await applyTabSetupAfterLoad();
+  } finally {
+    setLoading(false);
+  }
+}
+
+async function deleteTask(item) {
+  if (!confirm(i18n("tab_delete_confirm"))) return;
+  const res = await api.runtime.sendMessage({ command: "deleteItem", item });
+  if (res && res.error) {
+    showError(res.error);
+  }
+  loadItems();
 }
 
 async function toggleTask(item) {
@@ -296,14 +417,63 @@ async function toggleTask(item) {
   loadItems();
 }
 
-function editTask(item) {
-  const title = prompt("Edit task:", item.title);
-  if (title === null) return;
-  const newItem = { ...item, title: title.trim() || item.title };
-  api.runtime.sendMessage({ command: "modifyItem", oldItem: item, newItem }).then((res) => {
-    if (res && res.error) showError(res.error);
-    loadItems();
+function startInlineEdit(taskRow, item) {
+  const titleSpan = taskRow.querySelector(".task-title");
+  if (!titleSpan) return;
+  const originalTitle = item.title || "";
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = originalTitle;
+  input.className = "task-title-edit";
+  input.style.cssText = "flex:1; min-width:0; padding:2px 4px; font-size:inherit;";
+  titleSpan.replaceWith(input);
+  input.focus();
+  input.select();
+
+  function submitInlineEdit() {
+    const newTitle = (input.value || "").trim() || originalTitle;
+    input.replaceWith(titleSpan);
+    titleSpan.textContent = newTitle;
+    if (newTitle === originalTitle) return;
+    const newItem = { ...item, title: newTitle };
+    api.runtime.sendMessage({ command: "modifyItem", oldItem: item, newItem }).then((res) => {
+      if (res && res.error) showError(res.error);
+      loadItems();
+    });
+  }
+
+  function cancelInlineEdit() {
+    input.replaceWith(titleSpan);
+    titleSpan.textContent = originalTitle;
+  }
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      submitInlineEdit();
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      cancelInlineEdit();
+    }
   });
+  input.addEventListener("blur", () => submitInlineEdit());
+}
+
+function editTask(item) {
+  if (readOnlyMode) return;
+  const taskRow = Array.from(document.querySelectorAll(".task")).find((el) => el.dataset.id === String(item.id));
+  if (taskRow) startInlineEdit(taskRow, item);
+}
+
+function showAddFeedback() {
+  const el = document.getElementById("add-feedback");
+  if (!el) return;
+  el.textContent = i18n("tab_task_added");
+  el.style.display = "inline";
+  setTimeout(() => {
+    el.textContent = "";
+    el.style.display = "none";
+  }, 2000);
 }
 
 function addTask() {
@@ -316,6 +486,7 @@ function addTask() {
     if (res && res.error) showError(res.error);
     else {
       input.value = "";
+      showAddFeedback();
       loadItems();
     }
   });
@@ -357,5 +528,26 @@ document.getElementById("open-options").addEventListener("click", (e) => {
     api.runtime.openOptionsPage?.();
   }
 });
+
+const filtersHeader = document.getElementById("filters-bar-header");
+if (filtersHeader) {
+  filtersHeader.addEventListener("click", () => {
+    const section = document.getElementById("filters-section");
+    if (section) {
+      section.classList.toggle("collapsed");
+      saveTabPrefs(getPrefsFromUI());
+    }
+  });
+  filtersHeader.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      filtersHeader.click();
+    }
+  });
+}
+document.getElementById("reset-filters-btn")?.addEventListener("click", resetFiltersAndRefresh);
+
+const quickViewEl = document.getElementById("quick-view");
+if (quickViewEl) quickViewEl.title = i18n("tab_quick_view_tooltip");
 
 loadItems();

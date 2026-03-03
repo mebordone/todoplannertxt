@@ -28,34 +28,48 @@
     .filter-label { font-size: 11px; color: #666; white-space: nowrap; }
     .toolbar-filters select { padding: 4px 6px; font-size: 12px; min-width: 0; }
     .filter-search { padding: 4px 8px; font-size: 12px; }
+    .filters-section { border-bottom: 1px solid #eee; }
+    .filters-bar-header { padding: 6px 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; user-select: none; }
+    .filters-bar-header:hover { background: #f5f5f5; }
+    .filters-bar-header .chevron { font-size: 10px; transition: transform 0.2s; }
+    .filters-section.collapsed .chevron { transform: rotate(-90deg); }
+    .filters-section.collapsed .toolbar-filters { display: none; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="toolbar">
-      <button type="button" id="refresh">Refresh</button>
+      <button type="button" id="refresh" aria-label="Refresh task list">Refresh</button>
       <input type="text" id="new-task" placeholder="New task…" style="flex:1; min-width: 200px; padding: 6px 8px; font-size: 13px;">
-      <button type="button" id="add-task">Add</button>
+      <button type="button" id="add-task" aria-label="Add task">Add</button>
+      <span id="add-feedback" class="toolbar-hint" style="display:none;" aria-live="polite"></span>
       <div class="toolbar-secondary">
-        <button type="button" id="quick-view" class="toolbar-link" title="Open quick view (pending tasks only)">Quick view</button>
+        <button type="button" id="quick-view" class="toolbar-link" title="">Quick view</button>
         <a href="#" id="open-options" class="toolbar-link">Options</a>
         <span class="toolbar-hint" id="toolbar-hint">Toolbar icon is visible in the Mail tab.</span>
       </div>
     </div>
-    <div class="toolbar toolbar-filters" id="filters-bar">
-      <span class="filter-label" id="label-filters">Filters & view</span>
-      <input type="text" id="search" placeholder="Search…" class="filter-search" style="min-width: 120px;">
-      <label><span class="filter-label" id="label-project">Project</span><select id="filter-project"></select></label>
-      <label><span class="filter-label" id="label-context">Context</span><select id="filter-context"></select></label>
-      <label><span class="filter-label" id="label-priority">Priority</span><select id="filter-priority"></select></label>
-      <label><span class="filter-label" id="label-due">Due</span><select id="filter-due"></select></label>
-      <label><span class="filter-label" id="label-completion">Status</span><select id="filter-completion"></select></label>
-      <label><span class="filter-label" id="label-sort">Sort by</span><select id="sort-by"></select></label>
-      <label><select id="sort-dir"><option value="asc">Asc</option><option value="desc">Desc</option></select></label>
-      <label><span class="filter-label" id="label-group">Group by</span><select id="group-by"></select></label>
+    <div id="filters-section" class="filters-section">
+      <div id="filters-bar-header" class="filters-bar-header" role="button" tabindex="0">
+        <span class="filter-label" id="label-filters">Filters & view</span>
+        <span class="chevron" aria-hidden="true">▼</span>
+      </div>
+      <div class="toolbar toolbar-filters" id="filters-bar">
+        <input type="text" id="search" placeholder="Search…" class="filter-search" style="min-width: 120px;">
+        <label><span class="filter-label" id="label-project">Project</span><select id="filter-project"></select></label>
+        <label><span class="filter-label" id="label-context">Context</span><select id="filter-context"></select></label>
+        <label><span class="filter-label" id="label-priority">Priority</span><select id="filter-priority"></select></label>
+        <label><span class="filter-label" id="label-due">Due</span><select id="filter-due"></select></label>
+        <label><span class="filter-label" id="label-completion">Status</span><select id="filter-completion"></select></label>
+        <label><span class="filter-label" id="label-sort">Sort by</span><select id="sort-by"></select></label>
+        <label><select id="sort-dir"><option value="asc"></option><option value="desc"></option></select></label>
+        <label><span class="filter-label" id="label-group">Group by</span><select id="group-by"></select></label>
+        <button type="button" id="reset-filters-btn" class="toolbar-link" style="margin-left:4px;" aria-label="Reset filters">Reset filters</button>
+      </div>
     </div>
-    <div id="error" class="error" style="display:none;"></div>
-    <div id="list" class="list">
+    <div id="error" class="error" style="display:none;" role="alert" aria-live="polite"></div>
+    <div id="task-count" class="toolbar-hint" style="display:none; padding: 4px 0;"></div>
+    <div id="list" class="list" role="list" aria-label="Task list">
       <div class="empty">Loading…</div>
     </div>
   </div>
