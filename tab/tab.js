@@ -10,6 +10,8 @@ const SAVE_DEBOUNCE_MS = 300;
 let savePrefsTimer = null;
 let fullItems = [];
 let readOnlyMode = false;
+let currentViewMode = "all";
+let weeklyBacklogIds = [];
 
 function i18n(id, subs) {
   try {
@@ -131,7 +133,9 @@ function getPrefsFromUI() {
     filterDue: getElValue("filter-due") || "",
     filterCompleted: getElValue("filter-completion") || "open",
     filtersBarCollapsed,
-    defaultViewPreset: getElValue("default-view-preset") || "all"
+    defaultViewPreset: getElValue("default-view-preset") || "all",
+    viewMode: currentViewMode,
+    weeklyBacklogIds: weeklyBacklogIds.slice()
   };
 }
 
@@ -155,11 +159,15 @@ function applyPrefsToUI(prefs) {
     if (prefs.filtersBarCollapsed) section.classList.add("collapsed");
     else section.classList.remove("collapsed");
   }
+  currentViewMode = prefs.viewMode === "today" || prefs.viewMode === "backlog" || prefs.viewMode === "weekly" ? prefs.viewMode : "all";
+  weeklyBacklogIds = Array.isArray(prefs.weeklyBacklogIds) ? prefs.weeklyBacklogIds.slice() : [];
 }
 
 function getDefaultTabPrefs() {
   const base = fs && fs.DEFAULT_PREFS ? { ...fs.DEFAULT_PREFS } : {};
   if (!Object.prototype.hasOwnProperty.call(base, "defaultViewPreset")) base.defaultViewPreset = "all";
+  if (!Object.prototype.hasOwnProperty.call(base, "viewMode")) base.viewMode = "all";
+  if (!Object.prototype.hasOwnProperty.call(base, "weeklyBacklogIds")) base.weeklyBacklogIds = [];
   return base;
 }
 
@@ -178,6 +186,9 @@ async function loadTabPrefs() {
     const stored = raw && raw[TAB_PREFS_KEY];
     const merged = mergeStoredWithDefault(stored);
     normalizeFilterCompleted(merged);
+    if (Array.isArray(merged.weeklyBacklogIds)) {
+      merged.weeklyBacklogIds = cleanupWeeklyBacklogIds(merged.weeklyBacklogIds, fullItems);
+    }
     return merged;
   } catch (_) {
     return getDefaultTabPrefs();
@@ -202,6 +213,7 @@ function runPipeline(items, searchQuery, prefs) {
 
 function resetFiltersAndRefresh() {
   const defaultPrefs = getDefaultTabPrefs();
+  defaultPrefs.weeklyBacklogIds = weeklyBacklogIds.slice();
   const searchEl = document.getElementById("search");
   if (searchEl) searchEl.value = "";
   applyPrefsToUI(defaultPrefs);
@@ -220,6 +232,7 @@ function applyTodayView() {
   if (sortDirEl) sortDirEl.value = "asc";
   const searchEl = document.getElementById("search");
   if (searchEl) searchEl.value = "";
+  currentViewMode = "today";
   const prefs = getPrefsFromUI();
   saveTabPrefs(prefs);
   refreshView();
@@ -234,9 +247,40 @@ function applyOverdueView() {
   if (sortByEl) sortByEl.value = "dueDate";
   const sortDirEl = document.getElementById("sort-dir");
   if (sortDirEl) sortDirEl.value = "asc";
+  currentViewMode = "all";
   const prefs = getPrefsFromUI();
   saveTabPrefs(prefs);
   refreshView();
+}
+
+function applyBacklogView() {
+  const dueEl = document.getElementById("filter-due");
+  if (dueEl) dueEl.value = "none";
+  const compEl = document.getElementById("filter-completion");
+  if (compEl) compEl.value = "open";
+  const sortByEl = document.getElementById("sort-by");
+  if (sortByEl) sortByEl.value = "entryDate";
+  const sortDirEl = document.getElementById("sort-dir");
+  if (sortDirEl) sortDirEl.value = "asc";
+  const searchEl = document.getElementById("search");
+  if (searchEl) searchEl.value = "";
+  currentViewMode = "backlog";
+  const prefs = getPrefsFromUI();
+  saveTabPrefs(prefs);
+  refreshView();
+}
+
+function applyWeeklyView() {
+  currentViewMode = "weekly";
+  const prefs = getPrefsFromUI();
+  saveTabPrefs(prefs);
+  refreshView();
+}
+
+function cleanupWeeklyBacklogIds(ids, items) {
+  if (!Array.isArray(ids) || !items.length) return [];
+  const idSet = new Set(items.map((i) => String(i.id)));
+  return ids.filter((id) => idSet.has(String(id)));
 }
 
 function getTodayString() {
@@ -258,51 +302,42 @@ function getSummaryBaseItems() {
   return fs.applyFilters(fullItems, baseFilters);
 }
 
-function updateTodaySummary() {
-  const summaryEl = document.getElementById("today-summary");
-  if (!summaryEl || fullItems.length === 0) {
-    if (summaryEl) {
-      summaryEl.style.display = "none";
-      summaryEl.textContent = "";
-    }
-    return;
-  }
+function getViewCounts() {
   const base = getSummaryBaseItems();
-  if (!base || base.length === 0) {
-    summaryEl.style.display = "none";
-    summaryEl.textContent = "";
-    return;
-  }
-  const todayStr = getTodayString();
+  const todayStr = base && base.length > 0 ? getTodayString() : "";
   let countToday = 0;
   let countOverdue = 0;
-  base.forEach((item) => {
-    if (!item.dueDate) return;
-    const dueStr = String(item.dueDate).slice(0, 10);
-    if (dueStr === todayStr) countToday++;
-    else if (dueStr < todayStr) countOverdue++;
-  });
-  if (!countToday && !countOverdue) {
-    summaryEl.style.display = "none";
-    summaryEl.textContent = "";
-    return;
+  let countBacklog = 0;
+  if (base && base.length > 0) {
+    base.forEach((item) => {
+      if (!item.dueDate) {
+        countBacklog++;
+        return;
+      }
+      const dueStr = String(item.dueDate).slice(0, 10);
+      if (dueStr === todayStr) countToday++;
+      else if (dueStr < todayStr) countOverdue++;
+    });
   }
-  summaryEl.innerHTML = "";
-  const todayBtn = document.createElement("button");
-  todayBtn.type = "button";
-  todayBtn.className = "toolbar-link";
-  todayBtn.textContent = i18n("tab_summary_today").replace("%d", String(countToday));
-  todayBtn.addEventListener("click", () => applyTodayView());
-  summaryEl.appendChild(todayBtn);
-  const sep = document.createTextNode(" · ");
-  summaryEl.appendChild(sep);
-  const overdueBtn = document.createElement("button");
-  overdueBtn.type = "button";
-  overdueBtn.className = "toolbar-link";
-  overdueBtn.textContent = i18n("tab_summary_overdue").replace("%d", String(countOverdue));
-  overdueBtn.addEventListener("click", () => applyOverdueView());
-  summaryEl.appendChild(overdueBtn);
-  summaryEl.style.display = "block";
+  const countWeekly = Array.isArray(weeklyBacklogIds) ? weeklyBacklogIds.length : 0;
+  return { countToday, countOverdue, countBacklog, countWeekly };
+}
+
+function updateTodaySummary() {
+  const viewTodayEl = document.getElementById("view-today");
+  const viewOverdueEl = document.getElementById("view-overdue");
+  const viewWeeklyEl = document.getElementById("view-weekly");
+  const viewBacklogEl = document.getElementById("view-backlog");
+  if (!viewTodayEl || !viewOverdueEl) return;
+  const { countToday, countOverdue, countBacklog, countWeekly } = getViewCounts();
+  const todayLabel = i18n("tab_view_today");
+  const overdueLabel = i18n("tab_view_overdue");
+  const weeklyLabel = i18n("tab_view_weekly");
+  const backlogLabel = i18n("tab_view_backlog");
+  viewTodayEl.textContent = countToday > 0 ? `${todayLabel} (${countToday})` : todayLabel;
+  viewOverdueEl.textContent = countOverdue > 0 ? `${overdueLabel} (${countOverdue})` : overdueLabel;
+  if (viewWeeklyEl) viewWeeklyEl.textContent = countWeekly > 0 ? `${weeklyLabel} (${countWeekly})` : weeklyLabel;
+  if (viewBacklogEl) viewBacklogEl.textContent = countBacklog > 0 ? `${backlogLabel} (${countBacklog})` : backlogLabel;
 }
 
 function getTaskRowClass(item) {
@@ -372,6 +407,23 @@ function renderTask(item) {
   div.appendChild(title);
   const meta = createTaskMeta(item);
   if (meta) div.appendChild(meta);
+  const weekBtn = document.createElement("button");
+  weekBtn.type = "button";
+  weekBtn.className = "task-week-btn";
+  weekBtn.style.cssText = "flex-shrink:0; font-size:11px; padding:2px 6px; margin-right:4px;";
+  const idStr = String(item.id);
+  const inWeek = weeklyBacklogIds.indexOf(idStr) !== -1;
+  weekBtn.textContent = inWeek ? i18n("tab_task_in_week") : i18n("tab_task_add_to_week");
+  weekBtn.setAttribute("aria-label", inWeek ? i18n("tab_task_remove_from_week") : i18n("tab_task_add_to_week"));
+  weekBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const idx = weeklyBacklogIds.indexOf(idStr);
+    if (idx !== -1) weeklyBacklogIds.splice(idx, 1);
+    else weeklyBacklogIds.push(idStr);
+    saveTabPrefs(getPrefsFromUI());
+    refreshView();
+  });
+  div.appendChild(weekBtn);
   if (!readOnlyMode) {
     const delBtn = document.createElement("button");
     delBtn.type = "button";
@@ -424,7 +476,12 @@ function refreshView() {
   const searchEl = document.getElementById("search");
   const searchQuery = searchEl ? searchEl.value : "";
   const prefs = getPrefsFromUI();
-  const sorted = runPipeline(fullItems, searchQuery, prefs);
+  let sorted = runPipeline(fullItems, searchQuery, prefs);
+  if (prefs.viewMode === "weekly" && weeklyBacklogIds.length > 0) {
+    const idSet = new Set(weeklyBacklogIds.map((id) => String(id)));
+    sorted = sorted.filter((item) => idSet.has(String(item.id)));
+    if (fs) sorted = fs.applySort(sorted, "dueDate", "asc");
+  }
   const countEl = document.getElementById("task-count");
   if (countEl) {
     if (fullItems.length > 0) {
@@ -530,6 +587,7 @@ function fillFilterOptions(items) {
 }
 
 function onFilterOrSortChange() {
+  currentViewMode = "all";
   const prefs = getPrefsFromUI();
   saveTabPrefs(prefs);
   refreshView();
@@ -583,7 +641,9 @@ async function applyTabSetupAfterLoad() {
     defViewEl.innerHTML = "";
     const options = [
       { value: "all", label: i18n("tab_default_view_all") },
-      { value: "today", label: i18n("tab_default_view_today") }
+      { value: "today", label: i18n("tab_default_view_today") },
+      { value: "backlog", label: i18n("tab_default_view_backlog") },
+      { value: "weekly", label: i18n("tab_default_view_weekly") }
     ];
     options.forEach((opt) => {
       const o = document.createElement("option");
@@ -599,6 +659,8 @@ async function applyTabSetupAfterLoad() {
     });
   }
   if (prefs.defaultViewPreset === "today") applyTodayView();
+  else if (prefs.defaultViewPreset === "backlog") applyBacklogView();
+  else if (prefs.defaultViewPreset === "weekly") applyWeeklyView();
   else refreshView();
 }
 
@@ -739,17 +801,8 @@ document.getElementById("new-task").addEventListener("keydown", (e) => {
 const searchEl = document.getElementById("search");
 if (searchEl) searchEl.addEventListener("input", onFilterOrSortChange);
 
-const actionApi = api.browserAction || api.action;
-if (actionApi && typeof actionApi.openPopup === "function") {
-  document.getElementById("quick-view").addEventListener("click", () => {
-    actionApi.openPopup().catch(() => {});
-  });
-} else {
-  const qv = document.getElementById("quick-view");
-  if (qv) qv.style.display = "none";
-  const hint = document.getElementById("toolbar-hint");
-  if (hint) hint.textContent = "The Todo.txt icon appears in the toolbar when you are on the Mail tab.";
-}
+const toolbarResetEl = document.getElementById("toolbar-reset-filters");
+if (toolbarResetEl) toolbarResetEl.addEventListener("click", resetFiltersAndRefresh);
 
 document.getElementById("open-options").addEventListener("click", (e) => {
   e.preventDefault();
@@ -763,6 +816,12 @@ document.getElementById("open-options").addEventListener("click", (e) => {
 
 const viewTodayEl = document.getElementById("view-today");
 if (viewTodayEl) viewTodayEl.addEventListener("click", () => applyTodayView());
+const viewOverdueEl = document.getElementById("view-overdue");
+if (viewOverdueEl) viewOverdueEl.addEventListener("click", () => applyOverdueView());
+const viewBacklogEl = document.getElementById("view-backlog");
+if (viewBacklogEl) viewBacklogEl.addEventListener("click", () => applyBacklogView());
+const viewWeeklyEl = document.getElementById("view-weekly");
+if (viewWeeklyEl) viewWeeklyEl.addEventListener("click", () => applyWeeklyView());
 
 const filtersHeader = document.getElementById("filters-bar-header");
 if (filtersHeader) {
@@ -782,31 +841,67 @@ if (filtersHeader) {
 }
 document.getElementById("reset-filters-btn")?.addEventListener("click", resetFiltersAndRefresh);
 
-const quickViewEl = document.getElementById("quick-view");
+function setTabViewButtonsI18n() {
+  const viewTodayEl = document.getElementById("view-today");
+  if (viewTodayEl) {
+    const todayAria = i18n("tab_view_today_aria");
+    viewTodayEl.setAttribute("aria-label", todayAria);
+    viewTodayEl.title = todayAria;
+  }
+  const viewOverdueEl = document.getElementById("view-overdue");
+  if (viewOverdueEl) {
+    const overdueAria = i18n("tab_view_overdue_aria");
+    viewOverdueEl.setAttribute("aria-label", overdueAria);
+    viewOverdueEl.title = overdueAria;
+  }
+  const viewBacklogEl = document.getElementById("view-backlog");
+  if (viewBacklogEl) {
+    viewBacklogEl.textContent = i18n("tab_view_backlog");
+    const backlogAria = i18n("tab_view_backlog_aria");
+    viewBacklogEl.setAttribute("aria-label", backlogAria);
+    viewBacklogEl.title = backlogAria;
+  }
+  const viewWeeklyEl = document.getElementById("view-weekly");
+  if (viewWeeklyEl) {
+    viewWeeklyEl.textContent = i18n("tab_view_weekly");
+    const weeklyAria = i18n("tab_view_weekly_aria");
+    viewWeeklyEl.setAttribute("aria-label", weeklyAria);
+    viewWeeklyEl.title = weeklyAria;
+  }
+}
+
 function setToolbarI18n() {
   const refreshEl = document.getElementById("refresh");
   if (refreshEl) {
     refreshEl.textContent = i18n("tab_refresh");
-    refreshEl.setAttribute("aria-label", i18n("tab_refresh_aria"));
+    const refreshAria = i18n("tab_refresh_aria");
+    refreshEl.setAttribute("aria-label", refreshAria);
+    refreshEl.title = refreshAria;
   }
   const newTaskEl = document.getElementById("new-task");
   if (newTaskEl) newTaskEl.placeholder = i18n("tab_new_task_placeholder");
   const addEl = document.getElementById("add-task");
   if (addEl) {
     addEl.textContent = i18n("tab_add");
-    addEl.setAttribute("aria-label", i18n("tab_add_aria"));
+    const addAria = i18n("tab_add_aria");
+    addEl.setAttribute("aria-label", addAria);
+    addEl.title = addAria;
   }
-  if (quickViewEl) {
-    quickViewEl.textContent = i18n("tab_quick_view");
-    quickViewEl.title = i18n("tab_quick_view_tooltip");
+  const toolbarResetEl = document.getElementById("toolbar-reset-filters");
+  if (toolbarResetEl) {
+    toolbarResetEl.textContent = i18n("tab_reset_filters");
+    const resetAria = i18n("tab_reset_filters");
+    toolbarResetEl.setAttribute("aria-label", resetAria);
+    toolbarResetEl.title = resetAria;
   }
-  const viewTodayEl = document.getElementById("view-today");
-  if (viewTodayEl) {
-    viewTodayEl.textContent = i18n("tab_view_today");
-    viewTodayEl.setAttribute("aria-label", i18n("tab_view_today_aria"));
-  }
+  setTabViewButtonsI18n();
   const optionsEl = document.getElementById("open-options");
-  if (optionsEl) optionsEl.textContent = i18n("tab_options");
+  if (optionsEl) {
+    optionsEl.textContent = i18n("tab_options");
+    const optionsTitle = i18n("tab_open_options");
+    optionsEl.setAttribute("aria-label", optionsTitle);
+    optionsEl.title = optionsTitle;
+  }
   const hintEl = document.getElementById("toolbar-hint");
   if (hintEl) hintEl.textContent = i18n("tab_toolbar_hint");
 }

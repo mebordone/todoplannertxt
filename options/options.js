@@ -219,7 +219,26 @@ function handleSyncNowClick(syncNowBtn, syncStatusEl) {
   });
 }
 
+function bindCalendarListeners() {
+  document.getElementById("calendar-enabled").addEventListener("change", async (e) => {
+    await savePrefs({ calendarIntegrationEnabled: e.target.checked });
+    await loadPrefs();
+  });
+  document.getElementById("calendar-sync-auto").addEventListener("change", (e) => savePrefs({ calendarSyncAuto: e.target.checked }));
+  const calSelect = document.getElementById("calendar-select");
+  if (calSelect) calSelect.addEventListener("change", () => savePrefs({ calendarId: calSelect.value || null }));
+  const syncNowBtn = document.getElementById("calendar-sync-now");
+  const syncStatusEl = document.getElementById("calendar-sync-status");
+  if (syncNowBtn && syncStatusEl) syncNowBtn.addEventListener("click", () => handleSyncNowClick(syncNowBtn, syncStatusEl));
+  const copyLogBtn = document.getElementById("calendar-copy-log");
+  if (copyLogBtn) copyLogBtn.addEventListener("click", () => handleCopyLogClick(copyLogBtn));
+  const exportIcsBtn = document.getElementById("calendar-export-ics");
+  if (exportIcsBtn) exportIcsBtn.addEventListener("click", handleExportIcsClick);
+}
+
 function bindOptionListeners() {
+  const openFullViewBtn = document.getElementById("open-full-view");
+  if (openFullViewBtn) openFullViewBtn.addEventListener("click", (e) => { e.preventDefault(); openFullView(); });
   document.getElementById("browse-todo").addEventListener("click", () => pickFile("todo"));
   document.getElementById("browse-done").addEventListener("click", () => pickFile("done"));
   const selectTodoBtn = document.getElementById("options-select-todo-btn");
@@ -252,20 +271,7 @@ function bindOptionListeners() {
   if (readOnlyEl) readOnlyEl.addEventListener("change", (e) => savePrefs({ readOnly: e.target.checked }));
   const displayLangEl = document.getElementById("display-language");
   if (displayLangEl) displayLangEl.addEventListener("change", (e) => savePrefs({ displayLanguage: e.target.value || "browser" }));
-  document.getElementById("calendar-enabled").addEventListener("change", async (e) => {
-    await savePrefs({ calendarIntegrationEnabled: e.target.checked });
-    await loadPrefs();
-  });
-  document.getElementById("calendar-sync-auto").addEventListener("change", (e) => savePrefs({ calendarSyncAuto: e.target.checked }));
-  const calSelect = document.getElementById("calendar-select");
-  if (calSelect) calSelect.addEventListener("change", () => savePrefs({ calendarId: calSelect.value || null }));
-  const syncNowBtn = document.getElementById("calendar-sync-now");
-  const syncStatusEl = document.getElementById("calendar-sync-status");
-  if (syncNowBtn && syncStatusEl) syncNowBtn.addEventListener("click", () => handleSyncNowClick(syncNowBtn, syncStatusEl));
-  const copyLogBtn = document.getElementById("calendar-copy-log");
-  if (copyLogBtn) copyLogBtn.addEventListener("click", () => handleCopyLogClick(copyLogBtn));
-  const exportIcsBtn = document.getElementById("calendar-export-ics");
-  if (exportIcsBtn) exportIcsBtn.addEventListener("click", handleExportIcsClick);
+  bindCalendarListeners();
 }
 
 async function handleExportIcsClick() {
@@ -289,6 +295,13 @@ async function handleExportIcsClick() {
   showError("");
 }
 
+function openFullView() {
+  const url = api.runtime.getURL("tab/tab.html");
+  if (api.tabs && api.tabs.create) {
+    api.tabs.create({ url });
+  }
+}
+
 async function initOptionsPage() {
   try {
     if (typeof i18nHelper !== "undefined" && i18nHelper.init) await i18nHelper.init();
@@ -300,6 +313,11 @@ async function initOptionsPage() {
     const id = el.getAttribute("data-i18n");
     if (id) el.textContent = i18n(id);
   });
+  const todoPath = document.getElementById("todo-path");
+  const donePath = document.getElementById("done-path");
+  const placeholder = i18n("options_file_placeholder");
+  if (todoPath) todoPath.placeholder = placeholder;
+  if (donePath) donePath.placeholder = placeholder;
   loadPrefs();
   bindOptionListeners();
 }

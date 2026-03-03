@@ -317,6 +317,16 @@ if (editInput) {
 }
 
 const openTabEl = document.getElementById("open-tab");
+
+function setPopupEditDialogI18n() {
+  const editTitleEl = document.getElementById("edit-dialog-title");
+  if (editTitleEl) editTitleEl.textContent = i18n("popup_edit_task");
+  const editCancelBtn = document.getElementById("edit-cancel");
+  if (editCancelBtn) editCancelBtn.textContent = i18n("popup_edit_cancel");
+  const editSaveBtn = document.getElementById("edit-save");
+  if (editSaveBtn) editSaveBtn.textContent = i18n("popup_edit_save");
+}
+
 function setPopupToolbarI18n() {
   const titleEl = document.getElementById("popup-title");
   if (titleEl) titleEl.textContent = i18n("extensionName");
@@ -335,18 +345,15 @@ function setPopupToolbarI18n() {
   if (openTabEl) {
     openTabEl.setAttribute("title", i18n("popup_tab_tooltip"));
     openTabEl.setAttribute("aria-label", i18n("popup_tab_tooltip"));
+    const labelEl = document.getElementById("open-tab-label");
+    if (labelEl) labelEl.textContent = i18n("popup_open_full_view");
   }
   const optionsEl = document.getElementById("open-options");
   if (optionsEl) {
     optionsEl.setAttribute("title", i18n("popup_options"));
     optionsEl.setAttribute("aria-label", i18n("popup_options"));
   }
-  const editTitleEl = document.getElementById("edit-dialog-title");
-  if (editTitleEl) editTitleEl.textContent = i18n("popup_edit_task");
-  const editCancelBtn = document.getElementById("edit-cancel");
-  if (editCancelBtn) editCancelBtn.textContent = i18n("popup_edit_cancel");
-  const editSaveBtn = document.getElementById("edit-save");
-  if (editSaveBtn) editSaveBtn.textContent = i18n("popup_edit_save");
+  setPopupEditDialogI18n();
 }
 
 (async function initPopup() {
