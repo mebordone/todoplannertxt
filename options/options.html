@@ -4,28 +4,40 @@
   <meta charset="utf-8">
   <title data-i18n="options_title">Todo.txt – Options</title>
   <style>
-    body { font-family: system-ui, sans-serif; padding: 1.5rem; max-width: 40rem; }
-    h1 { font-size: 1.25rem; margin-bottom: 1rem; }
-    .group { margin-bottom: 1.25rem; }
+    body { font-family: system-ui, sans-serif; font-size: 13px; padding: 1rem 1.5rem; max-width: 40rem; }
+    h1 { font-size: 1.25rem; margin: 0 0 0.75rem 0; }
+    .options-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+    .options-header h1 { margin: 0; }
+    .btn-primary { background: #0a84ff; color: #fff; border: 1px solid #0a84ff; border-radius: 4px; padding: 0.35rem 0.75rem; cursor: pointer; font-size: 13px; }
+    .btn-primary:hover { background: #0060df; border-color: #0060df; }
+    .btn-primary:focus { outline: 1px solid #0a84ff; outline-offset: 1px; }
+    .group { margin-bottom: 1rem; }
     .group label { display: block; font-weight: 600; margin-bottom: 0.25rem; }
     .row { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.25rem; }
-    input[type="text"] { flex: 1; padding: 0.35rem 0.5rem; }
-    button { padding: 0.35rem 0.75rem; }
-    .checkbox { margin: 0.5rem 0; }
+    input[type="text"] { flex: 1; padding: 0.35rem 0.5rem; font-size: 13px; }
+    button { padding: 0.35rem 0.75rem; font-size: 13px; border-radius: 4px; cursor: pointer; }
+    .checkbox { margin: 0.35rem 0; }
     .checkbox input { margin-right: 0.5rem; }
     .error { color: #c00; font-size: 0.9rem; margin-top: 0.5rem; }
-    .hint { font-size: 0.85rem; color: #666; margin-top: 0.25rem; }
+    .hint { font-size: 11px; color: #888; margin-top: 0.25rem; }
+    .section-sep { border-top: 1px solid #eee; margin-top: 1rem; padding-top: 1rem; }
+    .calendar-panel { background: #fafafa; padding: 0.75rem; border-radius: 6px; margin-top: 0.5rem; }
+    .calendar-panel .row { margin-top: 0.35rem; }
+    .calendar-panel .checkbox { margin: 0.25rem 0; }
   </style>
 </head>
 <body>
-  <h1 data-i18n="options_heading">Todo.txt – Preferences</h1>
+  <div class="options-header">
+    <h1 data-i18n="options_heading">Todo.txt – Preferences</h1>
+    <button type="button" id="open-full-view" class="btn-primary" data-i18n="options_open_full_view">Open full view</button>
+  </div>
 
   <div id="welcome-no-paths" class="group" style="display:none; padding:1rem; background:#f0f7ff; border-radius:6px; margin-bottom:1rem;">
     <h3 style="margin-top:0;" data-i18n="welcome_options_heading">Para empezar</h3>
     <p data-i18n="welcome_text">Elige el archivo todo.txt donde guardar tus tareas. En la misma carpeta usaremos o crearemos done.txt.</p>
     <div class="row" style="flex-wrap:wrap; gap:0.5rem;">
-      <button type="button" id="options-select-folder-btn" data-i18n="welcome_btn_select_folder">Elegir carpeta</button>
-      <button type="button" id="options-select-todo-btn" data-i18n="welcome_btn_select_todo">Seleccionar todo.txt</button>
+      <button type="button" id="options-select-folder-btn" class="btn-primary" data-i18n="welcome_btn_select_folder">Elegir carpeta</button>
+      <button type="button" id="options-select-todo-btn" class="btn-primary" data-i18n="welcome_btn_select_todo">Seleccionar todo.txt</button>
     </div>
     <p id="options-select-todo-error" class="error" style="display:none; margin-top:0.35rem;"></p>
   </div>
@@ -33,20 +45,21 @@
   <div class="group">
     <label data-i18n="options_todoFile_label">Location of Todo.txt</label>
     <div class="row">
-      <input type="text" id="todo-path" readonly placeholder="Select file…">
-      <button type="button" id="browse-todo" data-i18n="options_browse">Browse</button>
+      <input type="text" id="todo-path" readonly placeholder="">
+      <button type="button" id="browse-todo" class="btn-primary" data-i18n="options_browse">Browse</button>
     </div>
   </div>
 
   <div class="group">
     <label data-i18n="options_doneFile_label">Location of Done.txt</label>
     <div class="row">
-      <input type="text" id="done-path" readonly placeholder="Select file…">
-      <button type="button" id="browse-done" data-i18n="options_browse">Browse</button>
+      <input type="text" id="done-path" readonly placeholder="">
+      <button type="button" id="browse-done" class="btn-primary" data-i18n="options_browse">Browse</button>
     </div>
+    <p class="hint" id="options-files-hint" data-i18n="options_files_hint">Use Browse to choose your files. No extra add-on required.</p>
   </div>
 
-  <div class="group">
+  <div class="group section-sep">
     <span class="label" data-i18n="options_behavior">Behavior</span>
     <div class="checkbox">
       <label><input type="checkbox" id="use-thunderbird" checked> <span data-i18n="options_useThunderbird">Use Thunderbird's functionality</span></label>
@@ -60,9 +73,9 @@
     <div class="checkbox">
       <label><input type="checkbox" id="read-only"> <span data-i18n="options_readOnly">Read-only mode (do not write to todo.txt/done.txt)</span></label>
     </div>
-    <div class="row" style="margin-top: 0.5rem;">
-      <label for="display-language" data-i18n="options_displayLanguage">Display language</label>
-      <select id="display-language" style="margin-left: 0.5rem;">
+    <label for="display-language" data-i18n="options_displayLanguage">Display language</label>
+    <div class="row" style="margin-top: 0.25rem;">
+      <select id="display-language" style="min-width: 12rem;">
         <option value="browser" data-i18n="options_displayLanguage_browser">Use Thunderbird language</option>
         <option value="en" data-i18n="options_displayLanguage_en">English</option>
         <option value="es" data-i18n="options_displayLanguage_es">Español</option>
@@ -71,12 +84,12 @@
     <p class="hint" style="margin-top: 0.25rem;" data-i18n="options_displayLanguage_hint">Takes effect after reopening the popup/tab or reloading this page.</p>
   </div>
 
-  <div class="group" id="calendar-group">
+  <div class="group section-sep" id="calendar-group">
     <span class="label" data-i18n="options_calendar_heading">Calendar (Lightning)</span>
     <div class="checkbox">
       <label><input type="checkbox" id="calendar-enabled"> <span data-i18n="options_calendar_enabled">Enable Calendar integration</span></label>
     </div>
-    <div class="group" id="calendar-options">
+    <div class="calendar-panel" id="calendar-options">
       <label data-i18n="options_calendar_select">Calendar to sync with</label>
       <div class="row">
         <select id="calendar-select"></select>
@@ -84,13 +97,9 @@
       <div class="checkbox">
         <label><input type="checkbox" id="calendar-sync-auto" checked> <span data-i18n="options_calendar_sync_auto">Automatic sync when todo.txt changes</span></label>
       </div>
-      <div class="row" style="margin-top: 0.5rem;">
+      <div class="row">
         <button type="button" id="calendar-sync-now" data-i18n="options_calendar_sync_now">Sync now (reload calendar)</button>
         <span id="calendar-sync-status" class="hint" style="margin-left: 0.5rem;"></span>
-      </div>
-      <div class="row" style="margin-top: 0.35rem; align-items: center;">
-        <button type="button" id="calendar-copy-log" data-i18n="options_calendar_copy_log">Copy extension debug log</button>
-        <span class="hint" style="margin-left: 0.5rem;" data-i18n="options_calendar_copy_log_hint">Copy full log for debugging.</span>
       </div>
     </div>
     <p id="calendar-unavailable" class="hint" style="display:none;" data-i18n="options_calendar_unavailable">Calendar API is not available. You can export tasks with due dates to an ICS file and import them manually in Thunderbird.</p>
@@ -99,9 +108,18 @@
     </div>
   </div>
 
-  <p id="error" class="error" style="display:none;"></p>
-  <p id="options-saved" class="hint" style="display:none; color:#080;"></p>
-  <p class="hint" data-i18n="options_fsa_hint">Use Browse to select your todo.txt and done.txt files. No extra add-on required.</p>
+  <div class="group section-sep" id="debug-group">
+    <span class="label" data-i18n="options_debug_heading">Debug</span>
+    <div class="calendar-panel" id="debug-options">
+      <div class="row" style="align-items: center;">
+        <button type="button" id="calendar-copy-log" data-i18n="options_calendar_copy_log">Copy extension debug log</button>
+        <span class="hint" style="margin-left: 0.5rem;" data-i18n="options_calendar_copy_log_hint">Copy full log for debugging.</span>
+      </div>
+    </div>
+  </div>
+
+  <p id="error" class="error" style="display:none;" role="alert" aria-live="polite"></p>
+  <p id="options-saved" class="hint" style="display:none; color:#080;" aria-live="polite"></p>
 
   <script src="../lib/i18nHelper.js"></script>
   <script src="options.js"></script>

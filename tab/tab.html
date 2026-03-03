@@ -61,6 +61,8 @@
     .syntax-example-label { font-weight: 600; margin-right: 4px; }
     .syntax-content code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 11px; background: #f0f0f0; padding: 1px 3px; border-radius: 3px; }
     .syntax-more-link { font-size: 11px; }
+    .task-week-btn { color: #666; border: 1px solid #ddd; background: transparent; border-radius: 3px; cursor: pointer; }
+    .task-week-btn:hover { background: #f0f0f0; color: #333; }
   </style>
 </head>
 <body>
@@ -71,8 +73,11 @@
       <span id="add-feedback" class="toolbar-hint" style="display:none;" aria-live="polite"></span>
       <div class="toolbar-secondary">
         <button type="button" id="view-today" class="toolbar-link" aria-label="View today">Today</button>
+        <button type="button" id="view-overdue" class="toolbar-link" aria-label="View overdue">Overdue</button>
+        <button type="button" id="view-weekly" class="toolbar-link" aria-label="View weekly">This week</button>
+        <button type="button" id="view-backlog" class="toolbar-link" aria-label="View backlog">Backlog</button>
+        <button type="button" id="toolbar-reset-filters" class="toolbar-link" aria-label="Reset filters">Reset filters</button>
         <button type="button" id="refresh" aria-label="Refresh task list">Refresh</button>
-        <button type="button" id="quick-view" class="toolbar-link" title="">Quick view</button>
         <a href="#" id="open-options" class="toolbar-link">Options</a>
       </div>
     </div>
@@ -99,7 +104,6 @@
         <a href="https://github.com/todotxt/todo.txt" target="_blank" rel="noopener noreferrer" id="syntax-more-link" class="syntax-more-link"></a>
       </div>
     </div>
-    <div id="today-summary" class="toolbar-hint" style="display:none; padding: 4px 0;"></div>
     <div id="filters-section" class="filters-section">
       <div id="filters-bar-header" class="filters-bar-header" role="button" tabindex="0">
         <span class="filter-label" id="label-filters">Filters & view</span>

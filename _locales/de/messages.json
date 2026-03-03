@@ -1,129 +1,434 @@
 {
-  "extensionName": { "message": "Todo.txt" },
-  "extensionDescription": { "message": "Todo.txt MailExtension (v3). Nicht abwärtskompatibel mit v2 (Legacy).\n\nKein zusätzliches Add-on nötig: Der Zugriff auf lokale todo.txt- und done.txt-Dateien ist integriert. Nach der Installation über addons.thunderbird.net: Todo.txt → Einstellungen öffnen und mit Durchsuchen die Dateien auswählen.\n\nGrundlegende Nutzung: Auf das Todo.txt-Symbol klicken; Aufgaben anzeigen, hinzufügen, erledigen und bearbeiten. Einstellungen für Dateipfade und Optionen anpassen.\n\nKalenderintegration: Die Erweiterung enthält ein Experiment, das einen „Todo.txt“-Kalender registrieren kann, aber moderne Thunderbird-140-ESR-Builds (z.B. Linux Mint 140.7.2esr mint-001) stellen den von der ursprünglichen Erweiterung verwendeten Legacy-Kalender-Provider nicht mehr bereit. Daher werden Todo.txt-Einträge in der Kalenderansicht möglicherweise nicht angezeigt; die unterstützte und getestete Oberfläche ist das Popup plus Dateisynchronisation. Siehe ROADMAP.md für zukünftige Pläne zur erneuten Einführung der Kalenderintegration mit unterstützten MailExtension-APIs." },
-  "options_title": { "message": "Todo.txt – Einstellungen" },
-  "options_heading": { "message": "Todo.txt – Einstellungen" },
-  "options_todoFile_label": { "message": "Speicherort von Todo.txt" },
-  "options_doneFile_label": { "message": "Speicherort von Done.txt" },
-  "options_browse": { "message": "Durchsuchen" },
-  "options_behavior": { "message": "Verhalten" },
-  "options_useThunderbird": { "message": "Thunderbird-Funktionalität nutzen" },
-  "options_useCreation": { "message": "Erstellungszeitstempel der Todo nutzen" },
-  "options_showFullTitle": { "message": "Projekte und Kontexte im Titel anzeigen" },
-  "options_calendar_heading": { "message": "Kalender (Lightning)" },
-  "options_calendar_enabled": { "message": "Kalenderintegration aktivieren" },
-  "options_calendar_select": { "message": "Kalender für Synchronisation" },
-  "options_calendar_sync_auto": { "message": "Automatische Synchronisation bei Änderung von todo.txt" },
-  "options_calendar_unavailable": { "message": "Kalender-API ist nicht verfügbar. Sie können Aufgaben mit Fälligkeitsdatum in eine ICS-Datei exportieren und in Thunderbird manuell importieren." },
-  "options_calendar_export_ics": { "message": "Als ICS-Datei exportieren" },
-  "options_calendar_sync_now": { "message": "Jetzt synchronisieren (Kalender neu laden)" },
-  "options_calendar_sync_done": { "message": "%d Aufgabe(n) synchronisiert." },
-  "options_calendar_sync_no_due": { "message": "Keine Aufgaben mit Fälligkeitsdatum in todo.txt." },
-  "options_calendar_copy_log": { "message": "Erweiterungs-Debug-Log kopieren" },
-  "options_calendar_copy_log_hint": { "message": "Vollständiges Log (Status, Pfade, Sync) zum Debuggen kopieren." },
-  "options_calendar_copied": { "message": "Kopiert." },
-  "options_fsa_hint": { "message": "Mit Durchsuchen todo.txt und done.txt auswählen. Kein zusätzliches Add-on nötig." },
-  "welcome_title": { "message": "Aufgabenliste einrichten" },
-  "welcome_text": { "message": "Wählen Sie die todo.txt-Datei, in der Ihre Aufgaben gespeichert werden. In demselben Ordner verwenden oder erstellen wir done.txt." },
-  "welcome_btn_select_todo": { "message": "todo.txt auswählen" },
-  "welcome_btn_select_folder": { "message": "Ordner wählen" },
-  "welcome_options_heading": { "message": "Erste Schritte" },
-  "welcome_select_error": { "message": "Einrichtung fehlgeschlagen. Erneut versuchen oder Durchsuchen in den Optionen nutzen." },
-  "options_readOnly": { "message": "Nur-Lesen-Modus (nicht in todo.txt/done.txt schreiben)" },
-  "error_fileNotFound": { "message": "Datei kann nicht gelesen werden. Prüfen Sie, ob die Datei existiert und der Pfad stimmt:" },
-  "error_fileCannotWrite": { "message": "Kann nicht in Datei schreiben. Prüfen Sie, ob die Datei woanders geöffnet oder gesperrt ist:" },
-  "error_filesNotSpecified": { "message": "Legen Sie die Pfade zu todo.txt und done.txt in den Einstellungen (Durchsuchen) fest." },
-  "error_readOnlyMode": { "message": "Nur-Lesen-Modus ist aktiv. Deaktivieren Sie ihn in den Einstellungen, um in todo.txt/done.txt zu schreiben." },
-  "error_fileLocked": { "message": "Die Datei wird verwendet oder ist gesperrt:" },
-  "error_fileNetworkOrRemote": { "message": "Die Datei befindet sich an einem Netzwerk- oder Remote-Speicherort und kann nicht zugegriffen werden." },
-  "error_itemNotFound": { "message": "Todo-Aufgabe konnte in todo.txt nicht gefunden werden" },
-  "error_eventEncountered": { "message": "Dieser Kalender wird für Todo.txt verwendet und akzeptiert nur Aufgaben, nicht Ereignisse!" },
-  "error_unknown": { "message": "Ein unbekannter Fehler ist aufgetreten" },
-  "tab_search_placeholder": { "message": "Suchen…" },
-  "tab_sort_by": { "message": "Sortieren nach" },
-  "tab_group_by": { "message": "Gruppieren nach" },
-  "tab_filter_all": { "message": "Alle" },
-  "tab_filter_open": { "message": "Offen" },
-  "tab_filter_done": { "message": "Erledigt" },
-  "tab_filter_overdue": { "message": "Überfällig" },
-  "tab_filter_today": { "message": "Heute" },
-  "tab_filter_week": { "message": "Diese Woche" },
-  "tab_filter_no_date": { "message": "Kein Datum" },
-  "tab_filter_priority": { "message": "Priorität" },
-  "tab_filter_project": { "message": "Projekt" },
-  "tab_filter_context": { "message": "Kontext" },
-  "tab_filter_due": { "message": "Fällig" },
-  "tab_filter_completion": { "message": "Erledigung" },
-  "tab_sort_priority": { "message": "Priorität" },
-  "tab_sort_due": { "message": "Fälligkeitsdatum" },
-  "tab_sort_created": { "message": "Erstellt" },
-  "tab_sort_completed": { "message": "Erledigt" },
-  "tab_sort_title": { "message": "Titel" },
-  "tab_group_none": { "message": "Keine" },
-  "tab_filters_view": { "message": "Filter & Ansicht" },
-  "tab_empty_no_match": { "message": "Keine Aufgaben entsprechen den Filtern. Setzen Sie Projekt, Kontext und Status auf Alle, um alles zu sehen, oder fügen Sie Aufgaben hinzu." },
-  "tab_reset_filters": { "message": "Filter zurücksetzen" },
-  "tab_task_added": { "message": "Aufgabe hinzugefügt" },
-  "options_saved": { "message": "Gespeichert" },
-  "tab_sort_asc": { "message": "Aufsteigend" },
-  "tab_sort_desc": { "message": "Absteigend" },
-  "tab_delete_task": { "message": "Löschen" },
-  "tab_delete_confirm": { "message": "Diese Aufgabe löschen?" },
-  "popup_delete_task": { "message": "Löschen" },
-  "popup_delete_confirm": { "message": "Diese Aufgabe löschen?" },
-  "tab_edit_task": { "message": "Aufgabe bearbeiten" },
-  "popup_edit_task": { "message": "Aufgabentitel bearbeiten" },
-  "tab_showing_count": { "message": "%d von %d Aufgaben angezeigt" },
-  "tab_empty_no_config": { "message": "Keine Aufgaben. Öffnen Sie die Einstellungen, um Ihre todo.txt-Datei auszuwählen." },
-  "popup_empty_no_config": { "message": "Keine Aufgaben. Öffnen Sie die Einstellungen, um Ihre todo.txt-Datei auszuwählen." },
-  "tab_quick_view_tooltip": { "message": "Schnellansicht – nur offene Aufgaben" },
-  "popup_tab_tooltip": { "message": "Vollansicht mit Filtern und allen Aufgaben öffnen" },
-  "tab_open_options": { "message": "Einstellungen öffnen" },
-  "popup_open_options": { "message": "Einstellungen öffnen" },
-  "options_displayLanguage": { "message": "Anzeigesprache" },
-  "options_displayLanguage_browser": { "message": "Thunderbird-Sprache verwenden" },
-  "options_displayLanguage_en": { "message": "English" },
-  "options_displayLanguage_es": { "message": "Español" },
-  "options_displayLanguage_hint": { "message": "Wirkt nach dem erneuten Öffnen des Popups/Tabs oder dem Neuladen dieser Seite." },
-  "tab_refresh": { "message": "Aktualisieren" },
-  "tab_new_task_placeholder": { "message": "Neue Aufgabe…" },
-  "tab_add": { "message": "Hinzufügen" },
-  "tab_quick_view": { "message": "Schnellansicht" },
-  "tab_options": { "message": "Einstellungen" },
-  "tab_toolbar_hint": { "message": "Das Symbol ist in der Mail-Ansicht sichtbar." },
-  "tab_refresh_aria": { "message": "Aufgabenliste aktualisieren" },
-  "tab_add_aria": { "message": "Aufgabe hinzufügen" },
-  "tab_meta_priority": { "message": "Priorität" },
-  "tab_meta_due": { "message": "Fällig:" },
-  "tab_loading": { "message": "Laden…" },
-  "tab_syntax_hint": { "message": "(A) Priorität · +Projekt · @Kontext · due:JJJJ-MM-TT" },
-  "tab_syntax_title": { "message": "Todo.txt – Kurzreferenz" },
-  "tab_syntax_line_priority": { "message": "(A) Priorität am Zeilenanfang (A = höchste)." },
-  "tab_syntax_line_created": { "message": "Erstellungsdatum JJJJ-MM-TT direkt nach der Priorität (optional)." },
-  "tab_syntax_line_project_context": { "message": "+Projekt und @Kontext beliebig im Titel." },
-  "tab_syntax_line_due": { "message": "due:JJJJ-MM-TT für das Fälligkeitsdatum (für den Kalender verwendet)." },
-  "tab_syntax_line_completed": { "message": "x JJJJ-MM-TT am Zeilenanfang markiert die Aufgabe als erledigt." },
-  "tab_syntax_example_label": { "message": "Beispiel:" },
-  "tab_syntax_example_text": { "message": "(A) Mama anrufen +Familie @phone due:2025-03-15" },
-  "tab_syntax_more_link": { "message": "Vollständige todo.txt-Formatbeschreibung…" },
-  "tab_syntax_toggle_aria": { "message": "Todo.txt-Syntaxhilfe ein- oder ausblenden" },
-  "popup_refresh": { "message": "Aktualisieren" },
-  "popup_new_task_placeholder": { "message": "Neue Aufgabe…" },
-  "popup_add": { "message": "Hinzufügen" },
-  "popup_tab": { "message": "Tab" },
-  "popup_options": { "message": "Einstellungen" },
-  "popup_refresh_aria": { "message": "Aufgabenliste aktualisieren" },
-  "popup_add_aria": { "message": "Aufgabe hinzufügen" },
-  "popup_meta_priority": { "message": "Priorität" },
-  "popup_meta_due": { "message": "Fällig:" },
-  "popup_loading": { "message": "Laden…" },
-  "popup_edit_cancel": { "message": "Abbrechen" },
-  "popup_edit_save": { "message": "Speichern" },
-  "tab_view_today": { "message": "Heute" },
-  "tab_view_today_aria": { "message": "Nur Aufgaben mit Fälligkeitsdatum heute anzeigen" },
-  "tab_default_view": { "message": "Standardansicht" },
-  "tab_default_view_all": { "message": "Alle Aufgaben" },
-  "tab_default_view_today": { "message": "Nur heute" },
-  "tab_summary_today": { "message": "%d Aufgaben heute" },
-  "tab_summary_overdue": { "message": "%d überfällig" }
+  "extensionName": {
+    "message": "Todo.txt"
+  },
+  "extensionDescription": {
+    "message": "Thunderbird-Erweiterung zur Verwaltung von todo.txt-Dateien: Aufgaben in Klartext, Prioritäten, Projekte, Kontexte und Fälligkeitsdaten in einer Datei, die Sie kontrollieren.\n\nBasiert auf der ursprünglichen Todo.txt-Erweiterung von Roy Kokkelkoren. Version 3.x ist eine komplette Neuimplementierung als MailExtension für Thunderbird 140+ und ist nicht abwärtskompatibel mit v2.\n\n• Keine zusätzlichen Add-ons: integrierter Dateizugriff für todo.txt und done.txt. Nach der Installation: Einstellungen → Durchsuchen, um Ihre Dateien auszuwählen.\n• Popup: Schnellansicht aus der Symbolleiste; Aufgaben hinzufügen, erledigen und bearbeiten.\n• Vollständige Tab-Ansicht: Filter, Heute, Backlog, Diese Woche, Sortierung nach Fälligkeit oder Priorität.\n• Einstellungen: Dateipfade, Verhalten, optionale Kalender- (Lightning-)Integration für Aufgaben mit Fälligkeitsdatum.\n• Vollständige Todo.txt-Syntax: Prioritäten (A)(B)(C), Projekte +name, Kontexte @name, due:JJJJ-MM-TT."
+  },
+  "extensionSummary": {
+    "message": "Todo.txt in Thunderbird verwalten: Aufgaben, Prioritäten, Projekte und Fälligkeiten in Klartext."
+  },
+  "options_title": {
+    "message": "Todo.txt – Einstellungen"
+  },
+  "options_heading": {
+    "message": "Todo.txt – Einstellungen"
+  },
+  "options_todoFile_label": {
+    "message": "Speicherort von Todo.txt"
+  },
+  "options_doneFile_label": {
+    "message": "Speicherort von Done.txt"
+  },
+  "options_browse": {
+    "message": "Durchsuchen"
+  },
+  "options_behavior": {
+    "message": "Verhalten"
+  },
+  "options_useThunderbird": {
+    "message": "Thunderbird-Funktionalität nutzen"
+  },
+  "options_useCreation": {
+    "message": "Erstellungszeitstempel der Todo nutzen"
+  },
+  "options_showFullTitle": {
+    "message": "Projekte und Kontexte im Titel anzeigen"
+  },
+  "options_calendar_heading": {
+    "message": "Kalender (Lightning)"
+  },
+  "options_calendar_enabled": {
+    "message": "Kalenderintegration aktivieren"
+  },
+  "options_calendar_select": {
+    "message": "Kalender für Synchronisation"
+  },
+  "options_calendar_sync_auto": {
+    "message": "Automatische Synchronisation bei Änderung von todo.txt"
+  },
+  "options_calendar_unavailable": {
+    "message": "Kalender-API ist nicht verfügbar. Sie können Aufgaben mit Fälligkeitsdatum in eine ICS-Datei exportieren und in Thunderbird manuell importieren."
+  },
+  "options_calendar_export_ics": {
+    "message": "Als ICS-Datei exportieren"
+  },
+  "options_calendar_sync_now": {
+    "message": "Jetzt synchronisieren (Kalender neu laden)"
+  },
+  "options_calendar_sync_done": {
+    "message": "%d Aufgabe(n) synchronisiert."
+  },
+  "options_calendar_sync_no_due": {
+    "message": "Keine Aufgaben mit Fälligkeitsdatum in todo.txt."
+  },
+  "options_debug_heading": {
+    "message": "Debug"
+  },
+  "options_calendar_copy_log": {
+    "message": "Erweiterungs-Debug-Log kopieren"
+  },
+  "options_calendar_copy_log_hint": {
+    "message": "Vollständiges Log (Status, Pfade, Sync) zum Debuggen kopieren."
+  },
+  "options_calendar_copied": {
+    "message": "Kopiert."
+  },
+  "options_fsa_hint": {
+    "message": "Mit Durchsuchen todo.txt und done.txt auswählen. Kein zusätzliches Add-on nötig."
+  },
+  "options_open_full_view": {
+    "message": "Vollansicht öffnen"
+  },
+  "options_file_placeholder": {
+    "message": "Datei auswählen…"
+  },
+  "options_files_hint": {
+    "message": "Mit Durchsuchen die Dateien wählen. Kein zusätzliches Add-on nötig."
+  },
+  "popup_open_full_view": {
+    "message": "Vollansicht"
+  },
+  "welcome_title": {
+    "message": "Aufgabenliste einrichten"
+  },
+  "welcome_text": {
+    "message": "Wählen Sie die todo.txt-Datei, in der Ihre Aufgaben gespeichert werden. In demselben Ordner verwenden oder erstellen wir done.txt."
+  },
+  "welcome_btn_select_todo": {
+    "message": "todo.txt auswählen"
+  },
+  "welcome_btn_select_folder": {
+    "message": "Ordner wählen"
+  },
+  "welcome_options_heading": {
+    "message": "Erste Schritte"
+  },
+  "welcome_select_error": {
+    "message": "Einrichtung fehlgeschlagen. Erneut versuchen oder Durchsuchen in den Optionen nutzen."
+  },
+  "options_readOnly": {
+    "message": "Nur-Lesen-Modus (nicht in todo.txt/done.txt schreiben)"
+  },
+  "error_fileNotFound": {
+    "message": "Datei kann nicht gelesen werden. Prüfen Sie, ob die Datei existiert und der Pfad stimmt:"
+  },
+  "error_fileCannotWrite": {
+    "message": "Kann nicht in Datei schreiben. Prüfen Sie, ob die Datei woanders geöffnet oder gesperrt ist:"
+  },
+  "error_filesNotSpecified": {
+    "message": "Legen Sie die Pfade zu todo.txt und done.txt in den Einstellungen (Durchsuchen) fest."
+  },
+  "error_readOnlyMode": {
+    "message": "Nur-Lesen-Modus ist aktiv. Deaktivieren Sie ihn in den Einstellungen, um in todo.txt/done.txt zu schreiben."
+  },
+  "error_fileLocked": {
+    "message": "Die Datei wird verwendet oder ist gesperrt:"
+  },
+  "error_fileNetworkOrRemote": {
+    "message": "Die Datei befindet sich an einem Netzwerk- oder Remote-Speicherort und kann nicht zugegriffen werden."
+  },
+  "error_itemNotFound": {
+    "message": "Todo-Aufgabe konnte in todo.txt nicht gefunden werden"
+  },
+  "error_eventEncountered": {
+    "message": "Dieser Kalender wird für Todo.txt verwendet und akzeptiert nur Aufgaben, nicht Ereignisse!"
+  },
+  "error_unknown": {
+    "message": "Ein unbekannter Fehler ist aufgetreten"
+  },
+  "tab_search_placeholder": {
+    "message": "Suchen…"
+  },
+  "tab_sort_by": {
+    "message": "Sortieren nach"
+  },
+  "tab_group_by": {
+    "message": "Gruppieren nach"
+  },
+  "tab_filter_all": {
+    "message": "Alle"
+  },
+  "tab_filter_open": {
+    "message": "Offen"
+  },
+  "tab_filter_done": {
+    "message": "Erledigt"
+  },
+  "tab_filter_overdue": {
+    "message": "Überfällig"
+  },
+  "tab_filter_today": {
+    "message": "Heute"
+  },
+  "tab_filter_week": {
+    "message": "Diese Woche"
+  },
+  "tab_filter_no_date": {
+    "message": "Kein Datum"
+  },
+  "tab_filter_priority": {
+    "message": "Priorität"
+  },
+  "tab_filter_project": {
+    "message": "Projekt"
+  },
+  "tab_filter_context": {
+    "message": "Kontext"
+  },
+  "tab_filter_due": {
+    "message": "Fällig"
+  },
+  "tab_filter_completion": {
+    "message": "Erledigung"
+  },
+  "tab_sort_priority": {
+    "message": "Priorität"
+  },
+  "tab_sort_due": {
+    "message": "Fälligkeitsdatum"
+  },
+  "tab_sort_created": {
+    "message": "Erstellt"
+  },
+  "tab_sort_completed": {
+    "message": "Erledigt"
+  },
+  "tab_sort_title": {
+    "message": "Titel"
+  },
+  "tab_group_none": {
+    "message": "Keine"
+  },
+  "tab_filters_view": {
+    "message": "Filter & Ansicht"
+  },
+  "tab_empty_no_match": {
+    "message": "Keine Aufgaben entsprechen den Filtern. Setzen Sie Projekt, Kontext und Status auf Alle, um alles zu sehen, oder fügen Sie Aufgaben hinzu."
+  },
+  "tab_reset_filters": {
+    "message": "Filter zurücksetzen"
+  },
+  "tab_task_added": {
+    "message": "Aufgabe hinzugefügt"
+  },
+  "options_saved": {
+    "message": "Gespeichert"
+  },
+  "tab_sort_asc": {
+    "message": "Aufsteigend"
+  },
+  "tab_sort_desc": {
+    "message": "Absteigend"
+  },
+  "tab_delete_task": {
+    "message": "Löschen"
+  },
+  "tab_delete_confirm": {
+    "message": "Diese Aufgabe löschen?"
+  },
+  "popup_delete_task": {
+    "message": "Löschen"
+  },
+  "popup_delete_confirm": {
+    "message": "Diese Aufgabe löschen?"
+  },
+  "tab_edit_task": {
+    "message": "Aufgabe bearbeiten"
+  },
+  "popup_edit_task": {
+    "message": "Aufgabentitel bearbeiten"
+  },
+  "tab_showing_count": {
+    "message": "%d von %d Aufgaben angezeigt"
+  },
+  "tab_empty_no_config": {
+    "message": "Keine Aufgaben. Öffnen Sie die Einstellungen, um Ihre todo.txt-Datei auszuwählen."
+  },
+  "popup_empty_no_config": {
+    "message": "Keine Aufgaben. Öffnen Sie die Einstellungen, um Ihre todo.txt-Datei auszuwählen."
+  },
+  "tab_quick_view_tooltip": {
+    "message": "Schnellansicht – nur offene Aufgaben"
+  },
+  "popup_tab_tooltip": {
+    "message": "Vollansicht mit Filtern und allen Aufgaben öffnen"
+  },
+  "tab_open_options": {
+    "message": "Einstellungen öffnen"
+  },
+  "popup_open_options": {
+    "message": "Einstellungen öffnen"
+  },
+  "options_displayLanguage": {
+    "message": "Anzeigesprache"
+  },
+  "options_displayLanguage_browser": {
+    "message": "Thunderbird-Sprache verwenden"
+  },
+  "options_displayLanguage_en": {
+    "message": "English"
+  },
+  "options_displayLanguage_es": {
+    "message": "Español"
+  },
+  "options_displayLanguage_hint": {
+    "message": "Wirkt nach dem erneuten Öffnen des Popups/Tabs oder dem Neuladen dieser Seite."
+  },
+  "tab_refresh": {
+    "message": "Aktualisieren"
+  },
+  "tab_new_task_placeholder": {
+    "message": "Neue Aufgabe…"
+  },
+  "tab_add": {
+    "message": "Hinzufügen"
+  },
+  "tab_quick_view": {
+    "message": "Schnellansicht"
+  },
+  "tab_options": {
+    "message": "Einstellungen"
+  },
+  "tab_toolbar_hint": {
+    "message": "Das Symbol ist in der Mail-Ansicht sichtbar."
+  },
+  "tab_refresh_aria": {
+    "message": "Aufgabenliste aktualisieren"
+  },
+  "tab_add_aria": {
+    "message": "Aufgabe hinzufügen"
+  },
+  "tab_meta_priority": {
+    "message": "Priorität"
+  },
+  "tab_meta_due": {
+    "message": "Fällig:"
+  },
+  "tab_loading": {
+    "message": "Laden…"
+  },
+  "tab_syntax_hint": {
+    "message": "(A) Priorität · +Projekt · @Kontext · due:JJJJ-MM-TT"
+  },
+  "tab_syntax_title": {
+    "message": "Todo.txt – Kurzreferenz"
+  },
+  "tab_syntax_line_priority": {
+    "message": "(A) Priorität am Zeilenanfang (A = höchste)."
+  },
+  "tab_syntax_line_created": {
+    "message": "Erstellungsdatum JJJJ-MM-TT direkt nach der Priorität (optional)."
+  },
+  "tab_syntax_line_project_context": {
+    "message": "+Projekt und @Kontext beliebig im Titel."
+  },
+  "tab_syntax_line_due": {
+    "message": "due:JJJJ-MM-TT für das Fälligkeitsdatum (für den Kalender verwendet)."
+  },
+  "tab_syntax_line_completed": {
+    "message": "x JJJJ-MM-TT am Zeilenanfang markiert die Aufgabe als erledigt."
+  },
+  "tab_syntax_example_label": {
+    "message": "Beispiel:"
+  },
+  "tab_syntax_example_text": {
+    "message": "(A) Mama anrufen +Familie @phone due:2025-03-15"
+  },
+  "tab_syntax_more_link": {
+    "message": "Vollständige todo.txt-Formatbeschreibung…"
+  },
+  "tab_syntax_toggle_aria": {
+    "message": "Todo.txt-Syntaxhilfe ein- oder ausblenden"
+  },
+  "popup_refresh": {
+    "message": "Aktualisieren"
+  },
+  "popup_new_task_placeholder": {
+    "message": "Neue Aufgabe…"
+  },
+  "popup_add": {
+    "message": "Hinzufügen"
+  },
+  "popup_tab": {
+    "message": "Tab"
+  },
+  "popup_options": {
+    "message": "Einstellungen"
+  },
+  "popup_refresh_aria": {
+    "message": "Aufgabenliste aktualisieren"
+  },
+  "popup_add_aria": {
+    "message": "Aufgabe hinzufügen"
+  },
+  "popup_meta_priority": {
+    "message": "Priorität"
+  },
+  "popup_meta_due": {
+    "message": "Fällig:"
+  },
+  "popup_loading": {
+    "message": "Laden…"
+  },
+  "popup_edit_cancel": {
+    "message": "Abbrechen"
+  },
+  "popup_edit_save": {
+    "message": "Speichern"
+  },
+  "tab_view_today": {
+    "message": "Heute"
+  },
+  "tab_view_today_aria": {
+    "message": "Nur Aufgaben mit Fälligkeitsdatum heute anzeigen"
+  },
+  "tab_view_overdue": {
+    "message": "Überfällig"
+  },
+  "tab_view_overdue_aria": {
+    "message": "Nur überfällige Aufgaben anzeigen"
+  },
+  "tab_default_view": {
+    "message": "Standardansicht"
+  },
+  "tab_default_view_all": {
+    "message": "Alle Aufgaben"
+  },
+  "tab_default_view_today": {
+    "message": "Nur heute"
+  },
+  "tab_summary_today": {
+    "message": "%d Aufgaben heute"
+  },
+  "tab_summary_overdue": {
+    "message": "%d überfällig"
+  },
+  "tab_view_backlog": {
+    "message": "Backlog"
+  },
+  "tab_view_backlog_aria": {
+    "message": "Aufgaben ohne Fälligkeitsdatum anzeigen"
+  },
+  "tab_view_weekly": {
+    "message": "Diese Woche"
+  },
+  "tab_view_weekly_aria": {
+    "message": "Wochen-Backlog anzeigen"
+  },
+  "tab_default_view_backlog": {
+    "message": "Nur Backlog"
+  },
+  "tab_default_view_weekly": {
+    "message": "Nur diese Woche"
+  },
+  "tab_task_add_to_week": {
+    "message": "Zur Woche hinzufügen"
+  },
+  "tab_task_in_week": {
+    "message": "In der Woche"
+  },
+  "tab_task_remove_from_week": {
+    "message": "Aus der Woche entfernen"
+  }
 }

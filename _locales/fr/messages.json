@@ -1,129 +1,434 @@
 {
-  "extensionName": { "message": "Todo.txt" },
-  "extensionDescription": { "message": "Todo.txt MailExtension (v3). Non rétrocompatible avec la v2 (legacy).\n\nInstallation : 1) Installer d’abord l’add-on File Access Manager (addons.thunderbird.net). 2) Installer cette extension. 3) Ouvrir Todo.txt → Options et utiliser Parcourir pour sélectionner vos fichiers todo.txt et done.txt.\n\nUtilisation : Cliquer sur l’icône Todo.txt dans la barre d’outils pour ouvrir la fenêtre ; afficher, ajouter, terminer et modifier les tâches. Utiliser Options pour modifier les chemins et préférences." },
-  "options_title": { "message": "Todo.txt – Options" },
-  "options_heading": { "message": "Todo.txt – Préférences" },
-  "options_todoFile_label": { "message": "Emplacement du fichier Todo.txt" },
-  "options_doneFile_label": { "message": "Emplacement du fichier Done.txt" },
-  "options_browse": { "message": "Parcourir" },
-  "options_behavior": { "message": "Comportement" },
-  "options_useThunderbird": { "message": "Afficher les tâches dans le calendrier de Thunderbird" },
-  "options_useCreation": { "message": "Ajouter la date de création aux tâches" },
-  "options_showFullTitle": { "message": "Voir Projets et Contextes dans le titre" },
-  "options_calendar_heading": { "message": "Calendrier (Lightning)" },
-  "options_calendar_enabled": { "message": "Activer l'intégration avec le calendrier" },
-  "options_calendar_select": { "message": "Calendrier à synchroniser" },
-  "options_calendar_sync_auto": { "message": "Synchronisation automatique quand todo.txt change" },
-  "options_calendar_unavailable": { "message": "L'API calendrier n'est pas disponible. Vous pouvez exporter les tâches avec date d'échéance en ICS et les importer manuellement dans Thunderbird." },
-  "options_calendar_export_ics": { "message": "Exporter en fichier ICS" },
-  "options_calendar_sync_now": { "message": "Synchroniser maintenant (recharger le calendrier)" },
-  "options_calendar_sync_done": { "message": "%d tâche(s) synchronisée(s)." },
-  "options_calendar_sync_no_due": { "message": "Aucune tâche avec date d'échéance dans todo.txt." },
-  "options_calendar_copy_log": { "message": "Copier le log de débogage de l’extension" },
-  "options_calendar_copy_log_hint": { "message": "Copie le log complet (état, chemins, sync) pour déboguer." },
-  "options_calendar_copied": { "message": "Copié." },
-  "options_fsa_hint": { "message": "Utiliser Parcourir pour sélectionner todo.txt et done.txt. Aucun add-on supplémentaire requis." },
-  "welcome_title": { "message": "Configurer votre liste de tâches" },
-  "welcome_text": { "message": "Choisissez le fichier todo.txt où enregistrer vos tâches. Nous utiliserons ou créerons done.txt dans le même dossier." },
-  "welcome_btn_select_todo": { "message": "Sélectionner todo.txt" },
-  "welcome_btn_select_folder": { "message": "Choisir un dossier" },
-  "welcome_options_heading": { "message": "Pour commencer" },
-  "welcome_select_error": { "message": "Configuration impossible. Réessayez ou utilisez Parcourir dans les options." },
-  "options_readOnly": { "message": "Mode lecture seule (ne pas écrire dans todo.txt/done.txt)" },
-  "error_fileNotFound": { "message": "Impossible de lire le fichier. Vérifiez que le fichier existe et que le chemin est correct:" },
-  "error_fileCannotWrite": { "message": "Impossible d'écrire le fichier. Vérifiez que le fichier n'est pas ouvert ailleurs ou verrouillé:" },
-  "error_filesNotSpecified": { "message": "Définissez les chemins vers todo.txt et done.txt dans les Options (Parcourir)." },
-  "error_readOnlyMode": { "message": "Le mode lecture seule est activé. Désactivez-le dans les Options pour écrire dans todo.txt/done.txt." },
-  "error_fileLocked": { "message": "Le fichier est en cours d'utilisation ou verrouillé:" },
-  "error_fileNetworkOrRemote": { "message": "Le fichier est sur un emplacement réseau ou distant et ne peut pas être accédé." },
-  "error_itemNotFound": { "message": "La tâche Todo est introuvable dans todo.txt" },
-  "error_eventEncountered": { "message": "Ce calendrier est utilisé pour Todo.txt et n'accepte que les tâches, pas les événements!" },
-  "error_unknown": { "message": "Une erreur inconnue s'est produite" },
-  "tab_search_placeholder": { "message": "Rechercher…" },
-  "tab_sort_by": { "message": "Trier par" },
-  "tab_group_by": { "message": "Grouper par" },
-  "tab_filter_all": { "message": "Tous" },
-  "tab_filter_open": { "message": "Ouvert" },
-  "tab_filter_done": { "message": "Terminé" },
-  "tab_filter_overdue": { "message": "En retard" },
-  "tab_filter_today": { "message": "Aujourd'hui" },
-  "tab_filter_week": { "message": "Cette semaine" },
-  "tab_filter_no_date": { "message": "Sans date" },
-  "tab_filter_priority": { "message": "Priorité" },
-  "tab_filter_project": { "message": "Projet" },
-  "tab_filter_context": { "message": "Contexte" },
-  "tab_filter_due": { "message": "Échéance" },
-  "tab_filter_completion": { "message": "Terminé" },
-  "tab_sort_priority": { "message": "Priorité" },
-  "tab_sort_due": { "message": "Date d'échéance" },
-  "tab_sort_created": { "message": "Créé" },
-  "tab_sort_completed": { "message": "Terminé" },
-  "tab_sort_title": { "message": "Titre" },
-  "tab_group_none": { "message": "Aucun" },
-  "tab_filters_view": { "message": "Filtres et vue" },
-  "tab_empty_no_match": { "message": "Aucune tâche ne correspond aux filtres. Mettez Projet, Contexte et Statut sur Tous pour tout voir, ou ajoutez des tâches." },
-  "tab_reset_filters": { "message": "Réinitialiser les filtres" },
-  "tab_task_added": { "message": "Tâche ajoutée" },
-  "options_saved": { "message": "Enregistré" },
-  "tab_sort_asc": { "message": "Croissant" },
-  "tab_sort_desc": { "message": "Décroissant" },
-  "tab_delete_task": { "message": "Supprimer" },
-  "tab_delete_confirm": { "message": "Supprimer cette tâche ?" },
-  "popup_delete_task": { "message": "Supprimer" },
-  "popup_delete_confirm": { "message": "Supprimer cette tâche ?" },
-  "tab_edit_task": { "message": "Modifier la tâche" },
-  "popup_edit_task": { "message": "Modifier le titre de la tâche" },
-  "tab_showing_count": { "message": "Affichage de %d sur %d tâches" },
-  "tab_empty_no_config": { "message": "Aucune tâche. Ouvrez les Options pour choisir votre fichier todo.txt." },
-  "popup_empty_no_config": { "message": "Aucune tâche. Ouvrez les Options pour choisir votre fichier todo.txt." },
-  "tab_quick_view_tooltip": { "message": "Vue rapide – tâches en attente uniquement" },
-  "popup_tab_tooltip": { "message": "Ouvrir la vue complète avec filtres et toutes les tâches" },
-  "tab_open_options": { "message": "Ouvrir les Options" },
-  "popup_open_options": { "message": "Ouvrir les Options" },
-  "options_displayLanguage": { "message": "Langue d'affichage" },
-  "options_displayLanguage_browser": { "message": "Utiliser la langue de Thunderbird" },
-  "options_displayLanguage_en": { "message": "English" },
-  "options_displayLanguage_es": { "message": "Español" },
-  "options_displayLanguage_hint": { "message": "Pris en compte après réouverture de la fenêtre/onglet ou rechargement de cette page." },
-  "tab_refresh": { "message": "Actualiser" },
-  "tab_new_task_placeholder": { "message": "Nouvelle tâche…" },
-  "tab_add": { "message": "Ajouter" },
-  "tab_quick_view": { "message": "Vue rapide" },
-  "tab_options": { "message": "Options" },
-  "tab_toolbar_hint": { "message": "L’icône est visible dans l’onglet Mail." },
-  "tab_refresh_aria": { "message": "Actualiser la liste des tâches" },
-  "tab_add_aria": { "message": "Ajouter une tâche" },
-  "tab_meta_priority": { "message": "Priorité" },
-  "tab_meta_due": { "message": "Échéance\u00a0:" },
-  "tab_loading": { "message": "Chargement…" },
-  "tab_syntax_hint": { "message": "(A) priorité · +projet · @contexte · due:AAAA-MM-JJ" },
-  "tab_syntax_title": { "message": "Rappel rapide de la syntaxe Todo.txt" },
-  "tab_syntax_line_priority": { "message": "(A) priorité au début de la ligne (A = la plus haute)." },
-  "tab_syntax_line_created": { "message": "Date de création AAAA-MM-JJ juste après la priorité (optionnelle)." },
-  "tab_syntax_line_project_context": { "message": "+projet et @contexte n’importe où dans le titre." },
-  "tab_syntax_line_due": { "message": "due:AAAA-MM-JJ pour la date d’échéance (utilisée par le calendrier)." },
-  "tab_syntax_line_completed": { "message": "x AAAA-MM-JJ au début marque la tâche comme terminée." },
-  "tab_syntax_example_label": { "message": "Exemple\u00a0:" },
-  "tab_syntax_example_text": { "message": "(A) Appeler maman +Famille @phone due:2025-03-15" },
-  "tab_syntax_more_link": { "message": "Guide complet du format todo.txt…" },
-  "tab_syntax_toggle_aria": { "message": "Afficher ou masquer l’aide sur la syntaxe todo.txt" },
-  "popup_refresh": { "message": "Actualiser" },
-  "popup_new_task_placeholder": { "message": "Nouvelle tâche…" },
-  "popup_add": { "message": "Ajouter" },
-  "popup_tab": { "message": "Onglet" },
-  "popup_options": { "message": "Options" },
-  "popup_refresh_aria": { "message": "Actualiser la liste des tâches" },
-  "popup_add_aria": { "message": "Ajouter une tâche" },
-  "popup_meta_priority": { "message": "Priorité" },
-  "popup_meta_due": { "message": "Échéance\u00a0:" },
-  "popup_loading": { "message": "Chargement…" },
-  "popup_edit_cancel": { "message": "Annuler" },
-  "popup_edit_save": { "message": "Enregistrer" },
-  "tab_view_today": { "message": "Aujourd'hui" },
-  "tab_view_today_aria": { "message": "Afficher uniquement les tâches qui arrivent à échéance aujourd'hui" },
-  "tab_default_view": { "message": "Vue par défaut" },
-  "tab_default_view_all": { "message": "Toutes les tâches" },
-  "tab_default_view_today": { "message": "Aujourd'hui seulement" },
-  "tab_summary_today": { "message": "%d tâches aujourd'hui" },
-  "tab_summary_overdue": { "message": "%d en retard" }
+  "extensionName": {
+    "message": "Todo.txt"
+  },
+  "extensionDescription": {
+    "message": "Extension Thunderbird pour gérer les fichiers todo.txt : tâches en texte brut, priorités, projets, contextes et échéances dans un fichier que vous contrôlez.\n\nBasée sur l'extension Todo.txt originale de Roy Kokkelkoren. La version 3.x est une réécriture complète en MailExtension pour Thunderbird 140+ et n'est pas rétrocompatible avec la v2.\n\n• Aucun add-on supplémentaire : accès intégré à todo.txt et done.txt. Après installation, ouvrez Options → Parcourir pour sélectionner vos fichiers.\n• Popup : vue rapide depuis la barre d'outils ; ajouter, terminer et modifier les tâches.\n• Vue onglet complète : filtres, Aujourd'hui, Backlog, Cette semaine, tri par date ou priorité.\n• Options : chemins des fichiers, comportement, intégration optionnelle au calendrier (Lightning) pour les tâches avec échéance.\n• Syntaxe Todo.txt : priorités (A)(B)(C), projets +nom, contextes @nom, due:AAAA-MM-JJ."
+  },
+  "extensionSummary": {
+    "message": "Gérer todo.txt depuis Thunderbird : tâches, priorités, projets et échéances en texte brut."
+  },
+  "options_title": {
+    "message": "Todo.txt – Options"
+  },
+  "options_heading": {
+    "message": "Todo.txt – Préférences"
+  },
+  "options_todoFile_label": {
+    "message": "Emplacement du fichier Todo.txt"
+  },
+  "options_doneFile_label": {
+    "message": "Emplacement du fichier Done.txt"
+  },
+  "options_browse": {
+    "message": "Parcourir"
+  },
+  "options_behavior": {
+    "message": "Comportement"
+  },
+  "options_useThunderbird": {
+    "message": "Afficher les tâches dans le calendrier de Thunderbird"
+  },
+  "options_useCreation": {
+    "message": "Ajouter la date de création aux tâches"
+  },
+  "options_showFullTitle": {
+    "message": "Voir Projets et Contextes dans le titre"
+  },
+  "options_calendar_heading": {
+    "message": "Calendrier (Lightning)"
+  },
+  "options_calendar_enabled": {
+    "message": "Activer l'intégration avec le calendrier"
+  },
+  "options_calendar_select": {
+    "message": "Calendrier à synchroniser"
+  },
+  "options_calendar_sync_auto": {
+    "message": "Synchronisation automatique quand todo.txt change"
+  },
+  "options_calendar_unavailable": {
+    "message": "L'API calendrier n'est pas disponible. Vous pouvez exporter les tâches avec date d'échéance en ICS et les importer manuellement dans Thunderbird."
+  },
+  "options_calendar_export_ics": {
+    "message": "Exporter en fichier ICS"
+  },
+  "options_calendar_sync_now": {
+    "message": "Synchroniser maintenant (recharger le calendrier)"
+  },
+  "options_calendar_sync_done": {
+    "message": "%d tâche(s) synchronisée(s)."
+  },
+  "options_calendar_sync_no_due": {
+    "message": "Aucune tâche avec date d'échéance dans todo.txt."
+  },
+  "options_debug_heading": {
+    "message": "Débogage"
+  },
+  "options_calendar_copy_log": {
+    "message": "Copier le log de débogage de l’extension"
+  },
+  "options_calendar_copy_log_hint": {
+    "message": "Copie le log complet (état, chemins, sync) pour déboguer."
+  },
+  "options_calendar_copied": {
+    "message": "Copié."
+  },
+  "options_fsa_hint": {
+    "message": "Utiliser Parcourir pour sélectionner todo.txt et done.txt. Aucun add-on supplémentaire requis."
+  },
+  "options_open_full_view": {
+    "message": "Ouvrir la vue complète"
+  },
+  "options_file_placeholder": {
+    "message": "Sélectionner un fichier…"
+  },
+  "options_files_hint": {
+    "message": "Utilisez Parcourir pour choisir les fichiers. Aucun add-on supplémentaire requis."
+  },
+  "popup_open_full_view": {
+    "message": "Vue complète"
+  },
+  "welcome_title": {
+    "message": "Configurer votre liste de tâches"
+  },
+  "welcome_text": {
+    "message": "Choisissez le fichier todo.txt où enregistrer vos tâches. Nous utiliserons ou créerons done.txt dans le même dossier."
+  },
+  "welcome_btn_select_todo": {
+    "message": "Sélectionner todo.txt"
+  },
+  "welcome_btn_select_folder": {
+    "message": "Choisir un dossier"
+  },
+  "welcome_options_heading": {
+    "message": "Pour commencer"
+  },
+  "welcome_select_error": {
+    "message": "Configuration impossible. Réessayez ou utilisez Parcourir dans les options."
+  },
+  "options_readOnly": {
+    "message": "Mode lecture seule (ne pas écrire dans todo.txt/done.txt)"
+  },
+  "error_fileNotFound": {
+    "message": "Impossible de lire le fichier. Vérifiez que le fichier existe et que le chemin est correct:"
+  },
+  "error_fileCannotWrite": {
+    "message": "Impossible d'écrire le fichier. Vérifiez que le fichier n'est pas ouvert ailleurs ou verrouillé:"
+  },
+  "error_filesNotSpecified": {
+    "message": "Définissez les chemins vers todo.txt et done.txt dans les Options (Parcourir)."
+  },
+  "error_readOnlyMode": {
+    "message": "Le mode lecture seule est activé. Désactivez-le dans les Options pour écrire dans todo.txt/done.txt."
+  },
+  "error_fileLocked": {
+    "message": "Le fichier est en cours d'utilisation ou verrouillé:"
+  },
+  "error_fileNetworkOrRemote": {
+    "message": "Le fichier est sur un emplacement réseau ou distant et ne peut pas être accédé."
+  },
+  "error_itemNotFound": {
+    "message": "La tâche Todo est introuvable dans todo.txt"
+  },
+  "error_eventEncountered": {
+    "message": "Ce calendrier est utilisé pour Todo.txt et n'accepte que les tâches, pas les événements!"
+  },
+  "error_unknown": {
+    "message": "Une erreur inconnue s'est produite"
+  },
+  "tab_search_placeholder": {
+    "message": "Rechercher…"
+  },
+  "tab_sort_by": {
+    "message": "Trier par"
+  },
+  "tab_group_by": {
+    "message": "Grouper par"
+  },
+  "tab_filter_all": {
+    "message": "Tous"
+  },
+  "tab_filter_open": {
+    "message": "Ouvert"
+  },
+  "tab_filter_done": {
+    "message": "Terminé"
+  },
+  "tab_filter_overdue": {
+    "message": "En retard"
+  },
+  "tab_filter_today": {
+    "message": "Aujourd'hui"
+  },
+  "tab_filter_week": {
+    "message": "Cette semaine"
+  },
+  "tab_filter_no_date": {
+    "message": "Sans date"
+  },
+  "tab_filter_priority": {
+    "message": "Priorité"
+  },
+  "tab_filter_project": {
+    "message": "Projet"
+  },
+  "tab_filter_context": {
+    "message": "Contexte"
+  },
+  "tab_filter_due": {
+    "message": "Échéance"
+  },
+  "tab_filter_completion": {
+    "message": "Terminé"
+  },
+  "tab_sort_priority": {
+    "message": "Priorité"
+  },
+  "tab_sort_due": {
+    "message": "Date d'échéance"
+  },
+  "tab_sort_created": {
+    "message": "Créé"
+  },
+  "tab_sort_completed": {
+    "message": "Terminé"
+  },
+  "tab_sort_title": {
+    "message": "Titre"
+  },
+  "tab_group_none": {
+    "message": "Aucun"
+  },
+  "tab_filters_view": {
+    "message": "Filtres et vue"
+  },
+  "tab_empty_no_match": {
+    "message": "Aucune tâche ne correspond aux filtres. Mettez Projet, Contexte et Statut sur Tous pour tout voir, ou ajoutez des tâches."
+  },
+  "tab_reset_filters": {
+    "message": "Réinitialiser les filtres"
+  },
+  "tab_task_added": {
+    "message": "Tâche ajoutée"
+  },
+  "options_saved": {
+    "message": "Enregistré"
+  },
+  "tab_sort_asc": {
+    "message": "Croissant"
+  },
+  "tab_sort_desc": {
+    "message": "Décroissant"
+  },
+  "tab_delete_task": {
+    "message": "Supprimer"
+  },
+  "tab_delete_confirm": {
+    "message": "Supprimer cette tâche ?"
+  },
+  "popup_delete_task": {
+    "message": "Supprimer"
+  },
+  "popup_delete_confirm": {
+    "message": "Supprimer cette tâche ?"
+  },
+  "tab_edit_task": {
+    "message": "Modifier la tâche"
+  },
+  "popup_edit_task": {
+    "message": "Modifier le titre de la tâche"
+  },
+  "tab_showing_count": {
+    "message": "Affichage de %d sur %d tâches"
+  },
+  "tab_empty_no_config": {
+    "message": "Aucune tâche. Ouvrez les Options pour choisir votre fichier todo.txt."
+  },
+  "popup_empty_no_config": {
+    "message": "Aucune tâche. Ouvrez les Options pour choisir votre fichier todo.txt."
+  },
+  "tab_quick_view_tooltip": {
+    "message": "Vue rapide – tâches en attente uniquement"
+  },
+  "popup_tab_tooltip": {
+    "message": "Ouvrir la vue complète avec filtres et toutes les tâches"
+  },
+  "tab_open_options": {
+    "message": "Ouvrir les Options"
+  },
+  "popup_open_options": {
+    "message": "Ouvrir les Options"
+  },
+  "options_displayLanguage": {
+    "message": "Langue d'affichage"
+  },
+  "options_displayLanguage_browser": {
+    "message": "Utiliser la langue de Thunderbird"
+  },
+  "options_displayLanguage_en": {
+    "message": "English"
+  },
+  "options_displayLanguage_es": {
+    "message": "Español"
+  },
+  "options_displayLanguage_hint": {
+    "message": "Pris en compte après réouverture de la fenêtre/onglet ou rechargement de cette page."
+  },
+  "tab_refresh": {
+    "message": "Actualiser"
+  },
+  "tab_new_task_placeholder": {
+    "message": "Nouvelle tâche…"
+  },
+  "tab_add": {
+    "message": "Ajouter"
+  },
+  "tab_quick_view": {
+    "message": "Vue rapide"
+  },
+  "tab_options": {
+    "message": "Options"
+  },
+  "tab_toolbar_hint": {
+    "message": "L’icône est visible dans l’onglet Mail."
+  },
+  "tab_refresh_aria": {
+    "message": "Actualiser la liste des tâches"
+  },
+  "tab_add_aria": {
+    "message": "Ajouter une tâche"
+  },
+  "tab_meta_priority": {
+    "message": "Priorité"
+  },
+  "tab_meta_due": {
+    "message": "Échéance :"
+  },
+  "tab_loading": {
+    "message": "Chargement…"
+  },
+  "tab_syntax_hint": {
+    "message": "(A) priorité · +projet · @contexte · due:AAAA-MM-JJ"
+  },
+  "tab_syntax_title": {
+    "message": "Rappel rapide de la syntaxe Todo.txt"
+  },
+  "tab_syntax_line_priority": {
+    "message": "(A) priorité au début de la ligne (A = la plus haute)."
+  },
+  "tab_syntax_line_created": {
+    "message": "Date de création AAAA-MM-JJ juste après la priorité (optionnelle)."
+  },
+  "tab_syntax_line_project_context": {
+    "message": "+projet et @contexte n’importe où dans le titre."
+  },
+  "tab_syntax_line_due": {
+    "message": "due:AAAA-MM-JJ pour la date d’échéance (utilisée par le calendrier)."
+  },
+  "tab_syntax_line_completed": {
+    "message": "x AAAA-MM-JJ au début marque la tâche comme terminée."
+  },
+  "tab_syntax_example_label": {
+    "message": "Exemple :"
+  },
+  "tab_syntax_example_text": {
+    "message": "(A) Appeler maman +Famille @phone due:2025-03-15"
+  },
+  "tab_syntax_more_link": {
+    "message": "Guide complet du format todo.txt…"
+  },
+  "tab_syntax_toggle_aria": {
+    "message": "Afficher ou masquer l’aide sur la syntaxe todo.txt"
+  },
+  "popup_refresh": {
+    "message": "Actualiser"
+  },
+  "popup_new_task_placeholder": {
+    "message": "Nouvelle tâche…"
+  },
+  "popup_add": {
+    "message": "Ajouter"
+  },
+  "popup_tab": {
+    "message": "Onglet"
+  },
+  "popup_options": {
+    "message": "Options"
+  },
+  "popup_refresh_aria": {
+    "message": "Actualiser la liste des tâches"
+  },
+  "popup_add_aria": {
+    "message": "Ajouter une tâche"
+  },
+  "popup_meta_priority": {
+    "message": "Priorité"
+  },
+  "popup_meta_due": {
+    "message": "Échéance :"
+  },
+  "popup_loading": {
+    "message": "Chargement…"
+  },
+  "popup_edit_cancel": {
+    "message": "Annuler"
+  },
+  "popup_edit_save": {
+    "message": "Enregistrer"
+  },
+  "tab_view_today": {
+    "message": "Aujourd'hui"
+  },
+  "tab_view_today_aria": {
+    "message": "Afficher uniquement les tâches qui arrivent à échéance aujourd'hui"
+  },
+  "tab_view_overdue": {
+    "message": "En retard"
+  },
+  "tab_view_overdue_aria": {
+    "message": "Afficher uniquement les tâches en retard"
+  },
+  "tab_default_view": {
+    "message": "Vue par défaut"
+  },
+  "tab_default_view_all": {
+    "message": "Toutes les tâches"
+  },
+  "tab_default_view_today": {
+    "message": "Aujourd'hui seulement"
+  },
+  "tab_summary_today": {
+    "message": "%d tâches aujourd'hui"
+  },
+  "tab_summary_overdue": {
+    "message": "%d en retard"
+  },
+  "tab_view_backlog": {
+    "message": "Backlog"
+  },
+  "tab_view_backlog_aria": {
+    "message": "Voir les tâches sans date d'échéance"
+  },
+  "tab_view_weekly": {
+    "message": "Cette semaine"
+  },
+  "tab_view_weekly_aria": {
+    "message": "Voir le backlog de la semaine"
+  },
+  "tab_default_view_backlog": {
+    "message": "Backlog uniquement"
+  },
+  "tab_default_view_weekly": {
+    "message": "Cette semaine uniquement"
+  },
+  "tab_task_add_to_week": {
+    "message": "Ajouter à la semaine"
+  },
+  "tab_task_in_week": {
+    "message": "Dans la semaine"
+  },
+  "tab_task_remove_from_week": {
+    "message": "Retirer de la semaine"
+  }
 }

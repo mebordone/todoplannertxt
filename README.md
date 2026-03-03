@@ -5,7 +5,7 @@ Extensión de **Thunderbird** para administrar archivos [todo.txt](http://todotx
 - **Basada en** [todo.txt extension](https://github.com/rkokkelk/todo.txt-ext) (Thunderbird extension for the Todo.txt application, por Roy Kokkelkoren).
 - **Inspirada en** [sleek](https://github.com/ransome1/sleek) (interfaz limpia y moderna para todo.txt, por Robin Ahle).
 
-**Versión 3.x** – Reescritura como WebExtension (MailExtension). **No es retrocompatible con la versión 2** (legacy XUL/XPCOM). Quienes usen la 2 deben reconfigurar rutas de archivos y preferencias al migrar a la 3.
+**Versión 3.5** – Reescritura como WebExtension (MailExtension). **No es retrocompatible con la versión 2** (legacy XUL/XPCOM). Quienes usen la 2 deben reconfigurar rutas de archivos y preferencias al migrar a la 3.
 
 ---
 
@@ -24,11 +24,11 @@ Extensión de **Thunderbird** para administrar archivos [todo.txt](http://todotx
 ## Funcionalidades
 
 - **Configuración inicial**: En la primera ejecución (o si no hay rutas configuradas), en Opciones o en la pestaña de inicio puedes **Elegir carpeta** (donde se crearán o usarán `todo.txt` y `done.txt`) o **Seleccionar todo.txt** (archivo existente; en la misma carpeta se usa o crea `done.txt`). Sin complementos externos.
-- **Opciones**: Rutas para todo.txt y done.txt con el selector de archivos o de carpeta integrado. Opciones de comportamiento en Thunderbird, fecha de creación y visualización del título completo.
+- **Opciones**: Rutas para todo.txt y done.txt con el selector de archivos o de carpeta integrado; botón «Abrir vista completa» en el encabezado; opciones de comportamiento (Thunderbird, fecha de creación, título completo); sección Depuración (copiar log). Idioma de la interfaz (en, es, de, fr).
 - **Interfaz dual**
-  - **Popup (vista rápida):** Clic en el icono de la barra abre un popup con título, solo las tareas pendientes (solo el título de cada tarea) y barra de herramientas con iconos: actualizar (⟳), campo nueva tarea, añadir (+), abrir vista completa (⧉) y opciones (⚙). Doble clic en una tarea para editar; checkbox para completar; botón × para eliminar (si no está en solo lectura).
-  - **Vista en pestaña:** El enlace “Tab” abre una página completa con todas las tareas (pendientes y completadas), donde puedes añadir, completar, editar y actualizar. Desde esa pestaña, el botón **Quick view** abre el popup de vista rápida cuando la API lo permite; si no, se muestra un texto recordando que el icono de Todo.txt aparece en la barra al estar en la pestaña Correo.
-  - **Visibilidad del icono:** El botón de Todo.txt en la barra de título es visible en la pestaña de correo (Mail). Cuando estás en la vista en pestaña de Todo.txt, usa **Quick view** para abrir el popup sin cambiar de pestaña, o vuelve a la pestaña Correo para ver el icono en la barra.
+  - **Popup (vista rápida):** Clic en el icono de la barra abre un popup con título, solo las tareas pendientes (prioridad y vencimiento visibles) y barra de herramientas: actualizar (⟳), nueva tarea, añadir (+), abrir vista completa (⧉) y opciones (⚙). Doble clic para editar; checkbox para completar; botón × para eliminar (si no está en solo lectura).
+  - **Vista en pestaña:** Enlace “Vista completa” (desde popup u Opciones) abre una página con todas las tareas. Toolbar: Hoy, Vencidas, Esta semana, Backlog (con contadores cuando aplica), Restablecer filtros, Actualizar, Opciones. Filtros y ordenación (proyecto, contexto, prioridad, vencimiento, agrupación); vista por defecto configurable; backlog sin fecha y backlog semanal (“añadir a la semana” por tarea). Prioridad y vencimiento visibles en cada fila.
+  - **Visibilidad del icono:** El botón de Todo.txt en la barra de título es visible en la pestaña de correo (Mail).
 - **Calendario (Lightning)**: El experimento intenta registrar un calendario “Todo.txt”. Solo las tareas con `due:YYYY-MM-DD` se sincronizan; aparecen en la vista **Tareas** de Lightning. Opciones: activar/desactivar integración, elegir calendario, "Sincronizar ahora", exportar a ICS si la API no está disponible. Ver `docs/calendar-integration.md`.
 
 ## Tests (funcionales, integración, cobertura, complejidad)
@@ -54,7 +54,7 @@ Los builds se generan en la carpeta `dist/`. Desde la raíz del proyecto:
 ./build.sh
 ```
 
-El archivo `.xpi` quedará en `dist/` (p. ej. `dist/todotxt_3.1.0_20250302_143022.xpi`). Opción `-d` para build con logs de depuración; `-h` para ayuda.
+El archivo `.xpi` quedará en `dist/` (p. ej. `dist/todotxt_3.5.0_20260303_123456.xpi`). Opción `-d` para build con logs de depuración; `-h` para ayuda.
 
 ## Depuración remota
 

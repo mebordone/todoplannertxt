@@ -1,129 +1,434 @@
 {
-  "extensionName": { "message": "Todo.txt" },
-  "extensionDescription": { "message": "Todo.txt MailExtension (v3). No compatible con v2 (legacy).\n\nNo se requiere complemento adicional: esta extensión incluye acceso a archivos locales todo.txt y done.txt. Instale desde addons.thunderbird.net, luego abra Todo.txt → Opciones y use Examinar para seleccionar sus archivos todo.txt y done.txt.\n\nUso básico: Haga clic en el icono Todo.txt en la barra de herramientas para abrir la ventana; ver, añadir, completar y editar tareas. Use Opciones para cambiar rutas y preferencias.\n\nIntegración con calendario: La extensión incluye un experimento que puede registrar un calendario \"Todo.txt\", pero las versiones modernas de Thunderbird 140 ESR no exponen el proveedor de calendario legacy. La interfaz soportada es el popup y la sincronización con archivos. Véase ROADMAP.md para planes de integración con calendario." },
-  "options_title": { "message": "Todo.txt – Opciones" },
-  "options_heading": { "message": "Todo.txt – Preferencias" },
-  "options_todoFile_label": { "message": "Ubicación de Todo.txt" },
-  "options_doneFile_label": { "message": "Ubicación de Done.txt" },
-  "options_browse": { "message": "Examinar" },
-  "options_behavior": { "message": "Comportamiento" },
-  "options_useThunderbird": { "message": "Usar la funcionalidad de Thunderbird" },
-  "options_useCreation": { "message": "Usar la fecha de creación del Todo" },
-  "options_showFullTitle": { "message": "Mostrar proyectos y contextos en el título" },
-  "options_calendar_heading": { "message": "Calendario (Lightning)" },
-  "options_calendar_enabled": { "message": "Activar integración con el calendario" },
-  "options_calendar_select": { "message": "Calendario con el que sincronizar" },
-  "options_calendar_sync_auto": { "message": "Sincronización automática cuando cambie todo.txt" },
-  "options_calendar_unavailable": { "message": "La API del calendario no está disponible. Puede exportar tareas con fecha de vencimiento a un archivo ICS e importarlas manualmente en Thunderbird." },
-  "options_calendar_export_ics": { "message": "Exportar a archivo ICS" },
-  "options_calendar_sync_now": { "message": "Sincronizar ahora (recargar calendario)" },
-  "options_calendar_sync_done": { "message": "Sincronizadas %d tarea(s)." },
-  "options_calendar_sync_no_due": { "message": "No hay tareas con fecha de vencimiento en todo.txt." },
-  "options_calendar_copy_log": { "message": "Copiar log de depuración de la extensión" },
-  "options_calendar_copy_log_hint": { "message": "Copia el log completo (estado, rutas, sincronización) para depurar." },
-  "options_calendar_copied": { "message": "Copiado." },
-  "options_fsa_hint": { "message": "Use Examinar para seleccionar sus archivos todo.txt y done.txt. No se requiere complemento adicional." },
-  "welcome_title": { "message": "Configura tu lista de tareas" },
-  "welcome_text": { "message": "Elige el archivo todo.txt donde guardar tus tareas. En la misma carpeta usaremos o crearemos done.txt." },
-  "welcome_btn_select_todo": { "message": "Seleccionar todo.txt" },
-  "welcome_btn_select_folder": { "message": "Elegir carpeta" },
-  "welcome_options_heading": { "message": "Para empezar" },
-  "welcome_select_error": { "message": "No se pudo configurar. Inténtalo de nuevo o usa Examinar en Opciones." },
-  "options_readOnly": { "message": "Modo solo lectura (no escribir en todo.txt/done.txt)" },
-  "error_fileNotFound": { "message": "No se puede leer el archivo. Compruebe que existe y que la ruta es correcta:" },
-  "error_fileCannotWrite": { "message": "No se puede escribir en el archivo. Compruebe que no esté abierto en otro sitio o bloqueado:" },
-  "error_filesNotSpecified": { "message": "Configure las rutas a todo.txt y done.txt en Opciones (Examinar)." },
-  "error_readOnlyMode": { "message": "El modo solo lectura está activado. Desactívelo en Opciones para escribir en todo.txt/done.txt." },
-  "error_fileLocked": { "message": "El archivo está en uso o bloqueado:" },
-  "error_fileNetworkOrRemote": { "message": "El archivo está en una ubicación de red o remota y no se puede acceder." },
-  "error_itemNotFound": { "message": "La tarea no se encontró en todo.txt" },
-  "error_eventEncountered": { "message": "Este calendario es para Todo.txt y solo acepta tareas, no eventos." },
-  "error_unknown": { "message": "Se produjo un error desconocido" },
-  "tab_search_placeholder": { "message": "Buscar…" },
-  "tab_sort_by": { "message": "Ordenar por" },
-  "tab_group_by": { "message": "Agrupar por" },
-  "tab_filter_all": { "message": "Todos" },
-  "tab_filter_open": { "message": "Abiertas" },
-  "tab_filter_done": { "message": "Hechas" },
-  "tab_filter_overdue": { "message": "Vencidas" },
-  "tab_filter_today": { "message": "Hoy" },
-  "tab_filter_week": { "message": "Esta semana" },
-  "tab_filter_no_date": { "message": "Sin fecha" },
-  "tab_filter_priority": { "message": "Prioridad" },
-  "tab_filter_project": { "message": "Proyecto" },
-  "tab_filter_context": { "message": "Contexto" },
-  "tab_filter_due": { "message": "Vencimiento" },
-  "tab_filter_completion": { "message": "Estado" },
-  "tab_sort_priority": { "message": "Prioridad" },
-  "tab_sort_due": { "message": "Fecha de vencimiento" },
-  "tab_sort_created": { "message": "Creado" },
-  "tab_sort_completed": { "message": "Completado" },
-  "tab_sort_title": { "message": "Título" },
-  "tab_group_none": { "message": "Ninguno" },
-  "tab_filters_view": { "message": "Filtros y vista" },
-  "tab_empty_no_match": { "message": "Ninguna tarea coincide con los filtros. Ponga Proyecto, Contexto y Estado en Todos para ver todo, o añada tareas." },
-  "tab_reset_filters": { "message": "Restablecer filtros" },
-  "tab_task_added": { "message": "Tarea añadida" },
-  "options_saved": { "message": "Guardado" },
-  "tab_sort_asc": { "message": "Ascendente" },
-  "tab_sort_desc": { "message": "Descendente" },
-  "tab_delete_task": { "message": "Eliminar" },
-  "tab_delete_confirm": { "message": "¿Eliminar esta tarea?" },
-  "popup_delete_task": { "message": "Eliminar" },
-  "popup_delete_confirm": { "message": "¿Eliminar esta tarea?" },
-  "tab_edit_task": { "message": "Editar tarea" },
-  "popup_edit_task": { "message": "Editar título de la tarea" },
-  "tab_showing_count": { "message": "Mostrando %d de %d tareas" },
-  "tab_empty_no_config": { "message": "No hay tareas. Abra Opciones para elegir su archivo todo.txt." },
-  "popup_empty_no_config": { "message": "No hay tareas. Abra Opciones para elegir su archivo todo.txt." },
-  "tab_quick_view_tooltip": { "message": "Vista rápida – solo tareas pendientes" },
-  "popup_tab_tooltip": { "message": "Abrir vista completa con filtros y todas las tareas" },
-  "tab_open_options": { "message": "Abrir Opciones" },
-  "popup_open_options": { "message": "Abrir Opciones" },
-  "options_displayLanguage": { "message": "Idioma de visualización" },
-  "options_displayLanguage_browser": { "message": "Usar idioma de Thunderbird" },
-  "options_displayLanguage_en": { "message": "English" },
-  "options_displayLanguage_es": { "message": "Español" },
-  "options_displayLanguage_hint": { "message": "Se aplica al reabrir la ventana o pestaña, o al recargar esta página." },
-  "tab_refresh": { "message": "Actualizar" },
-  "tab_new_task_placeholder": { "message": "Nueva tarea…" },
-  "tab_add": { "message": "Añadir" },
-  "tab_quick_view": { "message": "Vista rápida" },
-  "tab_options": { "message": "Opciones" },
-  "tab_toolbar_hint": { "message": "El icono de la barra está visible en la pestaña Correo." },
-  "tab_refresh_aria": { "message": "Actualizar lista de tareas" },
-  "tab_add_aria": { "message": "Añadir tarea" },
-  "tab_meta_priority": { "message": "Prioridad" },
-  "tab_meta_due": { "message": "Vencimiento:" },
-  "tab_loading": { "message": "Cargando…" },
-  "tab_syntax_hint": { "message": "(A) prioridad · +proyecto · @contexto · due:AAAA-MM-DD" },
-  "tab_syntax_title": { "message": "Sintaxis rápida de Todo.txt" },
-  "tab_syntax_line_priority": { "message": "(A) prioridad al inicio (A = más alta)." },
-  "tab_syntax_line_created": { "message": "Fecha de creación YYYY-MM-DD justo después de la prioridad (opcional)." },
-  "tab_syntax_line_project_context": { "message": "+proyecto y @contexto en cualquier parte del título." },
-  "tab_syntax_line_due": { "message": "due:AAAA-MM-DD para la fecha de vencimiento (usada por el calendario)." },
-  "tab_syntax_line_completed": { "message": "x YYYY-MM-DD al inicio marca la tarea como completada." },
-  "tab_syntax_example_label": { "message": "Ejemplo:" },
-  "tab_syntax_example_text": { "message": "(A) Llamar a mamá +Familia @phone due:2025-03-15" },
-  "tab_syntax_more_link": { "message": "Guía completa del formato todo.txt…" },
-  "tab_syntax_toggle_aria": { "message": "Mostrar u ocultar la ayuda de sintaxis de todo.txt" },
-  "popup_refresh": { "message": "Actualizar" },
-  "popup_new_task_placeholder": { "message": "Nueva tarea…" },
-  "popup_add": { "message": "Añadir" },
-  "popup_tab": { "message": "Pestaña" },
-  "popup_options": { "message": "Opciones" },
-  "popup_refresh_aria": { "message": "Actualizar lista de tareas" },
-  "popup_add_aria": { "message": "Añadir tarea" },
-  "popup_meta_priority": { "message": "Prioridad" },
-  "popup_meta_due": { "message": "Vencimiento:" },
-  "popup_loading": { "message": "Cargando…" },
-  "popup_edit_cancel": { "message": "Cancelar" },
-  "popup_edit_save": { "message": "Guardar" },
-  "tab_view_today": { "message": "Hoy" },
-  "tab_view_today_aria": { "message": "Mostrar solo las tareas que vencen hoy" },
-  "tab_default_view": { "message": "Vista por defecto" },
-  "tab_default_view_all": { "message": "Todas las tareas" },
-  "tab_default_view_today": { "message": "Solo hoy" },
-  "tab_summary_today": { "message": "%d tareas para hoy" },
-  "tab_summary_overdue": { "message": "%d vencidas" }
+  "extensionName": {
+    "message": "Todo.txt"
+  },
+  "extensionDescription": {
+    "message": "Extensión de Thunderbird para gestionar archivos todo.txt: tareas en texto plano, prioridades, proyectos, contextos y fechas en un archivo que tú controlas.\n\nBasada en la extensión original Todo.txt de Roy Kokkelkoren. La versión 3.x es una reescritura completa como MailExtension para Thunderbird 140+ y no es compatible con la v2.\n\n• Sin complementos extra: acceso integrado a todo.txt y done.txt. Tras instalar, abre Opciones → Examinar para elegir tus archivos.\n• Popup: vista rápida desde la barra; añadir, completar y editar tareas.\n• Vista en pestaña: filtros, Hoy, Backlog, Esta semana, ordenar por fecha o prioridad.\n• Opciones: rutas de archivos, comportamiento, integración opcional con Calendario (Lightning) para tareas con fecha.\n• Sintaxis Todo.txt: prioridades (A)(B)(C), proyectos +nombre, contextos @nombre, due:AAAA-MM-DD."
+  },
+  "extensionSummary": {
+    "message": "Gestiona todo.txt desde Thunderbird: tareas, prioridades, proyectos y fechas en texto plano."
+  },
+  "options_title": {
+    "message": "Todo.txt – Opciones"
+  },
+  "options_heading": {
+    "message": "Todo.txt – Preferencias"
+  },
+  "options_todoFile_label": {
+    "message": "Ubicación de Todo.txt"
+  },
+  "options_doneFile_label": {
+    "message": "Ubicación de Done.txt"
+  },
+  "options_browse": {
+    "message": "Examinar"
+  },
+  "options_behavior": {
+    "message": "Comportamiento"
+  },
+  "options_useThunderbird": {
+    "message": "Usar la funcionalidad de Thunderbird"
+  },
+  "options_useCreation": {
+    "message": "Usar la fecha de creación del Todo"
+  },
+  "options_showFullTitle": {
+    "message": "Mostrar proyectos y contextos en el título"
+  },
+  "options_calendar_heading": {
+    "message": "Calendario (Lightning)"
+  },
+  "options_calendar_enabled": {
+    "message": "Activar integración con el calendario"
+  },
+  "options_calendar_select": {
+    "message": "Calendario con el que sincronizar"
+  },
+  "options_calendar_sync_auto": {
+    "message": "Sincronización automática cuando cambie todo.txt"
+  },
+  "options_calendar_unavailable": {
+    "message": "La API del calendario no está disponible. Puede exportar tareas con fecha de vencimiento a un archivo ICS e importarlas manualmente en Thunderbird."
+  },
+  "options_calendar_export_ics": {
+    "message": "Exportar a archivo ICS"
+  },
+  "options_calendar_sync_now": {
+    "message": "Sincronizar ahora (recargar calendario)"
+  },
+  "options_calendar_sync_done": {
+    "message": "Sincronizadas %d tarea(s)."
+  },
+  "options_calendar_sync_no_due": {
+    "message": "No hay tareas con fecha de vencimiento en todo.txt."
+  },
+  "options_debug_heading": {
+    "message": "Depuración"
+  },
+  "options_calendar_copy_log": {
+    "message": "Copiar log de depuración de la extensión"
+  },
+  "options_calendar_copy_log_hint": {
+    "message": "Copia el log completo (estado, rutas, sincronización) para depurar."
+  },
+  "options_calendar_copied": {
+    "message": "Copiado."
+  },
+  "options_fsa_hint": {
+    "message": "Use Examinar para seleccionar sus archivos todo.txt y done.txt. No se requiere complemento adicional."
+  },
+  "options_open_full_view": {
+    "message": "Abrir vista completa"
+  },
+  "options_file_placeholder": {
+    "message": "Seleccionar archivo…"
+  },
+  "options_files_hint": {
+    "message": "Puedes usar Examinar para elegir los archivos. No hace falta otro complemento."
+  },
+  "popup_open_full_view": {
+    "message": "Vista completa"
+  },
+  "welcome_title": {
+    "message": "Configura tu lista de tareas"
+  },
+  "welcome_text": {
+    "message": "Elige el archivo todo.txt donde guardar tus tareas. En la misma carpeta usaremos o crearemos done.txt."
+  },
+  "welcome_btn_select_todo": {
+    "message": "Seleccionar todo.txt"
+  },
+  "welcome_btn_select_folder": {
+    "message": "Elegir carpeta"
+  },
+  "welcome_options_heading": {
+    "message": "Para empezar"
+  },
+  "welcome_select_error": {
+    "message": "No se pudo configurar. Inténtalo de nuevo o usa Examinar en Opciones."
+  },
+  "options_readOnly": {
+    "message": "Modo solo lectura (no escribir en todo.txt/done.txt)"
+  },
+  "error_fileNotFound": {
+    "message": "No se puede leer el archivo. Compruebe que existe y que la ruta es correcta:"
+  },
+  "error_fileCannotWrite": {
+    "message": "No se puede escribir en el archivo. Compruebe que no esté abierto en otro sitio o bloqueado:"
+  },
+  "error_filesNotSpecified": {
+    "message": "Configure las rutas a todo.txt y done.txt en Opciones (Examinar)."
+  },
+  "error_readOnlyMode": {
+    "message": "El modo solo lectura está activado. Desactívelo en Opciones para escribir en todo.txt/done.txt."
+  },
+  "error_fileLocked": {
+    "message": "El archivo está en uso o bloqueado:"
+  },
+  "error_fileNetworkOrRemote": {
+    "message": "El archivo está en una ubicación de red o remota y no se puede acceder."
+  },
+  "error_itemNotFound": {
+    "message": "La tarea no se encontró en todo.txt"
+  },
+  "error_eventEncountered": {
+    "message": "Este calendario es para Todo.txt y solo acepta tareas, no eventos."
+  },
+  "error_unknown": {
+    "message": "Se produjo un error desconocido"
+  },
+  "tab_search_placeholder": {
+    "message": "Buscar…"
+  },
+  "tab_sort_by": {
+    "message": "Ordenar por"
+  },
+  "tab_group_by": {
+    "message": "Agrupar por"
+  },
+  "tab_filter_all": {
+    "message": "Todos"
+  },
+  "tab_filter_open": {
+    "message": "Abiertas"
+  },
+  "tab_filter_done": {
+    "message": "Hechas"
+  },
+  "tab_filter_overdue": {
+    "message": "Vencidas"
+  },
+  "tab_filter_today": {
+    "message": "Hoy"
+  },
+  "tab_filter_week": {
+    "message": "Esta semana"
+  },
+  "tab_filter_no_date": {
+    "message": "Sin fecha"
+  },
+  "tab_filter_priority": {
+    "message": "Prioridad"
+  },
+  "tab_filter_project": {
+    "message": "Proyecto"
+  },
+  "tab_filter_context": {
+    "message": "Contexto"
+  },
+  "tab_filter_due": {
+    "message": "Vencimiento"
+  },
+  "tab_filter_completion": {
+    "message": "Estado"
+  },
+  "tab_sort_priority": {
+    "message": "Prioridad"
+  },
+  "tab_sort_due": {
+    "message": "Fecha de vencimiento"
+  },
+  "tab_sort_created": {
+    "message": "Creado"
+  },
+  "tab_sort_completed": {
+    "message": "Completado"
+  },
+  "tab_sort_title": {
+    "message": "Título"
+  },
+  "tab_group_none": {
+    "message": "Ninguno"
+  },
+  "tab_filters_view": {
+    "message": "Filtros y vista"
+  },
+  "tab_empty_no_match": {
+    "message": "Ninguna tarea coincide con los filtros. Ponga Proyecto, Contexto y Estado en Todos para ver todo, o añada tareas."
+  },
+  "tab_reset_filters": {
+    "message": "Restablecer filtros"
+  },
+  "tab_task_added": {
+    "message": "Tarea añadida"
+  },
+  "options_saved": {
+    "message": "Guardado"
+  },
+  "tab_sort_asc": {
+    "message": "Ascendente"
+  },
+  "tab_sort_desc": {
+    "message": "Descendente"
+  },
+  "tab_delete_task": {
+    "message": "Eliminar"
+  },
+  "tab_delete_confirm": {
+    "message": "¿Eliminar esta tarea?"
+  },
+  "popup_delete_task": {
+    "message": "Eliminar"
+  },
+  "popup_delete_confirm": {
+    "message": "¿Eliminar esta tarea?"
+  },
+  "tab_edit_task": {
+    "message": "Editar tarea"
+  },
+  "popup_edit_task": {
+    "message": "Editar título de la tarea"
+  },
+  "tab_showing_count": {
+    "message": "Mostrando %d de %d tareas"
+  },
+  "tab_empty_no_config": {
+    "message": "No hay tareas. Abra Opciones para elegir su archivo todo.txt."
+  },
+  "popup_empty_no_config": {
+    "message": "No hay tareas. Abra Opciones para elegir su archivo todo.txt."
+  },
+  "tab_quick_view_tooltip": {
+    "message": "Vista rápida – solo tareas pendientes"
+  },
+  "popup_tab_tooltip": {
+    "message": "Abrir vista completa con filtros y todas las tareas"
+  },
+  "tab_open_options": {
+    "message": "Abrir Opciones"
+  },
+  "popup_open_options": {
+    "message": "Abrir Opciones"
+  },
+  "options_displayLanguage": {
+    "message": "Idioma de visualización"
+  },
+  "options_displayLanguage_browser": {
+    "message": "Usar idioma de Thunderbird"
+  },
+  "options_displayLanguage_en": {
+    "message": "English"
+  },
+  "options_displayLanguage_es": {
+    "message": "Español"
+  },
+  "options_displayLanguage_hint": {
+    "message": "Se aplica al reabrir la ventana o pestaña, o al recargar esta página."
+  },
+  "tab_refresh": {
+    "message": "Actualizar"
+  },
+  "tab_new_task_placeholder": {
+    "message": "Nueva tarea…"
+  },
+  "tab_add": {
+    "message": "Añadir"
+  },
+  "tab_quick_view": {
+    "message": "Vista rápida"
+  },
+  "tab_options": {
+    "message": "Opciones"
+  },
+  "tab_toolbar_hint": {
+    "message": "El icono de la barra está visible en la pestaña Correo."
+  },
+  "tab_refresh_aria": {
+    "message": "Actualizar lista de tareas"
+  },
+  "tab_add_aria": {
+    "message": "Añadir tarea"
+  },
+  "tab_meta_priority": {
+    "message": "Prioridad"
+  },
+  "tab_meta_due": {
+    "message": "Vencimiento:"
+  },
+  "tab_loading": {
+    "message": "Cargando…"
+  },
+  "tab_syntax_hint": {
+    "message": "(A) prioridad · +proyecto · @contexto · due:AAAA-MM-DD"
+  },
+  "tab_syntax_title": {
+    "message": "Sintaxis rápida de Todo.txt"
+  },
+  "tab_syntax_line_priority": {
+    "message": "(A) prioridad al inicio (A = más alta)."
+  },
+  "tab_syntax_line_created": {
+    "message": "Fecha de creación YYYY-MM-DD justo después de la prioridad (opcional)."
+  },
+  "tab_syntax_line_project_context": {
+    "message": "+proyecto y @contexto en cualquier parte del título."
+  },
+  "tab_syntax_line_due": {
+    "message": "due:AAAA-MM-DD para la fecha de vencimiento (usada por el calendario)."
+  },
+  "tab_syntax_line_completed": {
+    "message": "x YYYY-MM-DD al inicio marca la tarea como completada."
+  },
+  "tab_syntax_example_label": {
+    "message": "Ejemplo:"
+  },
+  "tab_syntax_example_text": {
+    "message": "(A) Llamar a mamá +Familia @phone due:2025-03-15"
+  },
+  "tab_syntax_more_link": {
+    "message": "Guía completa del formato todo.txt…"
+  },
+  "tab_syntax_toggle_aria": {
+    "message": "Mostrar u ocultar la ayuda de sintaxis de todo.txt"
+  },
+  "popup_refresh": {
+    "message": "Actualizar"
+  },
+  "popup_new_task_placeholder": {
+    "message": "Nueva tarea…"
+  },
+  "popup_add": {
+    "message": "Añadir"
+  },
+  "popup_tab": {
+    "message": "Pestaña"
+  },
+  "popup_options": {
+    "message": "Opciones"
+  },
+  "popup_refresh_aria": {
+    "message": "Actualizar lista de tareas"
+  },
+  "popup_add_aria": {
+    "message": "Añadir tarea"
+  },
+  "popup_meta_priority": {
+    "message": "Prioridad"
+  },
+  "popup_meta_due": {
+    "message": "Vencimiento:"
+  },
+  "popup_loading": {
+    "message": "Cargando…"
+  },
+  "popup_edit_cancel": {
+    "message": "Cancelar"
+  },
+  "popup_edit_save": {
+    "message": "Guardar"
+  },
+  "tab_view_today": {
+    "message": "Hoy"
+  },
+  "tab_view_today_aria": {
+    "message": "Mostrar solo las tareas que vencen hoy"
+  },
+  "tab_view_overdue": {
+    "message": "Vencidas"
+  },
+  "tab_view_overdue_aria": {
+    "message": "Mostrar solo tareas vencidas"
+  },
+  "tab_default_view": {
+    "message": "Vista por defecto"
+  },
+  "tab_default_view_all": {
+    "message": "Todas las tareas"
+  },
+  "tab_default_view_today": {
+    "message": "Solo hoy"
+  },
+  "tab_summary_today": {
+    "message": "%d tareas para hoy"
+  },
+  "tab_summary_overdue": {
+    "message": "%d vencidas"
+  },
+  "tab_view_backlog": {
+    "message": "Backlog"
+  },
+  "tab_view_backlog_aria": {
+    "message": "Ver tareas sin fecha de vencimiento"
+  },
+  "tab_view_weekly": {
+    "message": "Esta semana"
+  },
+  "tab_view_weekly_aria": {
+    "message": "Ver backlog semanal"
+  },
+  "tab_default_view_backlog": {
+    "message": "Solo backlog"
+  },
+  "tab_default_view_weekly": {
+    "message": "Solo esta semana"
+  },
+  "tab_task_add_to_week": {
+    "message": "Añadir a la semana"
+  },
+  "tab_task_in_week": {
+    "message": "En la semana"
+  },
+  "tab_task_remove_from_week": {
+    "message": "Quitar de la semana"
+  }
 }

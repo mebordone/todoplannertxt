@@ -1,129 +1,434 @@
 {
-  "extensionName": { "message": "Todo.txt" },
-  "extensionDescription": { "message": "Todo.txt MailExtension (v3). Not backward compatible with v2 (legacy).\n\nNo extra add-on required: this extension includes built-in access to local todo.txt and done.txt files. Install from addons.thunderbird.net, then open Todo.txt → Options and use Browse to select your todo.txt and done.txt files.\n\nBasic use: Click the Todo.txt icon in the toolbar to open the popup; view, add, complete and edit tasks. Use Options to change file paths and preferences.\n\nCalendar integration: The extension ships an experiment that can register a “Todo.txt” calendar, but modern Thunderbird 140 ESR builds (e.g. Linux Mint 140.7.2esr mint-001) do not expose the legacy calendar provider used by the original add-on. As a result, calendar views may not show Todo.txt items; the supported and tested interface is the popup plus file syncing. See ROADMAP.md for future plans to reintroduce calendar integration using supported MailExtension calendar APIs." },
-  "options_title": { "message": "Todo.txt – Options" },
-  "options_heading": { "message": "Todo.txt – Preferences" },
-  "options_todoFile_label": { "message": "Location of Todo.txt" },
-  "options_doneFile_label": { "message": "Location of Done.txt" },
-  "options_browse": { "message": "Browse" },
-  "options_behavior": { "message": "Behavior" },
-  "options_useThunderbird": { "message": "Use Thunderbird's functionality" },
-  "options_useCreation": { "message": "Use the Todo's creation timestamp" },
-  "options_showFullTitle": { "message": "Show Projects and Contexts in the title" },
-  "options_calendar_heading": { "message": "Calendar (Lightning)" },
-  "options_calendar_enabled": { "message": "Enable Calendar integration" },
-  "options_calendar_select": { "message": "Calendar to sync with" },
-  "options_calendar_sync_auto": { "message": "Automatic sync when todo.txt changes" },
-  "options_calendar_unavailable": { "message": "Calendar API is not available. You can export tasks with due dates to an ICS file and import them manually in Thunderbird." },
-  "options_calendar_export_ics": { "message": "Export to ICS file" },
-  "options_calendar_sync_now": { "message": "Sync now (reload calendar)" },
-  "options_calendar_sync_done": { "message": "Synced %d task(s)." },
-  "options_calendar_sync_no_due": { "message": "No tasks with due date in todo.txt." },
-  "options_calendar_copy_log": { "message": "Copy extension debug log" },
-  "options_calendar_copy_log_hint": { "message": "Copy full log (state, paths, sync) for debugging." },
-  "options_calendar_copied": { "message": "Copied." },
-  "options_fsa_hint": { "message": "Use Browse to select your todo.txt and done.txt files. No extra add-on required." },
-  "welcome_title": { "message": "Set up your task list" },
-  "welcome_text": { "message": "Choose the todo.txt file where your tasks will be saved. We will use or create done.txt in the same folder." },
-  "welcome_btn_select_todo": { "message": "Select todo.txt" },
-  "welcome_btn_select_folder": { "message": "Select folder" },
-  "welcome_options_heading": { "message": "To get started" },
-  "welcome_select_error": { "message": "Could not set up. Try again or use Browse in Options." },
-  "options_readOnly": { "message": "Read-only mode (do not write to todo.txt/done.txt)" },
-  "error_fileNotFound": { "message": "Cannot read from file. Check that the file exists and the path is correct:" },
-  "error_fileCannotWrite": { "message": "Cannot write to file. Check that the file is not open elsewhere or locked:" },
-  "error_filesNotSpecified": { "message": "Set the paths to todo.txt and done.txt in Options (Browse)." },
-  "error_readOnlyMode": { "message": "Read-only mode is enabled. Disable it in Options to write to todo.txt/done.txt." },
-  "error_fileLocked": { "message": "The file is in use or locked:" },
-  "error_fileNetworkOrRemote": { "message": "The file is on a network or remote location and cannot be accessed." },
-  "error_itemNotFound": { "message": "Todo task cannot be found in todo.txt" },
-  "error_eventEncountered": { "message": "This calendar is used for Todo.txt and only accepts tasks, not events!" },
-  "error_unknown": { "message": "An unknown error occurred" },
-  "tab_search_placeholder": { "message": "Search…" },
-  "tab_sort_by": { "message": "Sort by" },
-  "tab_group_by": { "message": "Group by" },
-  "tab_filter_all": { "message": "All" },
-  "tab_filter_open": { "message": "Open" },
-  "tab_filter_done": { "message": "Done" },
-  "tab_filter_overdue": { "message": "Overdue" },
-  "tab_filter_today": { "message": "Today" },
-  "tab_filter_week": { "message": "This week" },
-  "tab_filter_no_date": { "message": "No date" },
-  "tab_filter_priority": { "message": "Priority" },
-  "tab_filter_project": { "message": "Project" },
-  "tab_filter_context": { "message": "Context" },
-  "tab_filter_due": { "message": "Due" },
-  "tab_filter_completion": { "message": "Completion" },
-  "tab_sort_priority": { "message": "Priority" },
-  "tab_sort_due": { "message": "Due date" },
-  "tab_sort_created": { "message": "Created" },
-  "tab_sort_completed": { "message": "Completed" },
-  "tab_sort_title": { "message": "Title" },
-  "tab_group_none": { "message": "None" },
-  "tab_filters_view": { "message": "Filters & view" },
-  "tab_empty_no_match": { "message": "No tasks match the filters. Set Project, Context and Status to All to see everything, or add tasks." },
-  "tab_reset_filters": { "message": "Reset filters" },
-  "tab_task_added": { "message": "Task added" },
-  "options_saved": { "message": "Saved" },
-  "tab_sort_asc": { "message": "Ascending" },
-  "tab_sort_desc": { "message": "Descending" },
-  "tab_delete_task": { "message": "Delete" },
-  "tab_delete_confirm": { "message": "Delete this task?" },
-  "popup_delete_task": { "message": "Delete" },
-  "popup_delete_confirm": { "message": "Delete this task?" },
-  "tab_edit_task": { "message": "Edit task" },
-  "popup_edit_task": { "message": "Edit task title" },
-  "tab_showing_count": { "message": "Showing %d of %d tasks" },
-  "tab_empty_no_config": { "message": "No tasks. Open Options to choose your todo.txt file." },
-  "popup_empty_no_config": { "message": "No tasks. Open Options to choose your todo.txt file." },
-  "tab_quick_view_tooltip": { "message": "Quick view – pending tasks only" },
-  "popup_tab_tooltip": { "message": "Open full view with filters and all tasks" },
-  "tab_open_options": { "message": "Open Options" },
-  "popup_open_options": { "message": "Open Options" },
-  "options_displayLanguage": { "message": "Display language" },
-  "options_displayLanguage_browser": { "message": "Use Thunderbird language" },
-  "options_displayLanguage_en": { "message": "English" },
-  "options_displayLanguage_es": { "message": "Español" },
-  "options_displayLanguage_hint": { "message": "Takes effect after reopening the popup/tab or reloading this page." },
-  "tab_refresh": { "message": "Refresh" },
-  "tab_new_task_placeholder": { "message": "New task…" },
-  "tab_add": { "message": "Add" },
-  "tab_quick_view": { "message": "Quick view" },
-  "tab_options": { "message": "Options" },
-  "tab_toolbar_hint": { "message": "Toolbar icon is visible in the Mail tab." },
-  "tab_refresh_aria": { "message": "Refresh task list" },
-  "tab_add_aria": { "message": "Add task" },
-  "tab_meta_priority": { "message": "Priority" },
-  "tab_meta_due": { "message": "Due:" },
-  "tab_loading": { "message": "Loading…" },
-  "tab_syntax_hint": { "message": "(A) priority · +project · @context · due:YYYY-MM-DD" },
-  "tab_syntax_title": { "message": "Todo.txt quick syntax" },
-  "tab_syntax_line_priority": { "message": "(A) priority at the start (A = highest)." },
-  "tab_syntax_line_created": { "message": "YYYY-MM-DD creation date right after priority (optional)." },
-  "tab_syntax_line_project_context": { "message": "+project and @context anywhere in the title." },
-  "tab_syntax_line_due": { "message": "due:YYYY-MM-DD for due date (used by the calendar)." },
-  "tab_syntax_line_completed": { "message": "x YYYY-MM-DD at the start marks the task as completed." },
-  "tab_syntax_example_label": { "message": "Example:" },
-  "tab_syntax_example_text": { "message": "(A) Call Mom +Family @phone due:2025-03-15" },
-  "tab_syntax_more_link": { "message": "Full todo.txt format guide…" },
-  "tab_syntax_toggle_aria": { "message": "Show or hide the todo.txt syntax help" },
-  "popup_refresh": { "message": "Refresh" },
-  "popup_new_task_placeholder": { "message": "New task…" },
-  "popup_add": { "message": "Add" },
-  "popup_tab": { "message": "Tab" },
-  "popup_options": { "message": "Options" },
-  "popup_refresh_aria": { "message": "Refresh task list" },
-  "popup_add_aria": { "message": "Add task" },
-  "popup_meta_priority": { "message": "Priority" },
-  "popup_meta_due": { "message": "Due:" },
-  "popup_loading": { "message": "Loading…" },
-  "popup_edit_cancel": { "message": "Cancel" },
-  "popup_edit_save": { "message": "Save" },
-  "tab_view_today": { "message": "Today" },
-  "tab_view_today_aria": { "message": "Show tasks due today" },
-  "tab_default_view": { "message": "Default view" },
-  "tab_default_view_all": { "message": "All tasks" },
-  "tab_default_view_today": { "message": "Today only" },
-  "tab_summary_today": { "message": "%d tasks today" },
-  "tab_summary_overdue": { "message": "%d overdue" }
+  "extensionName": {
+    "message": "Todo.txt"
+  },
+  "extensionDescription": {
+    "message": "Thunderbird extension to manage todo.txt files: plain-text tasks, priorities, projects, contexts and due dates in a file you control.\n\nBased on the original Todo.txt extension by Roy Kokkelkoren. Version 3.x is a full rewrite as a MailExtension for Thunderbird 140+ and is not backward compatible with v2.\n\n• No extra add-ons: built-in file access for todo.txt and done.txt. After install, open Options → Browse to select your files.\n• Popup: quick view from the toolbar; add, complete and edit tasks.\n• Full tab view: filters, Today, Backlog, This week, sort by due date or priority.\n• Options: file paths, behaviour, optional Calendar (Lightning) integration for tasks with due dates.\n• Full Todo.txt syntax: priorities (A)(B)(C), projects +name, contexts @name, due:YYYY-MM-DD."
+  },
+  "extensionSummary": {
+    "message": "Manage todo.txt from Thunderbird: tasks, priorities, projects and due dates in plain text."
+  },
+  "options_title": {
+    "message": "Todo.txt – Options"
+  },
+  "options_heading": {
+    "message": "Todo.txt – Preferences"
+  },
+  "options_todoFile_label": {
+    "message": "Location of Todo.txt"
+  },
+  "options_doneFile_label": {
+    "message": "Location of Done.txt"
+  },
+  "options_browse": {
+    "message": "Browse"
+  },
+  "options_behavior": {
+    "message": "Behavior"
+  },
+  "options_useThunderbird": {
+    "message": "Use Thunderbird's functionality"
+  },
+  "options_useCreation": {
+    "message": "Use the Todo's creation timestamp"
+  },
+  "options_showFullTitle": {
+    "message": "Show Projects and Contexts in the title"
+  },
+  "options_calendar_heading": {
+    "message": "Calendar (Lightning)"
+  },
+  "options_calendar_enabled": {
+    "message": "Enable Calendar integration"
+  },
+  "options_calendar_select": {
+    "message": "Calendar to sync with"
+  },
+  "options_calendar_sync_auto": {
+    "message": "Automatic sync when todo.txt changes"
+  },
+  "options_calendar_unavailable": {
+    "message": "Calendar API is not available. You can export tasks with due dates to an ICS file and import them manually in Thunderbird."
+  },
+  "options_calendar_export_ics": {
+    "message": "Export to ICS file"
+  },
+  "options_calendar_sync_now": {
+    "message": "Sync now (reload calendar)"
+  },
+  "options_calendar_sync_done": {
+    "message": "Synced %d task(s)."
+  },
+  "options_calendar_sync_no_due": {
+    "message": "No tasks with due date in todo.txt."
+  },
+  "options_debug_heading": {
+    "message": "Debug"
+  },
+  "options_calendar_copy_log": {
+    "message": "Copy extension debug log"
+  },
+  "options_calendar_copy_log_hint": {
+    "message": "Copy full log (state, paths, sync) for debugging."
+  },
+  "options_calendar_copied": {
+    "message": "Copied."
+  },
+  "options_fsa_hint": {
+    "message": "Use Browse to select your todo.txt and done.txt files. No extra add-on required."
+  },
+  "options_open_full_view": {
+    "message": "Open full view"
+  },
+  "options_file_placeholder": {
+    "message": "Select file…"
+  },
+  "options_files_hint": {
+    "message": "Use Browse to choose your files. No extra add-on required."
+  },
+  "popup_open_full_view": {
+    "message": "Full view"
+  },
+  "welcome_title": {
+    "message": "Set up your task list"
+  },
+  "welcome_text": {
+    "message": "Choose the todo.txt file where your tasks will be saved. We will use or create done.txt in the same folder."
+  },
+  "welcome_btn_select_todo": {
+    "message": "Select todo.txt"
+  },
+  "welcome_btn_select_folder": {
+    "message": "Select folder"
+  },
+  "welcome_options_heading": {
+    "message": "To get started"
+  },
+  "welcome_select_error": {
+    "message": "Could not set up. Try again or use Browse in Options."
+  },
+  "options_readOnly": {
+    "message": "Read-only mode (do not write to todo.txt/done.txt)"
+  },
+  "error_fileNotFound": {
+    "message": "Cannot read from file. Check that the file exists and the path is correct:"
+  },
+  "error_fileCannotWrite": {
+    "message": "Cannot write to file. Check that the file is not open elsewhere or locked:"
+  },
+  "error_filesNotSpecified": {
+    "message": "Set the paths to todo.txt and done.txt in Options (Browse)."
+  },
+  "error_readOnlyMode": {
+    "message": "Read-only mode is enabled. Disable it in Options to write to todo.txt/done.txt."
+  },
+  "error_fileLocked": {
+    "message": "The file is in use or locked:"
+  },
+  "error_fileNetworkOrRemote": {
+    "message": "The file is on a network or remote location and cannot be accessed."
+  },
+  "error_itemNotFound": {
+    "message": "Todo task cannot be found in todo.txt"
+  },
+  "error_eventEncountered": {
+    "message": "This calendar is used for Todo.txt and only accepts tasks, not events!"
+  },
+  "error_unknown": {
+    "message": "An unknown error occurred"
+  },
+  "tab_search_placeholder": {
+    "message": "Search…"
+  },
+  "tab_sort_by": {
+    "message": "Sort by"
+  },
+  "tab_group_by": {
+    "message": "Group by"
+  },
+  "tab_filter_all": {
+    "message": "All"
+  },
+  "tab_filter_open": {
+    "message": "Open"
+  },
+  "tab_filter_done": {
+    "message": "Done"
+  },
+  "tab_filter_overdue": {
+    "message": "Overdue"
+  },
+  "tab_filter_today": {
+    "message": "Today"
+  },
+  "tab_filter_week": {
+    "message": "This week"
+  },
+  "tab_filter_no_date": {
+    "message": "No date"
+  },
+  "tab_filter_priority": {
+    "message": "Priority"
+  },
+  "tab_filter_project": {
+    "message": "Project"
+  },
+  "tab_filter_context": {
+    "message": "Context"
+  },
+  "tab_filter_due": {
+    "message": "Due"
+  },
+  "tab_filter_completion": {
+    "message": "Completion"
+  },
+  "tab_sort_priority": {
+    "message": "Priority"
+  },
+  "tab_sort_due": {
+    "message": "Due date"
+  },
+  "tab_sort_created": {
+    "message": "Created"
+  },
+  "tab_sort_completed": {
+    "message": "Completed"
+  },
+  "tab_sort_title": {
+    "message": "Title"
+  },
+  "tab_group_none": {
+    "message": "None"
+  },
+  "tab_filters_view": {
+    "message": "Filters & view"
+  },
+  "tab_empty_no_match": {
+    "message": "No tasks match the filters. Set Project, Context and Status to All to see everything, or add tasks."
+  },
+  "tab_reset_filters": {
+    "message": "Reset filters"
+  },
+  "tab_task_added": {
+    "message": "Task added"
+  },
+  "options_saved": {
+    "message": "Saved"
+  },
+  "tab_sort_asc": {
+    "message": "Ascending"
+  },
+  "tab_sort_desc": {
+    "message": "Descending"
+  },
+  "tab_delete_task": {
+    "message": "Delete"
+  },
+  "tab_delete_confirm": {
+    "message": "Delete this task?"
+  },
+  "popup_delete_task": {
+    "message": "Delete"
+  },
+  "popup_delete_confirm": {
+    "message": "Delete this task?"
+  },
+  "tab_edit_task": {
+    "message": "Edit task"
+  },
+  "popup_edit_task": {
+    "message": "Edit task title"
+  },
+  "tab_showing_count": {
+    "message": "Showing %d of %d tasks"
+  },
+  "tab_empty_no_config": {
+    "message": "No tasks. Open Options to choose your todo.txt file."
+  },
+  "popup_empty_no_config": {
+    "message": "No tasks. Open Options to choose your todo.txt file."
+  },
+  "tab_quick_view_tooltip": {
+    "message": "Quick view – pending tasks only"
+  },
+  "popup_tab_tooltip": {
+    "message": "Open full view with filters and all tasks"
+  },
+  "tab_open_options": {
+    "message": "Open Options"
+  },
+  "popup_open_options": {
+    "message": "Open Options"
+  },
+  "options_displayLanguage": {
+    "message": "Display language"
+  },
+  "options_displayLanguage_browser": {
+    "message": "Use Thunderbird language"
+  },
+  "options_displayLanguage_en": {
+    "message": "English"
+  },
+  "options_displayLanguage_es": {
+    "message": "Español"
+  },
+  "options_displayLanguage_hint": {
+    "message": "Takes effect after reopening the popup/tab or reloading this page."
+  },
+  "tab_refresh": {
+    "message": "Refresh"
+  },
+  "tab_new_task_placeholder": {
+    "message": "New task…"
+  },
+  "tab_add": {
+    "message": "Add"
+  },
+  "tab_quick_view": {
+    "message": "Quick view"
+  },
+  "tab_options": {
+    "message": "Options"
+  },
+  "tab_toolbar_hint": {
+    "message": "Toolbar icon is visible in the Mail tab."
+  },
+  "tab_refresh_aria": {
+    "message": "Refresh task list"
+  },
+  "tab_add_aria": {
+    "message": "Add task"
+  },
+  "tab_meta_priority": {
+    "message": "Priority"
+  },
+  "tab_meta_due": {
+    "message": "Due:"
+  },
+  "tab_loading": {
+    "message": "Loading…"
+  },
+  "tab_syntax_hint": {
+    "message": "(A) priority · +project · @context · due:YYYY-MM-DD"
+  },
+  "tab_syntax_title": {
+    "message": "Todo.txt quick syntax"
+  },
+  "tab_syntax_line_priority": {
+    "message": "(A) priority at the start (A = highest)."
+  },
+  "tab_syntax_line_created": {
+    "message": "YYYY-MM-DD creation date right after priority (optional)."
+  },
+  "tab_syntax_line_project_context": {
+    "message": "+project and @context anywhere in the title."
+  },
+  "tab_syntax_line_due": {
+    "message": "due:YYYY-MM-DD for due date (used by the calendar)."
+  },
+  "tab_syntax_line_completed": {
+    "message": "x YYYY-MM-DD at the start marks the task as completed."
+  },
+  "tab_syntax_example_label": {
+    "message": "Example:"
+  },
+  "tab_syntax_example_text": {
+    "message": "(A) Call Mom +Family @phone due:2025-03-15"
+  },
+  "tab_syntax_more_link": {
+    "message": "Full todo.txt format guide…"
+  },
+  "tab_syntax_toggle_aria": {
+    "message": "Show or hide the todo.txt syntax help"
+  },
+  "popup_refresh": {
+    "message": "Refresh"
+  },
+  "popup_new_task_placeholder": {
+    "message": "New task…"
+  },
+  "popup_add": {
+    "message": "Add"
+  },
+  "popup_tab": {
+    "message": "Tab"
+  },
+  "popup_options": {
+    "message": "Options"
+  },
+  "popup_refresh_aria": {
+    "message": "Refresh task list"
+  },
+  "popup_add_aria": {
+    "message": "Add task"
+  },
+  "popup_meta_priority": {
+    "message": "Priority"
+  },
+  "popup_meta_due": {
+    "message": "Due:"
+  },
+  "popup_loading": {
+    "message": "Loading…"
+  },
+  "popup_edit_cancel": {
+    "message": "Cancel"
+  },
+  "popup_edit_save": {
+    "message": "Save"
+  },
+  "tab_view_today": {
+    "message": "Today"
+  },
+  "tab_view_today_aria": {
+    "message": "Show tasks due today"
+  },
+  "tab_view_overdue": {
+    "message": "Overdue"
+  },
+  "tab_view_overdue_aria": {
+    "message": "Show overdue tasks only"
+  },
+  "tab_default_view": {
+    "message": "Default view"
+  },
+  "tab_default_view_all": {
+    "message": "All tasks"
+  },
+  "tab_default_view_today": {
+    "message": "Today only"
+  },
+  "tab_summary_today": {
+    "message": "%d tasks today"
+  },
+  "tab_summary_overdue": {
+    "message": "%d overdue"
+  },
+  "tab_view_backlog": {
+    "message": "Backlog"
+  },
+  "tab_view_backlog_aria": {
+    "message": "View tasks with no due date"
+  },
+  "tab_view_weekly": {
+    "message": "This week"
+  },
+  "tab_view_weekly_aria": {
+    "message": "View weekly backlog"
+  },
+  "tab_default_view_backlog": {
+    "message": "Backlog only"
+  },
+  "tab_default_view_weekly": {
+    "message": "This week only"
+  },
+  "tab_task_add_to_week": {
+    "message": "Add to week"
+  },
+  "tab_task_in_week": {
+    "message": "In week"
+  },
+  "tab_task_remove_from_week": {
+    "message": "Remove from week"
+  }
 }

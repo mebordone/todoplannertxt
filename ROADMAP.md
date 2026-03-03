@@ -7,11 +7,11 @@ This document outlines planned and potential future work for the Todo.txt MailEx
 ## 1. Recommended order of implementation (future work only)
 
 Implemented milestones and details have been moved to `CHANGELOG.md`.  
-Versión actual publicada: **3.4.x**. La tabla asigna **fases próximas** a **versiones 3.5, 3.6, 3.7**, según la visión de producto (planner centrado en UX, 70% UX / 30% features, week planner después).
+Versión actual publicada: **3.5.x**. La tabla asigna **fases próximas** a **versiones 3.6, 3.7**, según la visión de producto (planner centrado en UX, 70% UX / 30% features, week planner después).
 
 | Version | Phase | Focus | Status |
 |---------|--------|--------|--------|
-| **3.5** | 8 | UX polish & daily planner basics (vista "hoy", backlog sin fecha/semanal ligero, quick wins visuales) | Planned |
+| **3.5** | 8 | UX polish & daily planner basics (vista "hoy", backlog sin fecha/semanal ligero, quick wins visuales) | **Implemented** (ver `CHANGELOG.md`) |
 | **3.6** | 9 | Form-based "Add task" (Todoist-style) integrado en el flujo diario | Planned |
 | **3.7** | 10 | Week planner & Calendar Phase 2 (backlog → semana → día/hora con calendario) | Backlog |
 
@@ -19,13 +19,11 @@ El resto del documento está ordenado por este plan: primero 3.5 (Phase 8), lueg
 
 ---
 
-## Version 3.5 – Phase 8: UX polish & daily planner basics
+## Version 3.5 – Phase 8: UX polish & daily planner basics ✅ (implementado)
 
 **Objetivo de la release:** Mejorar la experiencia diaria (legibilidad, vista "Hoy", backlog básico) sin tocar aún el week planner ni el calendario avanzado. Entregas incrementales por paquete de valor.
 
-**Alcance:** Popup y pestaña completa (tab). Todo debe respetar `AGENTS.md` (tests, complejidad, sin regresión).
-
-**Orden sugerido para el equipo:** 3.5-A → 3.5-B → 3.5-C (cada paquete entrega valor usable de forma independiente).
+**Estado:** Completado. Detalle en `CHANGELOG.md` (Version 3.5). Paquetes 3.5-A, 3.5-B y 3.5-C implementados; toolbar, opciones y descripción de la extensión actualizados.
 
 ---
 
@@ -169,8 +167,8 @@ Ver `CHANGELOG.md` (Phase 0b). Se mantiene aquí como referencia opcional.
 
 ## Summary
 
-- **Versión actual publicada:** 3.4.x. Lo implementado hasta 3.4 está en `CHANGELOG.md`.
+- **Versión actual publicada:** 3.5.x. Lo implementado hasta 3.5 está en `CHANGELOG.md`.
 - **Roadmap por versión:**
-  - **3.5 (Phase 8):** UX polish y bases del daily planner (vista "Hoy", backlog sin fecha/semanal ligero, quick wins visuales).
+  - **3.5 (Phase 8):** ✅ Implementado — UX polish y bases del daily planner (vista "Hoy", backlog sin fecha/semanal ligero, quick wins visuales).
   - **3.6 (Phase 9):** Form-based "Add task" (Todoist-style) integrado en el flujo diario.
   - **3.7 (Phase 10):** Week planner y Calendar Phase 2 (backlog → semana → día/hora, eventos de calendario visibles, drag & drop).

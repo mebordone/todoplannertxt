@@ -99,3 +99,45 @@ Implemented 12 items:
 11. **Accessibility:** ARIA roles, keyboard focus, screen-reader announcements.
 12. **First-run:** Friendlier empty state when paths are not set: "Elegir carpeta" (folder picker; creates or uses todo.txt/done.txt in that folder) or "Seleccionar todo.txt" (file picker); "Open Options" link.
 
+---
+
+## Version 3.5 – Phase 8: UX polish & daily planner basics
+
+**Objetivo:** Mejorar la experiencia diaria (legibilidad, vista "Hoy", backlog básico) y cumplir AGENTS.md (tests, cobertura, complejidad ≤10).
+
+### 3.5-A. Quick wins de legibilidad
+
+- **Prioridad visible:** Badge con letra (A, B, C…) y color en popup y tab; filas con prioridad alta o vencidas con estilo destacado (`lib/priorityDisplay.js`, tests en `test/unit/priorityDisplay.test.js`).
+- **Vencimiento:** Icono/fecha de `due:` en meta de cada tarea; clases CSS para vencidas.
+- **Botón "Añadir"** como acción primaria (estilo destacado) en popup y tab.
+- **Separadores y contraste** entre filas en la lista del tab.
+
+### 3.5-B. Flujo diario "Hoy" y preferencias de vista
+
+- **Vista "Hoy":** Botón en el toolbar que aplica filtro vencimiento = hoy, estado = abiertas, orden por vencimiento; persistido en `tabViewPrefs`.
+- **Vista "Vencidas":** Botón que filtra solo tareas vencidas (due &lt; hoy).
+- **Contadores en toolbar:** Los botones "Hoy", "Vencidas", "Esta semana" y "Backlog" muestran el número entre paréntesis cuando es &gt; 0 (unificado con la lógica de resumen).
+- **Vista por defecto:** Selector "Default view" en la barra de filtros (Todas / Solo hoy / Solo backlog / Solo esta semana); valor guardado en preferencias y aplicado al cargar el tab.
+
+### 3.5-C. Backlog sin fecha y backlog semanal
+
+- **Vista "Backlog":** Botón que muestra solo tareas sin `due:` (abiertas); misma barra de filtros y agrupación.
+- **Vista "Esta semana":** Muestra solo las tareas que el usuario ha marcado como "para esta semana" (`weeklyBacklogIds` en `tabViewPrefs`).
+- **Control "Añadir a la semana" / "En la semana":** En cada fila del tab, botón para añadir o quitar la tarea del backlog semanal; persistido y limpiado al cargar.
+
+### Toolbar y opciones (refinamientos)
+
+- **Toolbar del tab:** Orden de botones: Hoy, Vencidas, Esta semana, Backlog, Restablecer filtros, Actualizar, Opciones. El botón "Vista rápida" se sustituyó por "Restablecer filtros" en el toolbar.
+- **Tooltips:** Los botones del toolbar (Hoy, Vencidas, Esta semana, Backlog, Restablecer filtros, Actualizar, Añadir, Opciones) tienen `title`/aria descriptivos.
+- **Opciones:** Un solo botón "Abrir vista completa" en el encabezado; eliminado el duplicado del bloque de bienvenida. Sección "Depuración" separada con el botón "Copiar log de depuración".
+
+### Documentación y publicación
+
+- **Descripción de la extensión:** Texto único para la ficha en la tienda (crédito a Roy Kokkelkoren, autor Matías Bordone, homepage `github.com/mebordone/todoplannertxt`); actualizado en `_locales` (en, es, de, fr).
+- **Resumen en una línea:** Nueva clave i18n `extensionSummary` para uso en la ficha de addons.thunderbird.net.
+
+### Cumplimiento AGENTS.md
+
+- **Complejidad:** Refactor de `bindOptionListeners`, `setPopupToolbarI18n` y `setToolbarI18n` (extracción de helpers) para mantener complejidad ≤10.
+- **Cobertura y tests:** Sin regresión; umbrales ≥90% statements, ≥80% branches; tests existentes y `priorityDisplay.test.js` para el nuevo módulo.
+
