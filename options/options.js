@@ -74,21 +74,9 @@ function hasPathsConfigured(prefs) {
   return !!(prefs.todoFolderPath && prefs.doneFolderPath) || !!(prefs.todoFolderId && prefs.doneFolderId);
 }
 
-async function tryFetchAndSetDefaultPaths() {
-  const res = await api.runtime.sendMessage({ command: "getPrefs" });
-  const prefs = (res && !res.error) ? res : {};
-  if (hasPathsConfigured(prefs)) return;
-  const fsa = api.todotxtFileAccess;
-  if (!fsa || typeof fsa.getDefaultSearchPaths !== "function") return;
-  let result;
-  try {
-    result = await fsa.getDefaultSearchPaths();
-  } catch (_) {
-    return;
-  }
-  if (!result || result.error || !Array.isArray(result.paths) || result.paths.length === 0) return;
-  const setRes = await api.runtime.sendMessage({ command: "trySetDefaultPathsWithPaths", paths: result.paths });
-  if (setRes && setRes.ok) await loadPrefs();
+function setWelcomeNoPathsVisible(visible) {
+  const el = document.getElementById("welcome-no-paths");
+  if (el) el.style.display = visible ? "block" : "none";
 }
 
 async function loadPrefs() {
@@ -98,10 +86,10 @@ async function loadPrefs() {
     return;
   }
   const prefs = res || {};
+  setWelcomeNoPathsVisible(!hasPathsConfigured(prefs));
   applyBasicPrefsToUI(prefs);
   const calSelect = document.getElementById("calendar-select");
   if (calSelect) await loadCalendarSection(calSelect, prefs);
-  await tryFetchAndSetDefaultPaths();
 }
 
 function showSavedFeedback() {
@@ -234,6 +222,29 @@ function handleSyncNowClick(syncNowBtn, syncStatusEl) {
 function bindOptionListeners() {
   document.getElementById("browse-todo").addEventListener("click", () => pickFile("todo"));
   document.getElementById("browse-done").addEventListener("click", () => pickFile("done"));
+  const selectTodoBtn = document.getElementById("options-select-todo-btn");
+  const selectFolderBtn = document.getElementById("options-select-folder-btn");
+  const selectTodoErr = document.getElementById("options-select-todo-error");
+  function runSetupAndReload(command) {
+    return async () => {
+      if (!selectTodoErr) return;
+      selectTodoErr.style.display = "none";
+      selectTodoErr.textContent = "";
+      if (selectTodoBtn) selectTodoBtn.disabled = true;
+      if (selectFolderBtn) selectFolderBtn.disabled = true;
+      const res = await api.runtime.sendMessage({ command });
+      if (selectTodoBtn) selectTodoBtn.disabled = false;
+      if (selectFolderBtn) selectFolderBtn.disabled = false;
+      if (res && res.ok) {
+        await loadPrefs();
+        return;
+      }
+      selectTodoErr.textContent = (res && res.error) ? res.error : i18n("welcome_select_error");
+      selectTodoErr.style.display = "block";
+    };
+  }
+  if (selectTodoBtn) selectTodoBtn.addEventListener("click", runSetupAndReload("pickTodoFileAndSetup"));
+  if (selectFolderBtn) selectFolderBtn.addEventListener("click", runSetupAndReload("pickFolderAndSetup"));
   document.getElementById("use-thunderbird").addEventListener("change", (e) => savePrefs({ useThunderbird: e.target.checked }));
   document.getElementById("use-creation").addEventListener("change", (e) => savePrefs({ useCreation: e.target.checked }));
   document.getElementById("show-full-title").addEventListener("change", (e) => savePrefs({ showFullTitle: e.target.checked }));

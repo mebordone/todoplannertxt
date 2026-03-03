@@ -80,6 +80,53 @@ function setLoading(loading) {
   if (addBtn) addBtn.disabled = !!loading;
 }
 
+function runPopupSetup(command, errEl, buttons) {
+  return async () => {
+    errEl.style.display = "none";
+    errEl.textContent = "";
+    buttons.forEach((b) => { b.disabled = true; });
+    const res = await api.runtime.sendMessage({ command });
+    buttons.forEach((b) => { b.disabled = false; });
+    if (res && res.ok) {
+      loadItems();
+      return;
+    }
+    errEl.textContent = (res && res.error) ? res.error : i18n("welcome_select_error");
+    errEl.style.display = "inline";
+  };
+}
+
+function renderPopupWelcomeNoPaths(listEl) {
+  const wrap = document.createElement("div");
+  wrap.className = "empty welcome-setup";
+  const title = document.createElement("strong");
+  title.textContent = i18n("welcome_title");
+  wrap.appendChild(title);
+  wrap.appendChild(document.createTextNode(" " + i18n("welcome_text")));
+  const br = document.createElement("br");
+  wrap.appendChild(br);
+  const btnFolder = document.createElement("button");
+  btnFolder.type = "button";
+  btnFolder.textContent = i18n("welcome_btn_select_folder");
+  btnFolder.style.cssText = "margin:0.5rem 0.25rem 0.5rem 0; padding:0.4rem 0.8rem; cursor:pointer;";
+  const btnTodo = document.createElement("button");
+  btnTodo.type = "button";
+  btnTodo.textContent = i18n("welcome_btn_select_todo");
+  btnTodo.style.cssText = "margin:0.5rem 0.25rem 0.5rem 0; padding:0.4rem 0.8rem; cursor:pointer;";
+  const errEl = document.createElement("span");
+  errEl.className = "error";
+  errEl.style.display = "none";
+  errEl.style.marginLeft = "6px";
+  wrap.appendChild(btnFolder);
+  wrap.appendChild(btnTodo);
+  wrap.appendChild(errEl);
+  const buttons = [btnFolder, btnTodo];
+  btnFolder.addEventListener("click", runPopupSetup("pickFolderAndSetup", errEl, buttons));
+  btnTodo.addEventListener("click", runPopupSetup("pickTodoFileAndSetup", errEl, buttons));
+  listEl.innerHTML = "";
+  listEl.appendChild(wrap);
+}
+
 async function loadItems() {
   const listEl = document.getElementById("list");
   listEl.innerHTML = "<div class=\"empty\">" + i18n("popup_loading") + "</div>";
@@ -90,8 +137,7 @@ async function loadItems() {
     readOnlyMode = (prefsRes && prefsRes.readOnly) === true;
     const res = await api.runtime.sendMessage({ command: "getItems", refresh: true, pendingOnly: true });
     if (res && res.error) {
-      listEl.innerHTML = "";
-      showError(res.error, true);
+      renderPopupWelcomeNoPaths(listEl);
       return;
     }
     const items = (res && res.items) || [];

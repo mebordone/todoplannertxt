@@ -20,6 +20,16 @@
 <body>
   <h1 data-i18n="options_heading">Todo.txt – Preferences</h1>
 
+  <div id="welcome-no-paths" class="group" style="display:none; padding:1rem; background:#f0f7ff; border-radius:6px; margin-bottom:1rem;">
+    <h3 style="margin-top:0;" data-i18n="welcome_options_heading">Para empezar</h3>
+    <p data-i18n="welcome_text">Elige el archivo todo.txt donde guardar tus tareas. En la misma carpeta usaremos o crearemos done.txt.</p>
+    <div class="row" style="flex-wrap:wrap; gap:0.5rem;">
+      <button type="button" id="options-select-folder-btn" data-i18n="welcome_btn_select_folder">Elegir carpeta</button>
+      <button type="button" id="options-select-todo-btn" data-i18n="welcome_btn_select_todo">Seleccionar todo.txt</button>
+    </div>
+    <p id="options-select-todo-error" class="error" style="display:none; margin-top:0.35rem;"></p>
+  </div>
+
   <div class="group">
     <label data-i18n="options_todoFile_label">Location of Todo.txt</label>
     <div class="row">

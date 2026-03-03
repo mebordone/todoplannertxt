@@ -51,9 +51,12 @@
         ]
       },
       {
-        "name": "getDefaultSearchPaths",
+        "name": "getFolderWithPicker",
         "type": "function",
-        "async": true
+        "async": true,
+        "parameters": [
+          { "name": "options", "$ref": "PickerOptions", "optional": true }
+        ]
       }
     ]
   }

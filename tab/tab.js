@@ -43,6 +43,69 @@ function showError(msg, showOptionsLink) {
   el.style.display = msg ? "block" : "none";
 }
 
+function makeWelcomeSetupHandler(errEl, buttons, command) {
+  return async () => {
+    errEl.style.display = "none";
+    errEl.textContent = "";
+    buttons.forEach((b) => { b.disabled = true; });
+    const res = await api.runtime.sendMessage({ command });
+    buttons.forEach((b) => { b.disabled = false; });
+    if (res && res.ok) {
+      loadItems();
+      return;
+    }
+    errEl.textContent = (res && res.error) ? res.error : i18n("welcome_select_error");
+    errEl.style.display = "block";
+  };
+}
+
+function renderWelcomeNoPaths(listEl) {
+  const wrap = document.createElement("div");
+  wrap.className = "empty welcome-setup";
+  const title = document.createElement("h3");
+  title.textContent = i18n("welcome_title");
+  title.style.marginTop = "0";
+  wrap.appendChild(title);
+  const text = document.createElement("p");
+  text.textContent = i18n("welcome_text");
+  wrap.appendChild(text);
+  const btnFolder = document.createElement("button");
+  btnFolder.type = "button";
+  btnFolder.textContent = i18n("welcome_btn_select_folder");
+  btnFolder.style.cssText = "margin:0.5rem 0.5rem 0.5rem 0; padding:0.5rem 1rem; cursor:pointer;";
+  const btnTodo = document.createElement("button");
+  btnTodo.type = "button";
+  btnTodo.textContent = i18n("welcome_btn_select_todo");
+  btnTodo.className = "primary";
+  btnTodo.style.cssText = "margin:0.5rem 0.5rem 0.5rem 0; padding:0.5rem 1rem; cursor:pointer;";
+  const errEl = document.createElement("p");
+  errEl.className = "hint";
+  errEl.style.color = "#c00";
+  errEl.style.display = "none";
+  wrap.appendChild(btnFolder);
+  wrap.appendChild(btnTodo);
+  wrap.appendChild(errEl);
+  const optionsLink = document.createElement("a");
+  optionsLink.href = "#";
+  optionsLink.textContent = i18n("tab_open_options");
+  optionsLink.style.marginLeft = "8px";
+  optionsLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    const url = api.runtime.getURL("options/options.html");
+    if (api.tabs && api.tabs.create) api.tabs.create({ url });
+    else api.runtime.openOptionsPage?.();
+  });
+  wrap.appendChild(document.createTextNode(" "));
+  wrap.appendChild(optionsLink);
+  const buttons = [btnFolder, btnTodo];
+  btnFolder.addEventListener("click", makeWelcomeSetupHandler(errEl, buttons, "pickFolderAndSetup"));
+  btnTodo.addEventListener("click", makeWelcomeSetupHandler(errEl, buttons, "pickTodoFileAndSetup"));
+  listEl.innerHTML = "";
+  listEl.appendChild(wrap);
+  const filtersSection = document.getElementById("filters-section");
+  if (filtersSection) filtersSection.style.display = "none";
+}
+
 function getElValue(id) {
   const el = document.getElementById(id);
   return (el && el.value) ? el.value : "";
@@ -379,8 +442,8 @@ async function loadItems() {
   try {
     const res = await api.runtime.sendMessage({ command: "getItems", refresh: true, pendingOnly: false });
     if (res && res.error) {
-      listEl.innerHTML = "";
-      showError(res.error, true);
+      renderWelcomeNoPaths(listEl);
+      showError("");
       fullItems = [];
       return;
     }
@@ -572,46 +635,52 @@ function setToolbarI18n() {
   if (hintEl) hintEl.textContent = i18n("tab_toolbar_hint");
 }
 
-function initSyntaxUi() {
-  const hintText = document.getElementById("syntax-hint-text");
-  if (hintText) hintText.textContent = i18n("tab_syntax_hint");
-  const titleEl = document.getElementById("syntax-title");
-  if (titleEl) titleEl.textContent = i18n("tab_syntax_title");
-  const linePriority = document.getElementById("syntax-line-priority");
-  if (linePriority) linePriority.textContent = i18n("tab_syntax_line_priority");
-  const lineCreated = document.getElementById("syntax-line-created");
-  if (lineCreated) lineCreated.textContent = i18n("tab_syntax_line_created");
-  const lineProjCtx = document.getElementById("syntax-line-project-context");
-  if (lineProjCtx) lineProjCtx.textContent = i18n("tab_syntax_line_project_context");
-  const lineDue = document.getElementById("syntax-line-due");
-  if (lineDue) lineDue.textContent = i18n("tab_syntax_line_due");
-  const lineCompleted = document.getElementById("syntax-line-completed");
-  if (lineCompleted) lineCompleted.textContent = i18n("tab_syntax_line_completed");
-  const exLabel = document.getElementById("syntax-example-label");
-  if (exLabel) exLabel.textContent = i18n("tab_syntax_example_label");
-  const exText = document.getElementById("syntax-example-text");
-  if (exText) exText.textContent = i18n("tab_syntax_example_text");
+const SYNTAX_UI_IDS = [
+  ["syntax-hint-text", "tab_syntax_hint"],
+  ["syntax-title", "tab_syntax_title"],
+  ["syntax-line-priority", "tab_syntax_line_priority"],
+  ["syntax-line-created", "tab_syntax_line_created"],
+  ["syntax-line-project-context", "tab_syntax_line_project_context"],
+  ["syntax-line-due", "tab_syntax_line_due"],
+  ["syntax-line-completed", "tab_syntax_line_completed"],
+  ["syntax-example-label", "tab_syntax_example_label"],
+  ["syntax-example-text", "tab_syntax_example_text"]
+];
+
+function setSyntaxTextContents() {
+  SYNTAX_UI_IDS.forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = i18n(key);
+  });
   const moreLink = document.getElementById("syntax-more-link");
   if (moreLink) {
-    moreLink.textContent = i18n("tab_syntax_more_link");
-    moreLink.setAttribute("title", i18n("tab_syntax_more_link"));
+    const msg = i18n("tab_syntax_more_link");
+    moreLink.textContent = msg;
+    moreLink.setAttribute("title", msg);
   }
+}
+
+function initSyntaxToggle() {
   const toggle = document.getElementById("syntax-toggle");
   const section = document.getElementById("syntax-section");
-  if (toggle && section) {
-    const updateToggle = () => {
-      const collapsed = section.classList.contains("collapsed");
-      toggle.textContent = collapsed ? "▼" : "▲";
-      toggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
-      section.style.display = collapsed ? "" : "";
-    };
-    toggle.setAttribute("aria-label", i18n("tab_syntax_toggle_aria"));
+  if (!toggle || !section) return;
+  const updateToggle = () => {
+    const collapsed = section.classList.contains("collapsed");
+    toggle.textContent = collapsed ? "▼" : "▲";
+    toggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+    section.style.display = collapsed ? "" : "";
+  };
+  toggle.setAttribute("aria-label", i18n("tab_syntax_toggle_aria"));
+  updateToggle();
+  toggle.addEventListener("click", () => {
+    section.classList.toggle("collapsed");
     updateToggle();
-    toggle.addEventListener("click", () => {
-      section.classList.toggle("collapsed");
-      updateToggle();
-    });
-  }
+  });
+}
+
+function initSyntaxUi() {
+  setSyntaxTextContents();
+  initSyntaxToggle();
 }
 
 (async function initTab() {

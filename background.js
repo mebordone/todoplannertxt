@@ -140,6 +140,85 @@ async function handlePickFile(type) {
   return pickResultToPrefs(result, type);
 }
 
+function getFolderPathFromPickResult(result) {
+  if (!result || result.error) return null;
+  return (self.fsaUsesBuiltIn && result.folderPath) ? result.folderPath : null;
+}
+
+async function ensureDoneFileInFolder(folderPath) {
+  try {
+    await fileUtil.readFile(self.fsaApi, { folderPath, fileName: "done.txt" });
+  } catch (_) {
+    await fileUtil.writeFile(self.fsaApi, { folderPath, fileName: "done.txt" }, "");
+  }
+}
+
+async function handlePickTodoFileAndSetup() {
+  if (!self.fsaApi) return { error: "File access is not available. Please restart Thunderbird and try again." };
+  let result;
+  try {
+    result = await handlePickFile("todo");
+  } catch (e) {
+    return { error: (e && e.message) || String(e) };
+  }
+  const folderPath = getFolderPathFromPickResult(result);
+  if (!folderPath) return { error: "No file selected" };
+  const prefs = await getPrefs();
+  prefs.todoFolderPath = folderPath;
+  prefs.todoFileName = (result && result.fileName) || "todo.txt";
+  prefs.doneFolderPath = folderPath;
+  prefs.doneFileName = "done.txt";
+  await ensureDoneFileInFolder(folderPath);
+  await api.storage.local.set(prefs);
+  if (todotxtLogger) todotxtLogger.debug("background", "pickTodoFileAndSetup: " + folderPath);
+  return { ok: true, folderPath };
+}
+
+async function ensureTodoFileInFolder(folderPath) {
+  try {
+    await fileUtil.readFile(self.fsaApi, { folderPath, fileName: "todo.txt" });
+  } catch (_) {
+    // read failed (e.g. file does not exist): create empty todo.txt
+    await fileUtil.writeFile(self.fsaApi, { folderPath, fileName: "todo.txt" }, "");
+  }
+}
+
+async function saveFolderAsPrefs(folderPath) {
+  const prefs = await getPrefs();
+  prefs.todoFolderPath = folderPath;
+  prefs.todoFileName = "todo.txt";
+  prefs.doneFolderPath = folderPath;
+  prefs.doneFileName = "done.txt";
+  await api.storage.local.set(prefs);
+}
+
+async function getFolderFromPicker() {
+  try {
+    const result = await self.fsaApi.getFolderWithPicker();
+    if (!result || !result.folderPath) return { error: "No folder selected" };
+    if (!self.fsaUsesBuiltIn) return { error: "Folder picker is only available with built-in file access." };
+    return { folderPath: result.folderPath };
+  } catch (e) {
+    return { error: (e && e.message) || String(e) };
+  }
+}
+
+async function handlePickFolderAndSetup() {
+  if (!self.fsaApi) return { error: "File access is not available. Please restart Thunderbird and try again." };
+  const pick = await getFolderFromPicker();
+  if (pick.error) return { error: pick.error };
+  const folderPath = pick.folderPath;
+  try {
+    await ensureTodoFileInFolder(folderPath);
+  } catch (e) {
+    return { error: (e && e.message) || String(e) };
+  }
+  await ensureDoneFileInFolder(folderPath);
+  await saveFolderAsPrefs(folderPath);
+  if (todotxtLogger) todotxtLogger.debug("background", "pickFolderAndSetup: " + folderPath);
+  return { ok: true, folderPath };
+}
+
 async function handleListCalendars() {
   if (!self.calendarAdapter || !self.calendarAdapter.isCalendarApiAvailable()) {
     return { calendars: [], apiAvailable: false };
@@ -224,6 +303,27 @@ async function handleGetLastCalendarSyncLog() {
   return out;
 }
 
+function buildSyncLogCountsAndSample(log) {
+  const lines = [];
+  lines.push("ok: " + !!log.ok);
+  if (log.error) lines.push("error: " + log.error);
+  if (typeof log.withDueCount === "number") lines.push("withDueCount: " + log.withDueCount);
+  if (typeof log.syncedCount === "number") lines.push("syncedCount: " + log.syncedCount);
+  if (log.calendarId) lines.push("calendarId: " + log.calendarId);
+  if (log.sample) lines.push("sample: title=\"" + (log.sample.title || "") + "\" dueDate=" + (log.sample.dueDate || ""));
+  return lines;
+}
+
+function buildSyncLogDetailLines(log) {
+  const lines = buildSyncLogCountsAndSample(log);
+  if (log.errors && log.errors.length) log.errors.forEach((e, i) => lines.push("error[" + i + "]: " + (e.message || e.id || JSON.stringify(e))));
+  if (log.pullLog && log.pullLog.length) {
+    lines.push("--- calendar→todo (last " + log.pullLog.length + ") ---");
+    log.pullLog.forEach((e) => lines.push((e.at || "") + " " + (e.event || "") + " id=" + (e.plainId || "") + " " + (e.action || "")));
+  }
+  return lines;
+}
+
 function buildSyncLogLines(log) {
   const lines = [
     "[Todo.txt calendar sync log]",
@@ -234,20 +334,7 @@ function buildSyncLogLines(log) {
     lines.push("(no sync run yet)");
     return lines;
   }
-  lines.push("ok: " + !!log.ok);
-  if (log.error) lines.push("error: " + log.error);
-  if (typeof log.withDueCount === "number") lines.push("withDueCount: " + log.withDueCount);
-  if (typeof log.syncedCount === "number") lines.push("syncedCount: " + log.syncedCount);
-  if (log.calendarId) lines.push("calendarId: " + log.calendarId);
-  if (log.sample) lines.push("sample: title=\"" + (log.sample.title || "") + "\" dueDate=" + (log.sample.dueDate || ""));
-  if (log.errors && log.errors.length) log.errors.forEach((e, i) => lines.push("error[" + i + "]: " + (e.message || e.id || JSON.stringify(e))));
-  if (log.pullLog && log.pullLog.length) {
-    lines.push("--- calendar→todo (last " + log.pullLog.length + ") ---");
-    log.pullLog.forEach((e) => {
-      const line = (e.at || "") + " " + (e.event || "") + " id=" + (e.plainId || "") + " " + (e.action || "");
-      lines.push(line);
-    });
-  }
+  lines.push(...buildSyncLogDetailLines(log));
   return lines;
 }
 
@@ -263,53 +350,65 @@ function formatError(e) {
   return out;
 }
 
-async function handleGetExtensionDebugLog() {
-  const manifest = api.runtime.getManifest();
+function getBuildIdLogLine(build) {
+  const id = (build && build.buildId && String(build.buildId)) || "dev";
+  const date = build && build.buildDate && String(build.buildDate);
+  const time = build && build.buildTime && String(build.buildTime);
+  const suffix = (date && time) ? " (" + date + " " + time + ")" : "";
+  return "buildId: " + id + suffix;
+}
+
+function getDebugLogHeaderLines(manifest, build) {
   const version = (manifest && manifest.version) || "?";
-  const build = (typeof self.buildInfo !== "undefined" && self.buildInfo) ? self.buildInfo : {};
-  const buildId = (build.buildId && String(build.buildId)) || "dev";
-  const buildDate = (build.buildDate && String(build.buildDate)) || "";
-  const buildTime = (build.buildTime && String(build.buildTime)) || "";
-  const prefs = await getPrefs();
-  const lines = [
+  return [
     "=== Todo.txt extension debug log ===",
     "at: " + new Date().toISOString(),
     "version: " + version,
-    "buildId: " + buildId + (buildDate && buildTime ? " (" + buildDate + " " + buildTime + ")" : ""),
-    "",
-    "--- File access ---",
-    "fsa: " + (self.fsaUsesBuiltIn ? "built-in" : "proxy"),
-    "getDefaultSearchPaths available: " + (self.fsaApi && typeof self.fsaApi.getDefaultSearchPaths === "function"),
-    "paths configured: " + (hasPathsConfigured(prefs) ? "yes" : "no"),
+    getBuildIdLogLine(build),
+    ""
   ];
+}
+
+function getDebugLogPathLines(prefs) {
+  const lines = [];
   if (prefs.todoFolderPath) lines.push("todo folder: " + (String(prefs.todoFolderPath).slice(0, 80) + (prefs.todoFolderPath.length > 80 ? "…" : "")));
   if (prefs.doneFolderPath) lines.push("done folder: " + (String(prefs.doneFolderPath).slice(0, 80) + (prefs.doneFolderPath.length > 80 ? "…" : "")));
   if (prefs.todoFolderId && !prefs.todoFolderPath) lines.push("todo: folderId (path not stored)");
   if (prefs.doneFolderId && !prefs.doneFolderPath) lines.push("done: folderId (path not stored)");
-  lines.push("");
-  lines.push("--- Prefs ---");
-  lines.push("readOnly: " + !!prefs.readOnly);
-  lines.push("displayLanguage: " + (prefs.displayLanguage || "browser"));
-  lines.push("calendarIntegrationEnabled: " + !!prefs.calendarIntegrationEnabled);
-  lines.push("calendarId: " + (prefs.calendarId || "(none)"));
-  lines.push("");
-  lines.push("--- Default search paths (when paths not configured) ---");
-  lines.push("  (fetched from Options page when you open it; calling from background can throw InvalidStateError)");
-  if (self.fsaApi && typeof self.fsaApi.getDefaultSearchPaths === "function") {
-    try {
-      const res = await self.fsaApi.getDefaultSearchPaths();
-      if (res && res.error) {
-        lines.push("  error: " + (res.error || ""));
-        if (res.errorName) lines.push("  errorName: " + res.errorName);
-      } else if (res && Array.isArray(res.paths) && res.paths.length) {
-        res.paths.forEach((p, i) => lines.push("  [" + i + "] " + String(p).slice(0, 100)));
-      }
-    } catch (_) {
-      lines.push("  (background call skipped to avoid InvalidStateError)");
-    }
-  }
-  lines.push("");
-  lines.push("--- Last calendar sync log ---");
+  return lines;
+}
+
+function getDebugLogFileAccessLines(prefs) {
+  const lines = [
+    "--- File access ---",
+    "fsa: " + (self.fsaUsesBuiltIn ? "built-in" : "proxy"),
+    "paths configured: " + (hasPathsConfigured(prefs) ? "yes" : "no"),
+  ];
+  return lines.concat(getDebugLogPathLines(prefs));
+}
+
+function getDebugLogPrefsLines(prefs) {
+  return [
+    "",
+    "--- Prefs ---",
+    "readOnly: " + !!prefs.readOnly,
+    "displayLanguage: " + (prefs.displayLanguage || "browser"),
+    "calendarIntegrationEnabled: " + !!prefs.calendarIntegrationEnabled,
+    "calendarId: " + (prefs.calendarId || "(none)"),
+    ""
+  ];
+}
+
+async function handleGetExtensionDebugLog() {
+  const manifest = api.runtime.getManifest();
+  const build = (typeof self.buildInfo !== "undefined" && self.buildInfo) ? self.buildInfo : {};
+  const prefs = await getPrefs();
+  const lines = []
+    .concat(getDebugLogHeaderLines(manifest, build))
+    .concat(getDebugLogFileAccessLines(prefs))
+    .concat([""])
+    .concat(getDebugLogPrefsLines(prefs))
+    .concat(["", "--- Last calendar sync log ---"]);
   try {
     const syncLog = await handleGetLastCalendarSyncLog();
     lines.push(...buildSyncLogLines(syncLog));
@@ -353,12 +452,13 @@ const messageHandlers = {
   getPrefs: () => handleGetPrefs(),
   pickTodoFile: () => handlePickFile("todo"),
   pickDoneFile: () => handlePickFile("done"),
+  pickTodoFileAndSetup: () => handlePickTodoFileAndSetup(),
+  pickFolderAndSetup: () => handlePickFolderAndSetup(),
   listCalendars: () => handleListCalendars(),
   exportTodoToIcs: () => handleExportTodoToIcs(),
   syncCalendarNow: () => handleSyncCalendarNow(),
   getLastCalendarSyncLog: () => handleGetLastCalendarSyncLog(),
   getExtensionDebugLog: () => handleGetExtensionDebugLog(),
-  trySetDefaultPathsWithPaths: (msg) => trySetDefaultPathsWithPaths(msg.paths || []).then((ok) => ({ ok })),
   savePrefs: (msg) => handleSavePrefs(msg),
 };
 
@@ -380,80 +480,29 @@ api.runtime.onMessage.addListener((message, sender, sendResponse) => {
   return true;
 });
 
-function trySetDefaultPathsWithPaths(paths) {
-  if (!self.fsaUsesBuiltIn || !self.fsaApi || !Array.isArray(paths) || paths.length === 0) return Promise.resolve(false);
-  const emptyBlob = "";
-  return (async () => {
-    for (const folderPath of paths) {
-      try {
-        const prefsForPath = {
-          todoFolderPath: folderPath,
-          doneFolderPath: folderPath,
-          todoFileName: "todo.txt",
-          doneFileName: "done.txt"
-        };
-        try {
-          await fileUtil.readTodo(self.fsaApi, prefsForPath);
-        } catch (_) {
-          await fileUtil.writeFile(self.fsaApi, { folderPath, fileName: "todo.txt" }, emptyBlob);
-          await fileUtil.writeFile(self.fsaApi, { folderPath, fileName: "done.txt" }, emptyBlob);
-        }
-        await api.storage.local.set({
-          todoFolderPath: folderPath,
-          doneFolderPath: folderPath,
-          todoFileName: "todo.txt",
-          doneFileName: "done.txt"
-        });
-        if (todotxtLogger) todotxtLogger.debug("background", "Default paths set: " + folderPath);
-        return true;
-      } catch (e) {
-        if (todotxtLogger) todotxtLogger.debug("background", "trySetDefaultPaths skip " + folderPath + ": " + (e && e.message));
-      }
-    }
-    return false;
-  })();
-}
-
-async function trySetDefaultPaths() {
-  if (!self.fsaUsesBuiltIn || !self.fsaApi || typeof self.fsaApi.getDefaultSearchPaths !== "function") return;
-  const prefs = await getPrefs();
-  if (hasPathsConfigured(prefs)) return;
-  let paths = [];
-  try {
-    const res = await self.fsaApi.getDefaultSearchPaths();
-    paths = (res && Array.isArray(res.paths)) ? res.paths : [];
-  } catch (e) {
-    if (todotxtLogger) todotxtLogger.debug("background", "getDefaultSearchPaths: " + (e && e.message));
-    return;
-  }
-  if (paths.length === 0) return;
-  await trySetDefaultPathsWithPaths(paths);
-}
-
 api.runtime.onStartup?.addListener(() => {
   startPolling();
 });
 
-api.runtime.onInstalled?.addListener(() => {
+api.runtime.onInstalled?.addListener((details) => {
   startPolling();
-  setTimeout(() => {
-    if (typeof self.ensureBuiltInApi === "function") self.ensureBuiltInApi();
-    getPrefs().then(async (prefs) => {
-      if (!hasPathsConfigured(prefs) && self.fsaUsesBuiltIn) {
-        await trySetDefaultPaths();
-      }
-    });
-  }, 2500);
+  if (details && details.reason === "update") return;
+  if (details && details.reason === "install") {
+    setTimeout(() => {
+      if (typeof self.ensureBuiltInApi === "function") self.ensureBuiltInApi();
+      getPrefs().then(async (prefs) => {
+        if (!hasPathsConfigured(prefs) && typeof api.runtime.openOptionsPage === "function") {
+          api.runtime.openOptionsPage();
+        }
+      });
+    }, 1500);
+  }
 });
 
 startPolling();
 
-function scheduleTrySetDefaultPaths() {
+function scheduleStartup() {
   getPrefs().then(async (prefs) => {
-    if (!hasPathsConfigured(prefs) && self.fsaUsesBuiltIn) {
-      await trySetDefaultPaths();
-      prefs = await getPrefs();
-    }
     if (self.calendarAdapter && self.calendarAdapter.isCalendarApiAvailable() && self.syncService) {
       if (prefs.calendarIntegrationEnabled) {
         self.syncService.start();
@@ -464,17 +513,7 @@ function scheduleTrySetDefaultPaths() {
     }
   });
 }
-
-scheduleTrySetDefaultPaths();
-// Retry default paths after delay so experiment API is ready (e.g. after install)
-setTimeout(() => {
-  if (typeof self.ensureBuiltInApi === "function") self.ensureBuiltInApi();
-  getPrefs().then(async (prefs) => {
-    if (!hasPathsConfigured(prefs) && self.fsaUsesBuiltIn) {
-      await trySetDefaultPaths();
-    }
-  });
-}, 2500);
+scheduleStartup();
 
 // Expose for experiment (addon_parent) when it needs to fetch items / modify items.
 // If todo/done paths are not configured, return [] so calendar sync does not throw or log ERROR.
