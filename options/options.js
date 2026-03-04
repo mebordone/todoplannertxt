@@ -38,7 +38,10 @@ function applyBasicPrefsToUI(prefs) {
   const readOnlyEl = document.getElementById("read-only");
   if (readOnlyEl) readOnlyEl.checked = prefs.readOnly === true;
   const displayLangEl = document.getElementById("display-language");
-  if (displayLangEl) displayLangEl.value = prefs.displayLanguage === "en" || prefs.displayLanguage === "es" ? prefs.displayLanguage : "browser";
+  if (displayLangEl) {
+    const lang = prefs.displayLanguage;
+    displayLangEl.value = (lang === "en" || lang === "es" || lang === "de" || lang === "fr") ? lang : "browser";
+  }
   document.getElementById("calendar-enabled").checked = prefs.calendarIntegrationEnabled === true;
   document.getElementById("calendar-sync-auto").checked = prefs.calendarSyncAuto !== false;
 }

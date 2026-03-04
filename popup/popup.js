@@ -154,6 +154,16 @@ function renderPopupWelcomeNoPaths(listEl) {
   wrap.appendChild(btnFolder);
   wrap.appendChild(btnTodo);
   wrap.appendChild(errEl);
+  const optionsLink = document.createElement("a");
+  optionsLink.href = "#";
+  optionsLink.textContent = i18n("popup_open_options");
+  optionsLink.style.cssText = "margin-left:0.5rem;";
+  optionsLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    openOptionsPage();
+  });
+  wrap.appendChild(document.createTextNode(" "));
+  wrap.appendChild(optionsLink);
   const buttons = [btnFolder, btnTodo];
   btnFolder.addEventListener("click", runPopupSetup("pickFolderAndSetup", errEl, buttons));
   btnTodo.addEventListener("click", runPopupSetup("pickTodoFileAndSetup", errEl, buttons));
