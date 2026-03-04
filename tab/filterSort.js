@@ -37,10 +37,15 @@ function applySearch(items, query) {
   return items.filter((item) => itemSearchText(item).includes(lower));
 }
 
+function isBacklogDue(due, today) {
+  return !due || due < today;
+}
+
 function matchesFilterDue(item, filterDue) {
   if (!filterDue) return true;
   const due = item.dueDate ? String(item.dueDate).slice(0, 10) : null;
   const today = new Date().toISOString().slice(0, 10);
+  if (filterDue === "backlog") return isBacklogDue(due, today);
   if (filterDue === "none") return !due;
   if (!due) return false;
   if (filterDue === "today") return due === today;
@@ -148,11 +153,17 @@ function groupKeyCompletion(item) {
   return item.isCompleted ? "done" : "open";
 }
 
+function groupKeyDueDay(item) {
+  if (!item.dueDate) return "";
+  return String(item.dueDate).slice(0, 10);
+}
+
 const GROUP_KEY_FN = {
   project: groupKeyProject,
   context: groupKeyContext,
   priority: groupKeyPriority,
-  completion: groupKeyCompletion
+  completion: groupKeyCompletion,
+  dueDay: groupKeyDueDay
 };
 
 function groupKeyFor(item, groupBy) {

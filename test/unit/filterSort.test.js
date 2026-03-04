@@ -150,6 +150,12 @@ expect(DEFAULT_PREFS.sortBy).toBe("entryDate");
       expect(groupKeyFor(sampleItems[0], "completion")).toBe("open");
       expect(groupKeyFor(sampleItems[2], "completion")).toBe("done");
     });
+    test("dueDay returns YYYY-MM-DD when dueDate set", () => {
+      expect(groupKeyFor(sampleItems[0], "dueDay")).toBe("2025-01-10");
+    });
+    test("dueDay returns empty string when no dueDate", () => {
+      expect(groupKeyFor(sampleItems[1], "dueDay")).toBe("");
+    });
   });
 
   describe("itemSearchText", () => {
@@ -182,6 +188,16 @@ expect(DEFAULT_PREFS.sortBy).toBe("entryDate");
     test("empty filterDue returns true", () => {
       expect(matchesFilterDue({ dueDate: "2025-01-01" }, "")).toBe(true);
       expect(matchesFilterDue({ dueDate: "2025-01-01" }, null)).toBe(true);
+    });
+    test("backlog: no dueDate matches", () => {
+      expect(matchesFilterDue({ dueDate: null }, "backlog")).toBe(true);
+      expect(matchesFilterDue({}, "backlog")).toBe(true);
+    });
+    test("backlog: overdue matches", () => {
+      expect(matchesFilterDue({ dueDate: "2020-01-01" }, "backlog")).toBe(true);
+    });
+    test("backlog: future due does not match", () => {
+      expect(matchesFilterDue({ dueDate: "2030-01-01" }, "backlog")).toBe(false);
     });
   });
 
