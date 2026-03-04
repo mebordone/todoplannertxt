@@ -7,15 +7,16 @@ This document outlines planned and potential future work for the Todo.txt MailEx
 ## 1. Recommended order of implementation (future work only)
 
 Implemented milestones and details have been moved to `CHANGELOG.md`.  
-Versión actual publicada: **3.5.x**. La tabla asigna **fases próximas** a **versiones 3.6, 3.7**, según la visión de producto (planner centrado en UX, 70% UX / 30% features, week planner después).
+Versión actual publicada: **3.6.1** (adecuación para publicación + mejoras de UX en tab). La tabla asigna **fases próximas** a **versiones 3.6, 3.7, 3.8**, según la visión de producto (planner centrado en UX, 70% UX / 30% features, week planner después).
 
 | Version | Phase | Focus | Status |
 |---------|--------|--------|--------|
 | **3.5** | 8 | UX polish & daily planner basics (vista "hoy", backlog sin fecha/semanal ligero, quick wins visuales) | **Implemented** (ver `CHANGELOG.md`) |
-| **3.6** | 9 | Form-based "Add task" (Todoist-style) integrado en el flujo diario | Planned |
-| **3.7** | 10 | Week planner & Calendar Phase 2 (backlog → semana → día/hora con calendario) | Backlog |
+| **3.6** | — | Adecuación para primera publicación (manifest, i18n DE/FR, docs, permisos) | **Implemented** (esta release) |
+| **3.7** | 9 | Ampliaciones del formulario de tarea (recurrence, threshold, etc.); base ya en 3.6.1 ("Añadir con formulario") | Planned |
+| **3.8** | 10 | Week planner & Calendar Phase 2 (backlog → semana → día/hora con calendario) | Backlog |
 
-El resto del documento está ordenado por este plan: primero 3.5 (Phase 8), luego 3.6 (Phase 9), luego 3.7 (Phase 10).
+El resto del documento está ordenado por este plan: primero 3.5 (Phase 8), luego 3.6 (adecuación publicación), luego 3.7 (Phase 9), luego 3.8 (Phase 10).
 
 ---
 
@@ -58,32 +59,32 @@ El resto del documento está ordenado por este plan: primero 3.5 (Phase 8), lueg
 
 ---
 
-### 3.5-C. Backlog sin fecha y backlog semanal (preparación para 3.7)
+### 3.5-C. Backlog sin fecha y backlog semanal (preparación para 3.8)
 
-**Objetivo:** Exponer en el tab las tareas sin fecha y un subconjunto "esta semana", sin UI de calendario ni drag & drop (eso va en 3.7).
+**Objetivo:** Exponer en el tab las tareas sin fecha y un subconjunto "esta semana", sin UI de calendario ni drag & drop (eso va en 3.8).
 
 | # | Tarea | Detalle | Dónde |
 |---|--------|---------|--------|
 | C1 | Vista "Backlog" (sin fecha) | Vista o filtro que muestre solo tareas **sin** `due:`. Misma barra de filtros/agrupación que el tab actual (p.ej. agrupar por proyecto). | Tab |
-| C2 | Backlog semanal (lista simple) | Posibilidad de marcar o seleccionar un subconjunto de tareas como "para esta semana". Representación mínima (lista o checkbox/tag); sin asignar día/hora ni arrastrar. Preparar modelo/datos para que 3.7 reutilice (backlog semanal → día/hora). | Tab |
+| C2 | Backlog semanal (lista simple) | Posibilidad de marcar o seleccionar un subconjunto de tareas como "para esta semana". Representación mínima (lista o checkbox/tag); sin asignar día/hora ni arrastrar. Preparar modelo/datos para que 3.8 reutilice (backlog semanal → día/hora). | Tab |
 
 **Criterios de aceptación:** Se puede ver solo el backlog sin fecha; se puede definir un conjunto "esta semana" de forma simple; no se implementa aún calendario semanal ni DnD.
 
 ---
 
-### Fuera de alcance 3.5 (3.7 o posterior)
+### Fuera de alcance 3.5 (3.8 o posterior)
 
 - Reorganización de Opciones en secciones/pestañas (Archivos, Comportamiento, Calendario, Apariencia/Idioma).
 - Selector "Agrupar por defecto" / "Ordenar por defecto" en Opciones.
-- Copys "planificador" / "Vista completa / organizar tareas" (si implica reestructura de navegación, 3.7).
+- Copys "planificador" / "Vista completa / organizar tareas" (si implica reestructura de navegación, 3.8).
 - Pills/chips en la fila de tarea con clic para filtrar.
-- Pestañas Atributos / Filtros / Ordenación, flechas historial de vista, toggles "Fecha umbral" / "Tareas ocultas" (dependen de modelo o más UX; 3.7+).
+- Pestañas Atributos / Filtros / Ordenación, flechas historial de vista, toggles "Fecha umbral" / "Tareas ocultas" (dependen de modelo o más UX; 3.8+).
 
 ---
 
 ### Referencia: matriz impacto/dificultad (sleek)
 
-Para priorización fina dentro de 3.5-A y 3.5-B. No duplica ítems ya listados arriba; sirve para ordenar tareas o dejar algo para 3.7.
+Para priorización fina dentro de 3.5-A y 3.5-B. No duplica ítems ya listados arriba; sirve para ordenar tareas o dejar algo para 3.8.
 
 | Idea | Impacto | Dificultad | Asignación |
 |------|---------|------------|------------|
@@ -93,19 +94,25 @@ Para priorización fina dentro de 3.5-A y 3.5-B. No duplica ítems ya listados a
 | Separadores entre tareas | 2 | 1 | 3.5-A |
 | Botón "+" destacado | 3 | 1 | 3.5-A |
 | Toggles completadas / due futuro | 4 | 2 | Opcional 3.5 |
-| Pills/chips (clic = filtrar) | 4 | 3 | 3.7 |
-| Filtros colapsables (por tipo) | 3 | 2 | 3.7 |
+| Pills/chips (clic = filtrar) | 4 | 3 | 3.8 |
+| Filtros colapsables (por tipo) | 3 | 2 | 3.8 |
 | Tooltip (?) en filtros | 3 | 1 | Opcional 3.5 |
-| Nombre "Todo.txt" en cabecera | 1–2 | 1 | 3.7 |
-| Toggle "Fecha umbral" / "Tareas ocultas" | 2 | 3 | 3.7+ (requiere modelo) |
+| Nombre "Todo.txt" en cabecera | 1–2 | 1 | 3.8 |
+| Toggle "Fecha umbral" / "Tareas ocultas" | 2 | 3 | 3.8+ (requiere modelo) |
 
 ---
 
-## Version 3.6 – Phase 9: Form-based "Add task" (Todoist-style)
+## Version 3.6 – Adecuación para primera publicación
 
-Implementar el formulario de alta de tarea como primera gran feature funcional adicional. Encajar con la vista "Hoy" y el backlog básico de 3.5 (añadir tareas a hoy, a la semana o al backlog sin fecha).
+**Objetivo:** Preparar la extensión para la primera publicación en addons.thunderbird.net (manifest, ID, browser_specific_settings, strict_max_version, idiomas DE/FR en Opciones, documento de textos para el formulario, permisos Experiment APIs, PUBLISHING.md). **Estado:** Implementado con esta release.
 
-### 3.6.1 Form-based "Add task" (detalle)
+---
+
+## Version 3.7 – Phase 9: Form-based "Add task" (ampliaciones)
+
+En 3.6.1 se añadió "Añadir con formulario" en el tab (modal con título, prioridad, fecha, proyectos, contextos). Esta fase amplía el formulario y el flujo (recurrence, threshold, etc.). Encajar con la vista "Hoy" y el backlog básico de 3.5 (añadir tareas a hoy, a la semana o al backlog sin fecha).
+
+### 3.7.1 Form-based "Add task" (detalle)
 
 Parte de la paridad con sleek / Phase B de feature parity; ver [sleek](https://github.com/ransome1/sleek). Campos propuestos:
 
@@ -118,23 +125,23 @@ Parte de la paridad con sleek / Phase B de feature parity; ver [sleek](https://g
 
 Un botón de ayuda (?) puede explicar el formato todo.txt para usuarios avanzados. Al enviar, la extensión construye la línea todo.txt (p. ej. `(A) 2025-12-01 task description +project @context due:2025-12-15`). Implementable en popup y/o tab; respeta modo solo lectura.
 
-**Otros ítems Phase B (no obligatorios en 3.6):** Recurring todos, due/reminders first-class, archiving/housekeeping de done.txt, file watching (ya implementado o complementar). Se pueden dejar para 3.7 o releases posteriores.
+**Otros ítems Phase B (no obligatorios en 3.7):** Recurring todos, due/reminders first-class, archiving/housekeeping de done.txt, file watching (ya implementado o complementar). Se pueden dejar para 3.8 o releases posteriores.
 
 Todo debe respetar `AGENTS.md` (tests, complejidad, sin regresión de popup + file sync).
 
 ---
 
-## Version 3.7 – Phase 10: Week planner & Calendar Phase 2
+## Version 3.8 – Phase 10: Week planner & Calendar Phase 2
 
 Convertir la experiencia en un **planner semanal**: backlog por proyecto → backlog semanal → asignar día (y opcionalmente día+hora); ver eventos del calendario para evitar solapamientos.
 
-### 3.7.1 Calendar integration — Phase 2
+### 3.8.1 Calendar integration — Phase 2
 
 Phase 1 está implementada (ver `CHANGELOG.md`). Phase 2 incluye:
 
 - Resolución de conflictos más rica (p. ej. timestamps), mapeo opcional de recurrencia, mejoras de UX/rendimiento cuando la Experiment API esté estable.
 
-### 3.7.2 Planning window (backlog → calendar / week planner)
+### 3.8.2 Planning window (backlog → calendar / week planner)
 
 Vista de **planificación** que combine backlog Todo.txt con calendario/semana:
 
@@ -147,7 +154,7 @@ Vista de **planificación** que combine backlog Todo.txt con calendario/semana:
 
 Depende de la integración con calendario y del full tab existente. Primera iteración puede usar una UI tipo calendario propia y solo fechas `due:`; integración más profunda con el calendario nativo de Thunderbird cuando las MailExtension APIs estén estables. Antes de implementar a fondo, tiene sentido un **spike de usabilidad y diseño** (pantallas, flexibilidad de ventanas/pestañas en Thunderbird, reutilización de bloques).
 
-### 3.7.3 Bloque C de UX (si no se hizo en 3.5)
+### 3.8.3 Bloque C de UX (si no se hizo en 3.5)
 
 Si la reorganización de Opciones, ajustes por defecto de agrupación/orden y copys de planificación no se cerraron en 3.5, completarlos aquí.
 
@@ -167,8 +174,10 @@ Ver `CHANGELOG.md` (Phase 0b). Se mantiene aquí como referencia opcional.
 
 ## Summary
 
-- **Versión actual publicada:** 3.5.x. Lo implementado hasta 3.5 está en `CHANGELOG.md`.
+- **Versión actual publicada:** 3.6.1. Lo implementado hasta 3.5 está en `CHANGELOG.md`; adecuación 3.6 y mejoras 3.6.1 en este release.
 - **Roadmap por versión:**
   - **3.5 (Phase 8):** ✅ Implementado — UX polish y bases del daily planner (vista "Hoy", backlog sin fecha/semanal ligero, quick wins visuales).
-  - **3.6 (Phase 9):** Form-based "Add task" (Todoist-style) integrado en el flujo diario.
-  - **3.7 (Phase 10):** Week planner y Calendar Phase 2 (backlog → semana → día/hora, eventos de calendario visibles, drag & drop).
+  - **3.6:** ✅ Implementado — Adecuación para primera publicación en addons.thunderbird.net.
+  - **3.6.1:** ✅ Implementado — Mejoras tab: toolbar (Todas/Backlog/Esta semana/Hoy), agrupar por día, grupos plegables, edición completa por modal, "Añadir con formulario", completar sin recarga, id determinista (MD5), vista semana vacía, conservar vista al cambiar agrupación/orden. Ver `CHANGELOG.md`.
+  - **3.7 (Phase 9):** Ampliaciones del formulario de tarea (recurrence, threshold, etc.).
+  - **3.8 (Phase 10):** Week planner y Calendar Phase 2 (backlog → semana → día/hora, eventos de calendario visibles, drag & drop).

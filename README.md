@@ -2,10 +2,9 @@
 
 Extensión de **Thunderbird** para administrar archivos [todo.txt](http://todotxt.org/): tareas en texto plano, prioridades, proyectos, contextos y fechas en un archivo que tú controlas.
 
-- **Basada en** [todo.txt extension](https://github.com/rkokkelk/todo.txt-ext) (Thunderbird extension for the Todo.txt application, por Roy Kokkelkoren).
-- **Inspirada en** [sleek](https://github.com/ransome1/sleek) (interfaz limpia y moderna para todo.txt, por Robin Ahle).
+- **Inspirada en** la [extensión Todo.txt](https://github.com/rkokkelk/todo.txt-ext) (Roy Kokkelkoren) y en [sleek](https://github.com/ransome1/sleek) (Robin Ahle). El **código de esta extensión está desarrollado de cero** como MailExtension; no es un fork del código legacy.
 
-**Versión 3.5** – Reescritura como WebExtension (MailExtension). **No es retrocompatible con la versión 2** (legacy XUL/XPCOM). Quienes usen la 2 deben reconfigurar rutas de archivos y preferencias al migrar a la 3.
+**Versión 3.6** – WebExtension (MailExtension) para Thunderbird 140+. **No es retrocompatible con la versión 2** (legacy XUL/XPCOM). Quienes usen la 2 deben reconfigurar rutas de archivos y preferencias al migrar a la 3.
 
 ---
 
@@ -25,9 +24,10 @@ Extensión de **Thunderbird** para administrar archivos [todo.txt](http://todotx
 
 - **Configuración inicial**: En la primera ejecución (o si no hay rutas configuradas), en Opciones o en la pestaña de inicio puedes **Elegir carpeta** (donde se crearán o usarán `todo.txt` y `done.txt`) o **Seleccionar todo.txt** (archivo existente; en la misma carpeta se usa o crea `done.txt`). Sin complementos externos.
 - **Opciones**: Rutas para todo.txt y done.txt con el selector de archivos o de carpeta integrado; botón «Abrir vista completa» en el encabezado; opciones de comportamiento (Thunderbird, fecha de creación, título completo); sección Depuración (copiar log). Idioma de la interfaz (en, es, de, fr).
+- **Flujo de planificación:** Captura ideas en un **Backlog** (tareas sin fecha). Con **«Añadir a la semana»** eliges qué tareas quieres hacer esta semana. En la vista **«Esta semana»** las que no tienen fecha o están vencidas aparecen arriba; abajo se agrupan por día de la semana, así puedes asignar una fecha de vencimiento (`due:`) a las que no la tienen y planificar la semana.
 - **Interfaz dual**
   - **Popup (vista rápida):** Clic en el icono de la barra abre un popup con título, solo las tareas pendientes (prioridad y vencimiento visibles) y barra de herramientas: actualizar (⟳), nueva tarea, añadir (+), abrir vista completa (⧉) y opciones (⚙). Doble clic para editar; checkbox para completar; botón × para eliminar (si no está en solo lectura).
-  - **Vista en pestaña:** Enlace “Vista completa” (desde popup u Opciones) abre una página con todas las tareas. Toolbar: Hoy, Vencidas, Esta semana, Backlog (con contadores cuando aplica), Restablecer filtros, Actualizar, Opciones. Filtros y ordenación (proyecto, contexto, prioridad, vencimiento, agrupación); vista por defecto configurable; backlog sin fecha y backlog semanal (“añadir a la semana” por tarea). Prioridad y vencimiento visibles en cada fila.
+  - **Vista en pestaña:** Enlace “Vista completa” (desde popup u Opciones) abre una página con todas las tareas. Toolbar: campo de texto + **Añadir** (sintaxis todo.txt) y **Añadir con formulario** (modal sin sintaxis); botones de vista **Todas**, **Backlog** (sin fecha + vencidas), **Esta semana**, **Hoy** (con contadores), Restablecer filtros, Actualizar, Opciones. Filtros y ordenación (proyecto, contexto, prioridad, vencimiento, agrupación); **agrupar por día** (con día de la semana en el encabezado); grupos plegables; vista por defecto configurable; backlog semanal (“añadir a la semana” por tarea). Doble clic abre **modal de edición** (título, prioridad, fecha, proyectos, contextos). Completar tarea actualiza la lista sin recargar y mantiene el scroll. Prioridad y vencimiento visibles en cada fila.
   - **Visibilidad del icono:** El botón de Todo.txt en la barra de título es visible en la pestaña de correo (Mail).
 - **Calendario (Lightning)**: El experimento intenta registrar un calendario “Todo.txt”. Solo las tareas con `due:YYYY-MM-DD` se sincronizan; aparecen en la vista **Tareas** de Lightning. Opciones: activar/desactivar integración, elegir calendario, "Sincronizar ahora", exportar a ICS si la API no está disponible. Ver `docs/calendar-integration.md`.
 
@@ -54,7 +54,7 @@ Los builds se generan en la carpeta `dist/`. Desde la raíz del proyecto:
 ./build.sh
 ```
 
-El archivo `.xpi` quedará en `dist/` (p. ej. `dist/todotxt_3.5.0_20260303_123456.xpi`). Opción `-d` para build con logs de depuración; `-h` para ayuda.
+El archivo `.xpi` quedará en `dist/` (p. ej. `dist/todotxt_3.6.1_20260304_123456.xpi`). Opción `-d` para build con logs de depuración; `-h` para ayuda.
 
 ## Depuración remota
 
@@ -95,4 +95,8 @@ Ver `docs/debug-remote.md` para habilitar el servidor y usar las URLs con Chrome
 
 ## Licencia
 
-MPL 2.0 (igual que la extensión original).
+MPL 2.0. Ver [LICENSE](LICENSE) en la raíz del repositorio.
+
+## Publicar en addons.thunderbird.net
+
+Checklist, notas para revisores y recomendaciones: [docs/PUBLISHING.md](docs/PUBLISHING.md).

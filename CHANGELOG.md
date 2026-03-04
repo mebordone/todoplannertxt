@@ -5,6 +5,41 @@ The roadmap now focuses only on **upcoming / planned work**.
 
 ---
 
+## Version 3.6 – Adequacy for first publication
+
+**Goal:** Prepare the extension for first submission to addons.thunderbird.net.
+
+**Implemented:**
+
+- **Manifest:** Version set to 3.6.0; add-on ID changed to `todo.txt.planner@mebordone.com.ar`. Replaced `applications.gecko` with `browser_specific_settings.gecko`; added `strict_max_version`: `"140.*"`; added `browser_style: true` to `options_ui`.
+- **Options:** Display language selector extended with Deutsch and Français (existing _locales de/fr). Logic in `options.js` and `lib/i18nHelper.js` updated to support `de` and `fr`.
+- **Popup:** When no paths are configured, added an "Open Options" link next to the folder/todo buttons for consistency with empty and error states.
+- **Docs:** New `docs/SUBMISSION-FORM-TEXTS.md` with copy-paste texts for the add-on listing form (summary, description, notes for reviewers, privacy, support/source URLs, screenshots checklist). `docs/PUBLISHING.md` updated with new add-on ID, Experiment APIs "full access" permission note, link to SUBMISSION-FORM-TEXTS, and screenshots subsection.
+- **ROADMAP:** Renumbered: adequacy release = 3.6; former 3.6 (Form-based Add task) = 3.7; former 3.7 (Week planner) = 3.8. Summary and table updated.
+
+---
+
+## Version 3.6.1 – Tab UX improvements and stability
+
+**Goal:** Improve tab view usability, fix edit/refresh issues, and add form-based add without removing syntax flow.
+
+**Implemented:**
+
+- **Version:** Set to 3.6.1 in `manifest.json` and `package.json`.
+- **Toolbar view buttons:** Order changed to **Todas**, **Backlog**, **Esta semana**, **Hoy** (then Reset filters, Refresh, Options). **Backlog** now includes both tasks without due date and overdue tasks; separate "Overdue" button removed. New **Todas** button shows all open tasks regardless of due. Filter logic in `tab/filterSort.js` (`matchesFilterDue` with `"backlog"`); i18n `tab_view_all`, `tab_view_all_aria`, `tab_filter_backlog` in en, es, de, fr.
+- **Group by day:** New "Por día" option in Group by selector (`groupKeyDueDay` in `filterSort.js`); group header shows weekday + date (e.g. "Wednesday 2026-03-05") when grouping by day. i18n `tab_group_by_day`; tests in `filterSort.test.js` for `dueDay` and `backlog` filter.
+- **Complete task without full reload:** In `toggleTask`, after successful `modifyItem`, update `fullItems` in memory, call only `refreshView()` (no `loadItems()`), and restore `listEl.scrollTop` so the list does not jump to the top.
+- **Collapsible groups:** When grouping, each group has a clickable header with arrow (▼/▶); state persisted in `tabViewPrefs.collapsedGroupKeys`. CSS `.group-container.collapsed .group-items { display: none }`. i18n `tab_group_expand`, `tab_group_collapse`.
+- **Edit task – full details:** Replaced inline title-only edit with a modal: Title, Priority (None/A/B/C), Due date, Projects, Contexts, Save/Cancel. Submit builds `newItem` and calls `modifyItem`; on success updates `fullItems` and `refreshView()` without reload. i18n for modal labels in four locales.
+- **Add task with form:** New toolbar button "Añadir con formulario" opens a modal (same fields as edit) for users who prefer not to use todo.txt syntax; tip at bottom explains the syntax alternative. Submit calls `addItem` with built `plainItem`; new task appended to `fullItems` and view refreshed. i18n `tab_add_with_form`, `tab_add_task_title`, `tab_add_save`, `tab_add_form_tip`.
+- **Weekly view – empty state:** When "Esta semana" has no tasks assigned (`weeklyBacklogIds.length === 0`), show empty list with message "No tasks assigned to this week. Use 'Add to week'…" instead of showing all tasks. i18n `tab_empty_weekly`.
+- **Preserve view when changing Group by / Sort:** Changing "Group by", "Sort by" or sort direction no longer resets view to "Todas"; dedicated handler `onGroupOrSortOnlyChange` keeps current view mode (e.g. "Esta semana").
+- **Deterministic task id:** In `modules/todotxt.js`, task id is now a deterministic hash of the line content (MD5 when available) instead of a random UUID, so the same line keeps the same id across re-parses. Fixes "La tarea no se encontró en todo.txt" when editing after cache refresh (e.g. popup or polling). `manifest.json`: load `modules/md5.js` before `modules/todotxt.js`.
+- **Weekly view – Due filter:** In "Esta semana", pipeline runs with `filterDue: ""` so tasks that have a due date (e.g. after editing) still appear in the weekly list; only the weekly id filter is applied.
+- **Tests and AGENTS.md:** `npm run ci` passes; coverage ≥90% statements, ≥80% branches; complexity ≤10; lint clean. New tests for `filterDue === "backlog"` and `groupKeyFor(..., "dueDay")` in `filterSort.test.js`.
+
+---
+
 ## Phase 0a–0b: Repository migration and legacy cleanup
 
 ### 0a. Repository migration (own repo, URLs, structure)
