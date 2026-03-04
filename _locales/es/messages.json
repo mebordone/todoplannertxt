@@ -3,7 +3,7 @@
     "message": "Todo.txt"
   },
   "extensionDescription": {
-    "message": "Extensión de Thunderbird para gestionar archivos todo.txt: tareas en texto plano, prioridades, proyectos, contextos y fechas en un archivo que tú controlas.\n\nBasada en la extensión original Todo.txt de Roy Kokkelkoren. La versión 3.x es una reescritura completa como MailExtension para Thunderbird 140+ y no es compatible con la v2.\n\n• Sin complementos extra: acceso integrado a todo.txt y done.txt. Tras instalar, abre Opciones → Examinar para elegir tus archivos.\n• Popup: vista rápida desde la barra; añadir, completar y editar tareas.\n• Vista en pestaña: filtros, Hoy, Backlog, Esta semana, ordenar por fecha o prioridad.\n• Opciones: rutas de archivos, comportamiento, integración opcional con Calendario (Lightning) para tareas con fecha.\n• Sintaxis Todo.txt: prioridades (A)(B)(C), proyectos +nombre, contextos @nombre, due:AAAA-MM-DD."
+    "message": "Extensión de Thunderbird para gestionar archivos todo.txt: tareas en texto plano, prioridades, proyectos, contextos y fechas en un archivo que tú controlas.\n\nBasada en la extensión original Todo.txt de Roy Kokkelkoren. La versión 3.x es una reescritura completa como MailExtension para Thunderbird 140+ y no es compatible con la v2.\n\nFlujo de planificación: captura ideas en un Backlog (tareas sin fecha). Usa «Añadir a la semana» para elegir qué tareas quieres hacer esta semana. En la vista «Esta semana», las sin fecha o vencidas aparecen arriba; abajo se agrupan por día de la semana para que puedas asignar fechas y planificar.\n\n• Sin complementos extra: acceso integrado a todo.txt y done.txt. Tras instalar, abre Opciones → Examinar para elegir tus archivos.\n• Popup: vista rápida desde la barra; añadir, completar y editar tareas.\n• Vista en pestaña: filtros, Hoy, Vencidas, Esta semana, Backlog, ordenar por fecha o prioridad.\n• Opciones: rutas de archivos, comportamiento, integración opcional con Calendario (Lightning) para tareas con fecha.\n• Sintaxis Todo.txt: prioridades (A)(B)(C), proyectos +nombre, contextos @nombre, due:AAAA-MM-DD."
   },
   "extensionSummary": {
     "message": "Gestiona todo.txt desde Thunderbird: tareas, prioridades, proyectos y fechas en texto plano."
@@ -149,6 +149,9 @@
   "tab_filter_all": {
     "message": "Todos"
   },
+  "tab_filter_backlog": {
+    "message": "Backlog"
+  },
   "tab_filter_open": {
     "message": "Abiertas"
   },
@@ -200,11 +203,23 @@
   "tab_group_none": {
     "message": "Ninguno"
   },
+  "tab_group_by_day": {
+    "message": "Por día"
+  },
+  "tab_group_expand": {
+    "message": "Expandir grupo"
+  },
+  "tab_group_collapse": {
+    "message": "Contraer grupo"
+  },
   "tab_filters_view": {
     "message": "Filtros y vista"
   },
   "tab_empty_no_match": {
     "message": "Ninguna tarea coincide con los filtros. Ponga Proyecto, Contexto y Estado en Todos para ver todo, o añada tareas."
+  },
+  "tab_empty_weekly": {
+    "message": "No hay tareas asignadas a esta semana. Use «Añadir a la semana» en las tareas para planificar."
   },
   "tab_reset_filters": {
     "message": "Restablecer filtros"
@@ -235,6 +250,24 @@
   },
   "tab_edit_task": {
     "message": "Editar tarea"
+  },
+  "tab_edit_label_title": {
+    "message": "Título"
+  },
+  "tab_edit_label_priority": {
+    "message": "Prioridad"
+  },
+  "tab_edit_label_due": {
+    "message": "Fecha de vencimiento"
+  },
+  "tab_edit_label_projects": {
+    "message": "Proyectos"
+  },
+  "tab_edit_label_contexts": {
+    "message": "Contextos"
+  },
+  "tab_edit_priority_none": {
+    "message": "Ninguna"
   },
   "popup_edit_task": {
     "message": "Editar título de la tarea"
@@ -272,6 +305,12 @@
   "options_displayLanguage_es": {
     "message": "Español"
   },
+  "options_displayLanguage_de": {
+    "message": "Deutsch"
+  },
+  "options_displayLanguage_fr": {
+    "message": "Français"
+  },
   "options_displayLanguage_hint": {
     "message": "Se aplica al reabrir la ventana o pestaña, o al recargar esta página."
   },
@@ -298,6 +337,21 @@
   },
   "tab_add_aria": {
     "message": "Añadir tarea"
+  },
+  "tab_add_with_form": {
+    "message": "Añadir con formulario"
+  },
+  "tab_add_with_form_aria": {
+    "message": "Añadir tarea con formulario (sin usar sintaxis)"
+  },
+  "tab_add_task_title": {
+    "message": "Nueva tarea"
+  },
+  "tab_add_save": {
+    "message": "Añadir"
+  },
+  "tab_add_form_tip": {
+    "message": "Consejo: También puedes escribir en la caja de arriba con sintaxis todo.txt (ej. (A) comprar leche +casa due:2025-03-10)."
   },
   "tab_meta_priority": {
     "message": "Prioridad"
@@ -383,6 +437,12 @@
   "tab_view_today_aria": {
     "message": "Mostrar solo las tareas que vencen hoy"
   },
+  "tab_view_all": {
+    "message": "Todas"
+  },
+  "tab_view_all_aria": {
+    "message": "Mostrar todas las tareas"
+  },
   "tab_view_overdue": {
     "message": "Vencidas"
   },
@@ -408,7 +468,7 @@
     "message": "Backlog"
   },
   "tab_view_backlog_aria": {
-    "message": "Ver tareas sin fecha de vencimiento"
+    "message": "Ver tareas sin fecha o vencidas"
   },
   "tab_view_weekly": {
     "message": "Esta semana"

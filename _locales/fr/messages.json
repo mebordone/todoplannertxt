@@ -3,7 +3,7 @@
     "message": "Todo.txt"
   },
   "extensionDescription": {
-    "message": "Extension Thunderbird pour gérer les fichiers todo.txt : tâches en texte brut, priorités, projets, contextes et échéances dans un fichier que vous contrôlez.\n\nBasée sur l'extension Todo.txt originale de Roy Kokkelkoren. La version 3.x est une réécriture complète en MailExtension pour Thunderbird 140+ et n'est pas rétrocompatible avec la v2.\n\n• Aucun add-on supplémentaire : accès intégré à todo.txt et done.txt. Après installation, ouvrez Options → Parcourir pour sélectionner vos fichiers.\n• Popup : vue rapide depuis la barre d'outils ; ajouter, terminer et modifier les tâches.\n• Vue onglet complète : filtres, Aujourd'hui, Backlog, Cette semaine, tri par date ou priorité.\n• Options : chemins des fichiers, comportement, intégration optionnelle au calendrier (Lightning) pour les tâches avec échéance.\n• Syntaxe Todo.txt : priorités (A)(B)(C), projets +nom, contextes @nom, due:AAAA-MM-JJ."
+    "message": "Extension Thunderbird pour gérer les fichiers todo.txt : tâches en texte brut, priorités, projets, contextes et échéances dans un fichier que vous contrôlez.\n\nBasée sur l'extension Todo.txt originale de Roy Kokkelkoren. La version 3.x est une réécriture complète en MailExtension pour Thunderbird 140+ et n'est pas rétrocompatible avec la v2.\n\nFlux de planification : saisissez vos idées dans un Backlog (tâches sans date). Utilisez « Ajouter à la semaine » pour choisir les tâches de la semaine. Dans la vue « Cette semaine », les tâches sans date ou en retard apparaissent en haut ; en bas, regroupées par jour pour assigner des échéances et planifier.\n\n• Aucun add-on supplémentaire : accès intégré à todo.txt et done.txt. Après installation, ouvrez Options → Parcourir pour sélectionner vos fichiers.\n• Popup : vue rapide depuis la barre d'outils ; ajouter, terminer et modifier les tâches.\n• Vue onglet complète : filtres, Aujourd'hui, En retard, Cette semaine, Backlog, tri par date ou priorité.\n• Options : chemins des fichiers, comportement, intégration optionnelle au calendrier (Lightning) pour les tâches avec échéance.\n• Syntaxe Todo.txt : priorités (A)(B)(C), projets +nom, contextes @nom, due:AAAA-MM-JJ."
   },
   "extensionSummary": {
     "message": "Gérer todo.txt depuis Thunderbird : tâches, priorités, projets et échéances en texte brut."
@@ -149,6 +149,9 @@
   "tab_filter_all": {
     "message": "Tous"
   },
+  "tab_filter_backlog": {
+    "message": "Backlog"
+  },
   "tab_filter_open": {
     "message": "Ouvert"
   },
@@ -200,11 +203,23 @@
   "tab_group_none": {
     "message": "Aucun"
   },
+  "tab_group_by_day": {
+    "message": "Par jour"
+  },
+  "tab_group_expand": {
+    "message": "Développer le groupe"
+  },
+  "tab_group_collapse": {
+    "message": "Réduire le groupe"
+  },
   "tab_filters_view": {
     "message": "Filtres et vue"
   },
   "tab_empty_no_match": {
     "message": "Aucune tâche ne correspond aux filtres. Mettez Projet, Contexte et Statut sur Tous pour tout voir, ou ajoutez des tâches."
+  },
+  "tab_empty_weekly": {
+    "message": "Aucune tâche assignée à cette semaine. Utilisez « Ajouter à la semaine » sur les tâches pour planifier."
   },
   "tab_reset_filters": {
     "message": "Réinitialiser les filtres"
@@ -235,6 +250,24 @@
   },
   "tab_edit_task": {
     "message": "Modifier la tâche"
+  },
+  "tab_edit_label_title": {
+    "message": "Titre"
+  },
+  "tab_edit_label_priority": {
+    "message": "Priorité"
+  },
+  "tab_edit_label_due": {
+    "message": "Date d'échéance"
+  },
+  "tab_edit_label_projects": {
+    "message": "Projets"
+  },
+  "tab_edit_label_contexts": {
+    "message": "Contextes"
+  },
+  "tab_edit_priority_none": {
+    "message": "Aucune"
   },
   "popup_edit_task": {
     "message": "Modifier le titre de la tâche"
@@ -272,6 +305,12 @@
   "options_displayLanguage_es": {
     "message": "Español"
   },
+  "options_displayLanguage_de": {
+    "message": "Allemand"
+  },
+  "options_displayLanguage_fr": {
+    "message": "Français"
+  },
   "options_displayLanguage_hint": {
     "message": "Pris en compte après réouverture de la fenêtre/onglet ou rechargement de cette page."
   },
@@ -298,6 +337,21 @@
   },
   "tab_add_aria": {
     "message": "Ajouter une tâche"
+  },
+  "tab_add_with_form": {
+    "message": "Ajouter avec formulaire"
+  },
+  "tab_add_with_form_aria": {
+    "message": "Ajouter une tâche avec le formulaire (sans syntaxe)"
+  },
+  "tab_add_task_title": {
+    "message": "Nouvelle tâche"
+  },
+  "tab_add_save": {
+    "message": "Ajouter"
+  },
+  "tab_add_form_tip": {
+    "message": "Conseil : Vous pouvez aussi taper dans la zone ci-dessus avec la syntaxe todo.txt (ex. (A) acheter du lait +maison due:2025-03-10)."
   },
   "tab_meta_priority": {
     "message": "Priorité"
@@ -383,6 +437,12 @@
   "tab_view_today_aria": {
     "message": "Afficher uniquement les tâches qui arrivent à échéance aujourd'hui"
   },
+  "tab_view_all": {
+    "message": "Toutes"
+  },
+  "tab_view_all_aria": {
+    "message": "Afficher toutes les tâches"
+  },
   "tab_view_overdue": {
     "message": "En retard"
   },
@@ -408,7 +468,7 @@
     "message": "Backlog"
   },
   "tab_view_backlog_aria": {
-    "message": "Voir les tâches sans date d'échéance"
+    "message": "Voir les tâches sans date ou en retard"
   },
   "tab_view_weekly": {
     "message": "Cette semaine"

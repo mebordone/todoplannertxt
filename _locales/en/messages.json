@@ -3,7 +3,7 @@
     "message": "Todo.txt"
   },
   "extensionDescription": {
-    "message": "Thunderbird extension to manage todo.txt files: plain-text tasks, priorities, projects, contexts and due dates in a file you control.\n\nBased on the original Todo.txt extension by Roy Kokkelkoren. Version 3.x is a full rewrite as a MailExtension for Thunderbird 140+ and is not backward compatible with v2.\n\n• No extra add-ons: built-in file access for todo.txt and done.txt. After install, open Options → Browse to select your files.\n• Popup: quick view from the toolbar; add, complete and edit tasks.\n• Full tab view: filters, Today, Backlog, This week, sort by due date or priority.\n• Options: file paths, behaviour, optional Calendar (Lightning) integration for tasks with due dates.\n• Full Todo.txt syntax: priorities (A)(B)(C), projects +name, contexts @name, due:YYYY-MM-DD."
+    "message": "Thunderbird extension to manage todo.txt files: plain-text tasks, priorities, projects, contexts and due dates in a file you control.\n\nBased on the original Todo.txt extension by Roy Kokkelkoren. Version 3.x is a full rewrite as a MailExtension for Thunderbird 140+ and is not backward compatible with v2.\n\nPlanning workflow: capture ideas in a Backlog (tasks without due date). Use \"Add to week\" to select which tasks you want to do this week. In the \"This week\" view, undated or overdue tasks appear at the top; below, tasks are grouped by day so you can assign due dates and plan your week.\n\n• No extra add-ons: built-in file access for todo.txt and done.txt. After install, open Options → Browse to select your files.\n• Popup: quick view from the toolbar; add, complete and edit tasks.\n• Full tab view: filters, Today, Overdue, This week, Backlog, sort by due date or priority.\n• Options: file paths, behaviour, optional Calendar (Lightning) integration for tasks with due dates.\n• Full Todo.txt syntax: priorities (A)(B)(C), projects +name, contexts @name, due:YYYY-MM-DD."
   },
   "extensionSummary": {
     "message": "Manage todo.txt from Thunderbird: tasks, priorities, projects and due dates in plain text."
@@ -149,6 +149,9 @@
   "tab_filter_all": {
     "message": "All"
   },
+  "tab_filter_backlog": {
+    "message": "Backlog"
+  },
   "tab_filter_open": {
     "message": "Open"
   },
@@ -200,11 +203,23 @@
   "tab_group_none": {
     "message": "None"
   },
+  "tab_group_by_day": {
+    "message": "By day"
+  },
+  "tab_group_expand": {
+    "message": "Expand group"
+  },
+  "tab_group_collapse": {
+    "message": "Collapse group"
+  },
   "tab_filters_view": {
     "message": "Filters & view"
   },
   "tab_empty_no_match": {
     "message": "No tasks match the filters. Set Project, Context and Status to All to see everything, or add tasks."
+  },
+  "tab_empty_weekly": {
+    "message": "No tasks assigned to this week. Use \"Add to week\" on tasks to plan your week."
   },
   "tab_reset_filters": {
     "message": "Reset filters"
@@ -235,6 +250,24 @@
   },
   "tab_edit_task": {
     "message": "Edit task"
+  },
+  "tab_edit_label_title": {
+    "message": "Title"
+  },
+  "tab_edit_label_priority": {
+    "message": "Priority"
+  },
+  "tab_edit_label_due": {
+    "message": "Due date"
+  },
+  "tab_edit_label_projects": {
+    "message": "Projects"
+  },
+  "tab_edit_label_contexts": {
+    "message": "Contexts"
+  },
+  "tab_edit_priority_none": {
+    "message": "None"
   },
   "popup_edit_task": {
     "message": "Edit task title"
@@ -272,6 +305,12 @@
   "options_displayLanguage_es": {
     "message": "Español"
   },
+  "options_displayLanguage_de": {
+    "message": "Deutsch"
+  },
+  "options_displayLanguage_fr": {
+    "message": "Français"
+  },
   "options_displayLanguage_hint": {
     "message": "Takes effect after reopening the popup/tab or reloading this page."
   },
@@ -298,6 +337,21 @@
   },
   "tab_add_aria": {
     "message": "Add task"
+  },
+  "tab_add_with_form": {
+    "message": "Add with form"
+  },
+  "tab_add_with_form_aria": {
+    "message": "Add task with form (no syntax needed)"
+  },
+  "tab_add_task_title": {
+    "message": "New task"
+  },
+  "tab_add_save": {
+    "message": "Add"
+  },
+  "tab_add_form_tip": {
+    "message": "Tip: You can also type in the box above using todo.txt syntax (e.g. (A) buy milk +home due:2025-03-10)."
   },
   "tab_meta_priority": {
     "message": "Priority"
@@ -383,6 +437,12 @@
   "tab_view_today_aria": {
     "message": "Show tasks due today"
   },
+  "tab_view_all": {
+    "message": "All"
+  },
+  "tab_view_all_aria": {
+    "message": "Show all tasks"
+  },
   "tab_view_overdue": {
     "message": "Overdue"
   },
@@ -408,7 +468,7 @@
     "message": "Backlog"
   },
   "tab_view_backlog_aria": {
-    "message": "View tasks with no due date"
+    "message": "View tasks with no due date or overdue"
   },
   "tab_view_weekly": {
     "message": "This week"

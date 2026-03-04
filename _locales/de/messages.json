@@ -3,7 +3,7 @@
     "message": "Todo.txt"
   },
   "extensionDescription": {
-    "message": "Thunderbird-Erweiterung zur Verwaltung von todo.txt-Dateien: Aufgaben in Klartext, Prioritäten, Projekte, Kontexte und Fälligkeitsdaten in einer Datei, die Sie kontrollieren.\n\nBasiert auf der ursprünglichen Todo.txt-Erweiterung von Roy Kokkelkoren. Version 3.x ist eine komplette Neuimplementierung als MailExtension für Thunderbird 140+ und ist nicht abwärtskompatibel mit v2.\n\n• Keine zusätzlichen Add-ons: integrierter Dateizugriff für todo.txt und done.txt. Nach der Installation: Einstellungen → Durchsuchen, um Ihre Dateien auszuwählen.\n• Popup: Schnellansicht aus der Symbolleiste; Aufgaben hinzufügen, erledigen und bearbeiten.\n• Vollständige Tab-Ansicht: Filter, Heute, Backlog, Diese Woche, Sortierung nach Fälligkeit oder Priorität.\n• Einstellungen: Dateipfade, Verhalten, optionale Kalender- (Lightning-)Integration für Aufgaben mit Fälligkeitsdatum.\n• Vollständige Todo.txt-Syntax: Prioritäten (A)(B)(C), Projekte +name, Kontexte @name, due:JJJJ-MM-TT."
+    "message": "Thunderbird-Erweiterung zur Verwaltung von todo.txt-Dateien: Aufgaben in Klartext, Prioritäten, Projekte, Kontexte und Fälligkeitsdaten in einer Datei, die Sie kontrollieren.\n\nBasiert auf der ursprünglichen Todo.txt-Erweiterung von Roy Kokkelkoren. Version 3.x ist eine komplette Neuimplementierung als MailExtension für Thunderbird 140+ und ist nicht abwärtskompatibel mit v2.\n\nPlanungsablauf: Ideen im Backlog erfassen (Aufgaben ohne Fälligkeit). Mit „Zur Woche hinzufügen“ wählen Sie die Aufgaben für diese Woche. In der Ansicht „Diese Woche“ erscheinen undatierte oder überfällige oben; darunter gruppiert nach Wochentag, damit Sie Fälligkeiten setzen und planen können.\n\n• Keine zusätzlichen Add-ons: integrierter Dateizugriff für todo.txt und done.txt. Nach der Installation: Einstellungen → Durchsuchen, um Ihre Dateien auszuwählen.\n• Popup: Schnellansicht aus der Symbolleiste; Aufgaben hinzufügen, erledigen und bearbeiten.\n• Vollständige Tab-Ansicht: Filter, Heute, Überfällig, Diese Woche, Backlog, Sortierung nach Fälligkeit oder Priorität.\n• Einstellungen: Dateipfade, Verhalten, optionale Kalender- (Lightning-)Integration für Aufgaben mit Fälligkeitsdatum.\n• Vollständige Todo.txt-Syntax: Prioritäten (A)(B)(C), Projekte +name, Kontexte @name, due:JJJJ-MM-TT."
   },
   "extensionSummary": {
     "message": "Todo.txt in Thunderbird verwalten: Aufgaben, Prioritäten, Projekte und Fälligkeiten in Klartext."
@@ -149,6 +149,9 @@
   "tab_filter_all": {
     "message": "Alle"
   },
+  "tab_filter_backlog": {
+    "message": "Backlog"
+  },
   "tab_filter_open": {
     "message": "Offen"
   },
@@ -200,11 +203,23 @@
   "tab_group_none": {
     "message": "Keine"
   },
+  "tab_group_by_day": {
+    "message": "Nach Tag"
+  },
+  "tab_group_expand": {
+    "message": "Gruppe aufklappen"
+  },
+  "tab_group_collapse": {
+    "message": "Gruppe einklappen"
+  },
   "tab_filters_view": {
     "message": "Filter & Ansicht"
   },
   "tab_empty_no_match": {
     "message": "Keine Aufgaben entsprechen den Filtern. Setzen Sie Projekt, Kontext und Status auf Alle, um alles zu sehen, oder fügen Sie Aufgaben hinzu."
+  },
+  "tab_empty_weekly": {
+    "message": "Keine Aufgaben dieser Woche zugeordnet. Nutzen Sie „Zur Woche hinzufügen“ bei Aufgaben, um die Woche zu planen."
   },
   "tab_reset_filters": {
     "message": "Filter zurücksetzen"
@@ -235,6 +250,24 @@
   },
   "tab_edit_task": {
     "message": "Aufgabe bearbeiten"
+  },
+  "tab_edit_label_title": {
+    "message": "Titel"
+  },
+  "tab_edit_label_priority": {
+    "message": "Priorität"
+  },
+  "tab_edit_label_due": {
+    "message": "Fälligkeitsdatum"
+  },
+  "tab_edit_label_projects": {
+    "message": "Projekte"
+  },
+  "tab_edit_label_contexts": {
+    "message": "Kontexte"
+  },
+  "tab_edit_priority_none": {
+    "message": "Keine"
   },
   "popup_edit_task": {
     "message": "Aufgabentitel bearbeiten"
@@ -272,6 +305,12 @@
   "options_displayLanguage_es": {
     "message": "Español"
   },
+  "options_displayLanguage_de": {
+    "message": "Deutsch"
+  },
+  "options_displayLanguage_fr": {
+    "message": "Französisch"
+  },
   "options_displayLanguage_hint": {
     "message": "Wirkt nach dem erneuten Öffnen des Popups/Tabs oder dem Neuladen dieser Seite."
   },
@@ -298,6 +337,21 @@
   },
   "tab_add_aria": {
     "message": "Aufgabe hinzufügen"
+  },
+  "tab_add_with_form": {
+    "message": "Mit Formular hinzufügen"
+  },
+  "tab_add_with_form_aria": {
+    "message": "Aufgabe mit Formular hinzufügen (ohne Syntax)"
+  },
+  "tab_add_task_title": {
+    "message": "Neue Aufgabe"
+  },
+  "tab_add_save": {
+    "message": "Hinzufügen"
+  },
+  "tab_add_form_tip": {
+    "message": "Tipp: Sie können oben auch mit Todo.txt-Syntax eingeben (z. B. (A) Milch kaufen +haus due:2025-03-10)."
   },
   "tab_meta_priority": {
     "message": "Priorität"
@@ -383,6 +437,12 @@
   "tab_view_today_aria": {
     "message": "Nur Aufgaben mit Fälligkeitsdatum heute anzeigen"
   },
+  "tab_view_all": {
+    "message": "Alle"
+  },
+  "tab_view_all_aria": {
+    "message": "Alle Aufgaben anzeigen"
+  },
   "tab_view_overdue": {
     "message": "Überfällig"
   },
@@ -408,7 +468,7 @@
     "message": "Backlog"
   },
   "tab_view_backlog_aria": {
-    "message": "Aufgaben ohne Fälligkeitsdatum anzeigen"
+    "message": "Aufgaben ohne Fälligkeitsdatum oder überfällig anzeigen"
   },
   "tab_view_weekly": {
     "message": "Diese Woche"
