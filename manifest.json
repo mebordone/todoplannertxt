@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "__MSG_extensionName__",
-  "version": "3.5.0",
+  "version": "3.6.1",
   "description": "__MSG_extensionDescription__",
   "default_locale": "en",
   "author": "Matias Bordone (based on original by Roy Kokkelkoren)",
@@ -9,10 +9,11 @@
     "name": "Matias Bordone",
     "url": "https://github.com/mebordone/todoplannertxt"
   },
-  "applications": {
+  "browser_specific_settings": {
     "gecko": {
-      "id": "todo.txt@xseth.nl",
-      "strict_min_version": "140.0"
+      "id": "todo.txt.planner@mebordone.com.ar",
+      "strict_min_version": "140.0",
+      "strict_max_version": "140.*"
     }
   },
   "permissions": [
@@ -22,11 +23,11 @@
   "background": {
     "scripts": [
       "lib/build-info.js",
-      "modules/todotxt.js",
       "modules/exception.js",
       "modules/logger.js",
       "modules/util.js",
       "modules/md5.js",
+      "modules/todotxt.js",
       "modules/fileUtil.js",
       "modules/todoclient.js",
       "lib/fsa.js",
@@ -48,7 +49,8 @@
   },
   "options_ui": {
     "page": "options/options.html",
-    "open_in_tab": true
+    "open_in_tab": true,
+    "browser_style": true
   },
   "icons": {
     "16": "icons/16.png",
