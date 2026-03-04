@@ -64,6 +64,16 @@ function tokenToDate(token) {
   return dt;
 }
 
+function deterministicId(line) {
+  const g = typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : {};
+  if (typeof g.md5 === "function") return g.md5(line);
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 function parseLineInternal(line, lineNumberGetter) {
   let tokens;
   const readLine = (text) => {
@@ -73,13 +83,8 @@ function parseLineInternal(line, lineNumberGetter) {
   };
 
   if (!line || reBlankLine.test(line)) return null;
+  const id = deterministicId(line);
   readLine(line);
-
-  const id = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
 
   const output = {};
   output.render = () => tokens.join(" ");
