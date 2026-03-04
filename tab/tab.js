@@ -9,7 +9,9 @@ const TAB_PREFS_KEY = "tabViewPrefs";
 const SAVE_DEBOUNCE_MS = 300;
 let savePrefsTimer = null;
 let fullItems = [];
+let collapsedGroupKeys = new Set();
 let readOnlyMode = false;
+let editModalItem = null;
 let currentViewMode = "all";
 let weeklyBacklogIds = [];
 
@@ -135,7 +137,8 @@ function getPrefsFromUI() {
     filtersBarCollapsed,
     defaultViewPreset: getElValue("default-view-preset") || "all",
     viewMode: currentViewMode,
-    weeklyBacklogIds: weeklyBacklogIds.slice()
+    weeklyBacklogIds: weeklyBacklogIds.slice(),
+    collapsedGroupKeys: Array.from(collapsedGroupKeys)
   };
 }
 
@@ -161,6 +164,7 @@ function applyPrefsToUI(prefs) {
   }
   currentViewMode = prefs.viewMode === "today" || prefs.viewMode === "backlog" || prefs.viewMode === "weekly" ? prefs.viewMode : "all";
   weeklyBacklogIds = Array.isArray(prefs.weeklyBacklogIds) ? prefs.weeklyBacklogIds.slice() : [];
+  collapsedGroupKeys = new Set(Array.isArray(prefs.collapsedGroupKeys) ? prefs.collapsedGroupKeys : []);
 }
 
 function getDefaultTabPrefs() {
@@ -168,6 +172,7 @@ function getDefaultTabPrefs() {
   if (!Object.prototype.hasOwnProperty.call(base, "defaultViewPreset")) base.defaultViewPreset = "all";
   if (!Object.prototype.hasOwnProperty.call(base, "viewMode")) base.viewMode = "all";
   if (!Object.prototype.hasOwnProperty.call(base, "weeklyBacklogIds")) base.weeklyBacklogIds = [];
+  if (!Object.prototype.hasOwnProperty.call(base, "collapsedGroupKeys")) base.collapsedGroupKeys = [];
   return base;
 }
 
@@ -221,6 +226,23 @@ function resetFiltersAndRefresh() {
   refreshView();
 }
 
+function applyAllView() {
+  const dueEl = document.getElementById("filter-due");
+  if (dueEl) dueEl.value = "";
+  const compEl = document.getElementById("filter-completion");
+  if (compEl) compEl.value = "open";
+  const sortByEl = document.getElementById("sort-by");
+  if (sortByEl) sortByEl.value = "dueDate";
+  const sortDirEl = document.getElementById("sort-dir");
+  if (sortDirEl) sortDirEl.value = "asc";
+  const searchEl = document.getElementById("search");
+  if (searchEl) searchEl.value = "";
+  currentViewMode = "all";
+  const prefs = getPrefsFromUI();
+  saveTabPrefs(prefs);
+  refreshView();
+}
+
 function applyTodayView() {
   const dueEl = document.getElementById("filter-due");
   if (dueEl) dueEl.value = "today";
@@ -238,24 +260,9 @@ function applyTodayView() {
   refreshView();
 }
 
-function applyOverdueView() {
-  const dueEl = document.getElementById("filter-due");
-  if (dueEl) dueEl.value = "overdue";
-  const compEl = document.getElementById("filter-completion");
-  if (compEl) compEl.value = "open";
-  const sortByEl = document.getElementById("sort-by");
-  if (sortByEl) sortByEl.value = "dueDate";
-  const sortDirEl = document.getElementById("sort-dir");
-  if (sortDirEl) sortDirEl.value = "asc";
-  currentViewMode = "all";
-  const prefs = getPrefsFromUI();
-  saveTabPrefs(prefs);
-  refreshView();
-}
-
 function applyBacklogView() {
   const dueEl = document.getElementById("filter-due");
-  if (dueEl) dueEl.value = "none";
+  if (dueEl) dueEl.value = "backlog";
   const compEl = document.getElementById("filter-completion");
   if (compEl) compEl.value = "open";
   const sortByEl = document.getElementById("sort-by");
@@ -324,20 +331,21 @@ function getViewCounts() {
 }
 
 function updateTodaySummary() {
-  const viewTodayEl = document.getElementById("view-today");
-  const viewOverdueEl = document.getElementById("view-overdue");
-  const viewWeeklyEl = document.getElementById("view-weekly");
+  const viewAllEl = document.getElementById("view-all");
   const viewBacklogEl = document.getElementById("view-backlog");
-  if (!viewTodayEl || !viewOverdueEl) return;
+  const viewWeeklyEl = document.getElementById("view-weekly");
+  const viewTodayEl = document.getElementById("view-today");
+  if (!viewAllEl || !viewBacklogEl) return;
   const { countToday, countOverdue, countBacklog, countWeekly } = getViewCounts();
-  const todayLabel = i18n("tab_view_today");
-  const overdueLabel = i18n("tab_view_overdue");
-  const weeklyLabel = i18n("tab_view_weekly");
+  const allLabel = i18n("tab_view_all");
   const backlogLabel = i18n("tab_view_backlog");
-  viewTodayEl.textContent = countToday > 0 ? `${todayLabel} (${countToday})` : todayLabel;
-  viewOverdueEl.textContent = countOverdue > 0 ? `${overdueLabel} (${countOverdue})` : overdueLabel;
+  const weeklyLabel = i18n("tab_view_weekly");
+  const todayLabel = i18n("tab_view_today");
+  const backlogCount = countBacklog + countOverdue;
+  if (viewAllEl) viewAllEl.textContent = allLabel;
+  if (viewBacklogEl) viewBacklogEl.textContent = backlogCount > 0 ? `${backlogLabel} (${backlogCount})` : backlogLabel;
   if (viewWeeklyEl) viewWeeklyEl.textContent = countWeekly > 0 ? `${weeklyLabel} (${countWeekly})` : weeklyLabel;
-  if (viewBacklogEl) viewBacklogEl.textContent = countBacklog > 0 ? `${backlogLabel} (${countBacklog})` : backlogLabel;
+  if (viewTodayEl) viewTodayEl.textContent = countToday > 0 ? `${todayLabel} (${countToday})` : todayLabel;
 }
 
 function getTaskRowClass(item) {
@@ -440,13 +448,26 @@ function renderTask(item) {
   return div;
 }
 
-function renderList(sortedItems, groupBy) {
+function formatGroupHeaderLabel(groupBy, groupKey) {
+  if (!groupKey) return i18n("tab_group_none");
+  if (groupBy === "dueDay" && /^\d{4}-\d{2}-\d{2}$/.test(groupKey)) {
+    const d = new Date(groupKey + "T12:00:00");
+    if (!isNaN(d.getTime())) {
+      const weekday = d.toLocaleDateString(undefined, { weekday: "long" });
+      return weekday + " " + groupKey;
+    }
+  }
+  return groupKey;
+}
+
+function renderList(sortedItems, groupBy, viewMode) {
   const listEl = document.getElementById("list");
   listEl.innerHTML = "";
   if (sortedItems.length === 0) {
     const emptyWrap = document.createElement("div");
     emptyWrap.className = "empty";
-    emptyWrap.appendChild(document.createTextNode(i18n("tab_empty_no_match")));
+    const message = viewMode === "weekly" ? i18n("tab_empty_weekly") : i18n("tab_empty_no_match");
+    emptyWrap.appendChild(document.createTextNode(message));
     const resetBtn = document.createElement("button");
     resetBtn.type = "button";
     resetBtn.textContent = i18n("tab_reset_filters");
@@ -460,12 +481,38 @@ function renderList(sortedItems, groupBy) {
   if (fs && groupBy) {
     const groups = fs.applyGroup(sortedItems, groupBy);
     groups.forEach((g) => {
-      const heading = document.createElement("div");
-      heading.className = "group-heading";
-      heading.style.cssText = "font-weight:600; margin-top:8px; margin-bottom:4px; color:#555;";
-      heading.textContent = g.groupKey || i18n("tab_group_none");
-      listEl.appendChild(heading);
-      g.items.forEach((item) => listEl.appendChild(renderTask(item)));
+      const groupKey = g.groupKey != null ? String(g.groupKey) : "";
+      const isCollapsed = collapsedGroupKeys.has(groupKey);
+      const container = document.createElement("div");
+      container.className = "group-container" + (isCollapsed ? " collapsed" : "");
+      const header = document.createElement("button");
+      header.type = "button";
+      header.className = "group-heading";
+      const headerLabel = formatGroupHeaderLabel(groupBy, groupKey);
+      header.setAttribute("aria-expanded", String(!isCollapsed));
+      header.setAttribute("aria-label", (isCollapsed ? i18n("tab_group_expand") : i18n("tab_group_collapse")) + ": " + headerLabel);
+      const arrow = document.createElement("span");
+      arrow.className = "group-arrow";
+      arrow.setAttribute("aria-hidden", "true");
+      arrow.textContent = isCollapsed ? "\u25B6" : "\u25BC";
+      const label = document.createElement("span");
+      label.className = "group-label";
+      label.textContent = headerLabel;
+      header.appendChild(arrow);
+      header.appendChild(label);
+      const itemsWrap = document.createElement("div");
+      itemsWrap.className = "group-items";
+      g.items.forEach((item) => itemsWrap.appendChild(renderTask(item)));
+      header.addEventListener("click", () => {
+        if (collapsedGroupKeys.has(groupKey)) collapsedGroupKeys.delete(groupKey);
+        else collapsedGroupKeys.add(groupKey);
+        const prefs = getPrefsFromUI();
+        saveTabPrefs(prefs);
+        refreshView();
+      });
+      container.appendChild(header);
+      container.appendChild(itemsWrap);
+      listEl.appendChild(container);
     });
   } else {
     sortedItems.forEach((item) => listEl.appendChild(renderTask(item)));
@@ -476,11 +523,16 @@ function refreshView() {
   const searchEl = document.getElementById("search");
   const searchQuery = searchEl ? searchEl.value : "";
   const prefs = getPrefsFromUI();
-  let sorted = runPipeline(fullItems, searchQuery, prefs);
-  if (prefs.viewMode === "weekly" && weeklyBacklogIds.length > 0) {
-    const idSet = new Set(weeklyBacklogIds.map((id) => String(id)));
-    sorted = sorted.filter((item) => idSet.has(String(item.id)));
-    if (fs) sorted = fs.applySort(sorted, "dueDate", "asc");
+  const effectivePrefs = prefs.viewMode === "weekly" ? { ...prefs, filterDue: "" } : prefs;
+  let sorted = runPipeline(fullItems, searchQuery, effectivePrefs);
+  if (prefs.viewMode === "weekly") {
+    if (weeklyBacklogIds.length > 0) {
+      const idSet = new Set(weeklyBacklogIds.map((id) => String(id)));
+      sorted = sorted.filter((item) => idSet.has(String(item.id)));
+      if (fs) sorted = fs.applySort(sorted, "dueDate", "asc");
+    } else {
+      sorted = [];
+    }
   }
   const countEl = document.getElementById("task-count");
   if (countEl) {
@@ -492,7 +544,7 @@ function refreshView() {
       countEl.style.display = "none";
     }
   }
-  renderList(sorted, prefs.groupBy);
+  renderList(sorted, prefs.groupBy, prefs.viewMode);
   updateTodaySummary();
 }
 
@@ -540,8 +592,8 @@ function fillPriorityDueCompletionOptions() {
     for (let p = 0; p <= 9; p++) priorityEl.appendChild(makeOpt(p, String(p)));
     if (prefs.filterPriority !== "") priorityEl.value = prefs.filterPriority;
   }
-  const dueLabels = [i18n("tab_filter_all"), i18n("tab_filter_overdue"), i18n("tab_filter_today"), i18n("tab_filter_week"), i18n("tab_filter_no_date")];
-  setSelectOptions(document.getElementById("filter-due"), ["", "overdue", "today", "week", "none"], dueLabels, prefs.filterDue);
+  const dueLabels = [i18n("tab_filter_all"), i18n("tab_filter_backlog"), i18n("tab_filter_overdue"), i18n("tab_filter_today"), i18n("tab_filter_week"), i18n("tab_filter_no_date")];
+  setSelectOptions(document.getElementById("filter-due"), ["", "backlog", "overdue", "today", "week", "none"], dueLabels, prefs.filterDue);
   const compEl = document.getElementById("filter-completion");
   if (compEl) {
     compEl.innerHTML = "";
@@ -570,6 +622,7 @@ function fillSortGroupOptions() {
     groupEl.appendChild(makeOpt("context", i18n("tab_filter_context")));
     groupEl.appendChild(makeOpt("priority", i18n("tab_filter_priority")));
     groupEl.appendChild(makeOpt("completion", i18n("tab_filter_completion")));
+    groupEl.appendChild(makeOpt("dueDay", i18n("tab_group_by_day")));
     groupEl.value = prefs.groupBy || "project";
   }
   const sortDirEl = document.getElementById("sort-dir");
@@ -588,6 +641,12 @@ function fillFilterOptions(items) {
 
 function onFilterOrSortChange() {
   currentViewMode = "all";
+  const prefs = getPrefsFromUI();
+  saveTabPrefs(prefs);
+  refreshView();
+}
+
+function onGroupOrSortOnlyChange() {
   const prefs = getPrefsFromUI();
   saveTabPrefs(prefs);
   refreshView();
@@ -708,7 +767,13 @@ async function toggleTask(item) {
     loadItems();
     return;
   }
-  loadItems();
+  const updatedItem = res && res.id != null ? res : newItem;
+  const idx = fullItems.findIndex((i) => String(i.id) === String(item.id));
+  if (idx >= 0) fullItems[idx] = updatedItem;
+  const listEl = document.getElementById("list");
+  const scrollTop = listEl ? listEl.scrollTop : 0;
+  refreshView();
+  if (listEl) listEl.scrollTop = scrollTop;
 }
 
 function startInlineEdit(taskRow, item) {
@@ -753,10 +818,156 @@ function startInlineEdit(taskRow, item) {
   input.addEventListener("blur", () => submitInlineEdit());
 }
 
+function parseCommaList(val) {
+  if (!val || typeof val !== "string") return [];
+  return val.split(",").map((s) => s.trim().replace(/^[+@]/, "")).filter(Boolean);
+}
+
+function setEditModalLabels() {
+  document.getElementById("edit-task-title").textContent = i18n("tab_edit_task");
+  document.getElementById("edit-label-title").textContent = i18n("tab_edit_label_title");
+  document.getElementById("edit-label-priority").textContent = i18n("tab_edit_label_priority");
+  document.getElementById("edit-label-due").textContent = i18n("tab_edit_label_due");
+  document.getElementById("edit-label-projects").textContent = i18n("tab_edit_label_projects");
+  document.getElementById("edit-label-contexts").textContent = i18n("tab_edit_label_contexts");
+  document.getElementById("edit-cancel").textContent = i18n("popup_edit_cancel");
+  document.getElementById("edit-save").textContent = i18n("popup_edit_save");
+}
+
+function fillPrioritySelect(prioritySelect, currentPriority) {
+  if (!prioritySelect) return;
+  prioritySelect.innerHTML = "";
+  const options = [
+    { v: 0, l: i18n("tab_edit_priority_none") },
+    { v: 1, l: "A" },
+    { v: 5, l: "B" },
+    { v: 9, l: "C" }
+  ];
+  options.forEach((o) => {
+    const opt = document.createElement("option");
+    opt.value = String(o.v);
+    opt.textContent = o.l;
+    prioritySelect.appendChild(opt);
+  });
+  prioritySelect.value = String(currentPriority != null ? currentPriority : 0);
+}
+
+function fillEditFormFromItem(item) {
+  const titleInput = document.getElementById("edit-field-title");
+  const prioritySelect = document.getElementById("edit-field-priority");
+  const dueInput = document.getElementById("edit-field-due");
+  const projectsInput = document.getElementById("edit-field-projects");
+  const contextsInput = document.getElementById("edit-field-contexts");
+  if (titleInput) titleInput.value = item.title || "";
+  fillPrioritySelect(prioritySelect, item.priority);
+  if (dueInput) dueInput.value = item.dueDate ? String(item.dueDate).slice(0, 10) : "";
+  if (projectsInput) projectsInput.value = (item.categories || []).join(", ");
+  const loc = item.location;
+  if (contextsInput) contextsInput.value = Array.isArray(loc) ? loc.join(", ") : (loc ? String(loc) : "");
+}
+
+function openEditModal(item) {
+  if (readOnlyMode || !item) return;
+  editModalItem = item;
+  const overlay = document.getElementById("edit-task-overlay");
+  if (!overlay || !document.getElementById("edit-field-title")) return;
+  setEditModalLabels();
+  fillEditFormFromItem(item);
+  overlay.style.display = "flex";
+  document.getElementById("edit-field-title").focus();
+}
+
+function closeEditModal() {
+  editModalItem = null;
+  const overlay = document.getElementById("edit-task-overlay");
+  if (overlay) overlay.style.display = "none";
+}
+
+function setAddModalLabels() {
+  document.getElementById("add-task-title").textContent = i18n("tab_add_task_title");
+  document.getElementById("add-label-title").textContent = i18n("tab_edit_label_title");
+  document.getElementById("add-label-priority").textContent = i18n("tab_edit_label_priority");
+  document.getElementById("add-label-due").textContent = i18n("tab_edit_label_due");
+  document.getElementById("add-label-projects").textContent = i18n("tab_edit_label_projects");
+  document.getElementById("add-label-contexts").textContent = i18n("tab_edit_label_contexts");
+  document.getElementById("add-cancel").textContent = i18n("popup_edit_cancel");
+  document.getElementById("add-save").textContent = i18n("tab_add_save");
+  const tipEl = document.getElementById("add-form-tip");
+  if (tipEl) tipEl.textContent = i18n("tab_add_form_tip");
+}
+
+function fillAddFormEmpty() {
+  const titleInput = document.getElementById("add-field-title");
+  const prioritySelect = document.getElementById("add-field-priority");
+  const dueInput = document.getElementById("add-field-due");
+  const projectsInput = document.getElementById("add-field-projects");
+  const contextsInput = document.getElementById("add-field-contexts");
+  if (titleInput) titleInput.value = "";
+  fillPrioritySelect(prioritySelect, 0);
+  if (dueInput) dueInput.value = "";
+  if (projectsInput) projectsInput.value = "";
+  if (contextsInput) contextsInput.value = "";
+}
+
+function openAddModal() {
+  if (readOnlyMode) return;
+  const overlay = document.getElementById("add-task-overlay");
+  if (!overlay || !document.getElementById("add-field-title")) return;
+  setAddModalLabels();
+  fillAddFormEmpty();
+  overlay.style.display = "flex";
+  document.getElementById("add-field-title").focus();
+}
+
+function closeAddModal() {
+  const overlay = document.getElementById("add-task-overlay");
+  if (overlay) overlay.style.display = "none";
+}
+
+function getAddFormValues() {
+  const titleInput = document.getElementById("add-field-title");
+  const prioritySelect = document.getElementById("add-field-priority");
+  const dueInput = document.getElementById("add-field-due");
+  const projectsInput = document.getElementById("add-field-projects");
+  const contextsInput = document.getElementById("add-field-contexts");
+  const title = (titleInput && titleInput.value || "").trim();
+  const priority = prioritySelect ? parseInt(prioritySelect.value, 10) : 0;
+  const dueVal = dueInput && dueInput.value ? dueInput.value : null;
+  const categories = parseCommaList(projectsInput ? projectsInput.value : "");
+  const location = parseCommaList(contextsInput ? contextsInput.value : "");
+  return { title, priority, dueVal, categories, location };
+}
+
+function buildPlainItemFromAddForm(formValues) {
+  return {
+    title: formValues.title,
+    priority: isNaN(formValues.priority) ? 0 : formValues.priority,
+    dueDate: formValues.dueVal,
+    categories: formValues.categories,
+    location: formValues.location,
+    isCompleted: false
+  };
+}
+
+async function handleAddFormSubmit(e) {
+  e.preventDefault();
+  const formValues = getAddFormValues();
+  if (!formValues.title) return;
+  const plainItem = buildPlainItemFromAddForm(formValues);
+  const res = await api.runtime.sendMessage({ command: "addItem", item: plainItem });
+  if (res && res.error) {
+    showError(res.error);
+    return;
+  }
+  if (res && res.id != null) fullItems.push(res);
+  closeAddModal();
+  refreshView();
+  showAddFeedback();
+}
+
 function editTask(item) {
   if (readOnlyMode) return;
-  const taskRow = Array.from(document.querySelectorAll(".task")).find((el) => el.dataset.id === String(item.id));
-  if (taskRow) startInlineEdit(taskRow, item);
+  openEditModal(item);
 }
 
 function showAddFeedback() {
@@ -788,15 +999,84 @@ function addTask() {
 
 document.getElementById("refresh").addEventListener("click", () => loadItems());
 document.getElementById("add-task").addEventListener("click", addTask);
+
+const addFormBtn = document.getElementById("add-task-form-btn");
+if (addFormBtn) addFormBtn.addEventListener("click", openAddModal);
+
+const addTaskOverlay = document.getElementById("add-task-overlay");
+if (addTaskOverlay) {
+  addTaskOverlay.addEventListener("click", (e) => { if (e.target === addTaskOverlay) closeAddModal(); });
+}
+const addCancelBtn = document.getElementById("add-cancel");
+if (addCancelBtn) addCancelBtn.addEventListener("click", closeAddModal);
+const addTaskForm = document.getElementById("add-task-form");
+if (addTaskForm) addTaskForm.addEventListener("submit", handleAddFormSubmit);
+
+const editOverlay = document.getElementById("edit-task-overlay");
+if (editOverlay) {
+  editOverlay.addEventListener("click", (e) => { if (e.target === editOverlay) closeEditModal(); });
+}
+const editCancelBtn = document.getElementById("edit-cancel");
+if (editCancelBtn) editCancelBtn.addEventListener("click", closeEditModal);
+function getEditFormValues(item) {
+  const titleInput = document.getElementById("edit-field-title");
+  const prioritySelect = document.getElementById("edit-field-priority");
+  const dueInput = document.getElementById("edit-field-due");
+  const projectsInput = document.getElementById("edit-field-projects");
+  const contextsInput = document.getElementById("edit-field-contexts");
+  const title = (titleInput && titleInput.value || "").trim() || (item.title || "");
+  const priority = prioritySelect ? parseInt(prioritySelect.value, 10) : 0;
+  const dueVal = dueInput && dueInput.value ? dueInput.value : null;
+  const categories = parseCommaList(projectsInput ? projectsInput.value : "");
+  const location = parseCommaList(contextsInput ? contextsInput.value : "");
+  return { title, priority, dueVal, categories, location };
+}
+
+function buildNewItemFromEditForm(item, formValues) {
+  return {
+    id: item.id,
+    title: formValues.title,
+    priority: isNaN(formValues.priority) ? 0 : formValues.priority,
+    dueDate: formValues.dueVal,
+    categories: formValues.categories,
+    location: formValues.location,
+    isCompleted: item.isCompleted
+  };
+}
+
+async function handleEditFormSubmit(e) {
+  e.preventDefault();
+  const item = editModalItem;
+  if (!item) return closeEditModal();
+  const formValues = getEditFormValues(item);
+  const newItem = buildNewItemFromEditForm(item, formValues);
+  const res = await api.runtime.sendMessage({ command: "modifyItem", oldItem: item, newItem });
+  if (res && res.error) {
+    showError(res.error);
+    return;
+  }
+  const updatedItem = res && res.id != null ? res : newItem;
+  const idx = fullItems.findIndex((i) => String(i.id) === String(item.id));
+  if (idx >= 0) fullItems[idx] = updatedItem;
+  closeEditModal();
+  refreshView();
+}
+
+const editForm = document.getElementById("edit-task-form");
+if (editForm) editForm.addEventListener("submit", handleEditFormSubmit);
 document.getElementById("new-task").addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
     addTask();
   }
 });
-["search", "filter-project", "filter-context", "filter-priority", "filter-due", "filter-completion", "sort-by", "sort-dir", "group-by"].forEach((id) => {
+["search", "filter-project", "filter-context", "filter-priority", "filter-due", "filter-completion"].forEach((id) => {
   const el = document.getElementById(id);
   if (el) el.addEventListener("change", onFilterOrSortChange);
+});
+["sort-by", "sort-dir", "group-by"].forEach((id) => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener("change", onGroupOrSortOnlyChange);
 });
 const searchEl = document.getElementById("search");
 if (searchEl) searchEl.addEventListener("input", onFilterOrSortChange);
@@ -814,14 +1094,14 @@ document.getElementById("open-options").addEventListener("click", (e) => {
   }
 });
 
-const viewTodayEl = document.getElementById("view-today");
-if (viewTodayEl) viewTodayEl.addEventListener("click", () => applyTodayView());
-const viewOverdueEl = document.getElementById("view-overdue");
-if (viewOverdueEl) viewOverdueEl.addEventListener("click", () => applyOverdueView());
+const viewAllEl = document.getElementById("view-all");
+if (viewAllEl) viewAllEl.addEventListener("click", () => applyAllView());
 const viewBacklogEl = document.getElementById("view-backlog");
 if (viewBacklogEl) viewBacklogEl.addEventListener("click", () => applyBacklogView());
 const viewWeeklyEl = document.getElementById("view-weekly");
 if (viewWeeklyEl) viewWeeklyEl.addEventListener("click", () => applyWeeklyView());
+const viewTodayEl = document.getElementById("view-today");
+if (viewTodayEl) viewTodayEl.addEventListener("click", () => applyTodayView());
 
 const filtersHeader = document.getElementById("filters-bar-header");
 if (filtersHeader) {
@@ -842,17 +1122,12 @@ if (filtersHeader) {
 document.getElementById("reset-filters-btn")?.addEventListener("click", resetFiltersAndRefresh);
 
 function setTabViewButtonsI18n() {
-  const viewTodayEl = document.getElementById("view-today");
-  if (viewTodayEl) {
-    const todayAria = i18n("tab_view_today_aria");
-    viewTodayEl.setAttribute("aria-label", todayAria);
-    viewTodayEl.title = todayAria;
-  }
-  const viewOverdueEl = document.getElementById("view-overdue");
-  if (viewOverdueEl) {
-    const overdueAria = i18n("tab_view_overdue_aria");
-    viewOverdueEl.setAttribute("aria-label", overdueAria);
-    viewOverdueEl.title = overdueAria;
+  const viewAllEl = document.getElementById("view-all");
+  if (viewAllEl) {
+    viewAllEl.textContent = i18n("tab_view_all");
+    const allAria = i18n("tab_view_all_aria");
+    viewAllEl.setAttribute("aria-label", allAria);
+    viewAllEl.title = allAria;
   }
   const viewBacklogEl = document.getElementById("view-backlog");
   if (viewBacklogEl) {
@@ -867,6 +1142,13 @@ function setTabViewButtonsI18n() {
     const weeklyAria = i18n("tab_view_weekly_aria");
     viewWeeklyEl.setAttribute("aria-label", weeklyAria);
     viewWeeklyEl.title = weeklyAria;
+  }
+  const viewTodayEl = document.getElementById("view-today");
+  if (viewTodayEl) {
+    viewTodayEl.textContent = i18n("tab_view_today");
+    const todayAria = i18n("tab_view_today_aria");
+    viewTodayEl.setAttribute("aria-label", todayAria);
+    viewTodayEl.title = todayAria;
   }
 }
 
@@ -886,6 +1168,13 @@ function setToolbarI18n() {
     const addAria = i18n("tab_add_aria");
     addEl.setAttribute("aria-label", addAria);
     addEl.title = addAria;
+  }
+  const addFormBtnEl = document.getElementById("add-task-form-btn");
+  if (addFormBtnEl) {
+    addFormBtnEl.textContent = i18n("tab_add_with_form");
+    const addFormAria = i18n("tab_add_with_form_aria");
+    addFormBtnEl.setAttribute("aria-label", addFormAria);
+    addFormBtnEl.title = addFormAria;
   }
   const toolbarResetEl = document.getElementById("toolbar-reset-filters");
   if (toolbarResetEl) {

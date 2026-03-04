@@ -63,6 +63,18 @@
     .syntax-more-link { font-size: 11px; }
     .task-week-btn { color: #666; border: 1px solid #ddd; background: transparent; border-radius: 3px; cursor: pointer; }
     .task-week-btn:hover { background: #f0f0f0; color: #333; }
+    .group-container { margin-top: 8px; }
+    .group-container .group-heading { display: flex; align-items: center; gap: 6px; width: 100%; padding: 6px 8px; margin: 0 0 4px; font-weight: 600; font-size: 13px; color: #555; background: #f5f5f5; border: none; border-radius: 4px; cursor: pointer; text-align: left; }
+    .group-container .group-heading:hover { background: #eee; }
+    .group-arrow { font-size: 10px; flex-shrink: 0; }
+    .group-container.collapsed .group-items { display: none; }
+    .edit-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .edit-modal { background: #fff; border-radius: 8px; padding: 1.25rem; min-width: 320px; max-width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+    .edit-modal-title { margin: 0 0 1rem; font-size: 1.1rem; }
+    .edit-label { display: block; margin-bottom: 0.75rem; }
+    .edit-label > span { display: block; font-size: 11px; color: #666; margin-bottom: 2px; }
+    .edit-label input, .edit-label select { width: 100%; padding: 6px 8px; font-size: 13px; box-sizing: border-box; }
+    .edit-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem; }
   </style>
 </head>
 <body>
@@ -70,12 +82,13 @@
     <div class="toolbar">
       <input type="text" id="new-task" placeholder="New task…" style="flex:1; min-width: 200px; padding: 6px 8px; font-size: 13px;">
       <button type="button" id="add-task" class="btn-primary" aria-label="Add task">Add</button>
+      <button type="button" id="add-task-form-btn" class="toolbar-link" aria-label="Add task with form">Add with form</button>
       <span id="add-feedback" class="toolbar-hint" style="display:none;" aria-live="polite"></span>
       <div class="toolbar-secondary">
-        <button type="button" id="view-today" class="toolbar-link" aria-label="View today">Today</button>
-        <button type="button" id="view-overdue" class="toolbar-link" aria-label="View overdue">Overdue</button>
-        <button type="button" id="view-weekly" class="toolbar-link" aria-label="View weekly">This week</button>
+        <button type="button" id="view-all" class="toolbar-link" aria-label="View all">All</button>
         <button type="button" id="view-backlog" class="toolbar-link" aria-label="View backlog">Backlog</button>
+        <button type="button" id="view-weekly" class="toolbar-link" aria-label="View weekly">This week</button>
+        <button type="button" id="view-today" class="toolbar-link" aria-label="View today">Today</button>
         <button type="button" id="toolbar-reset-filters" class="toolbar-link" aria-label="Reset filters">Reset filters</button>
         <button type="button" id="refresh" aria-label="Refresh task list">Refresh</button>
         <a href="#" id="open-options" class="toolbar-link">Options</a>
@@ -127,6 +140,39 @@
     <div id="task-count" class="toolbar-hint" style="display:none; padding: 4px 0;"></div>
     <div id="list" class="list" role="list" aria-label="Task list">
       <div class="empty">Loading…</div>
+    </div>
+    <div id="edit-task-overlay" class="edit-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="edit-task-title">
+      <div class="edit-modal">
+        <h2 id="edit-task-title" class="edit-modal-title"></h2>
+        <form id="edit-task-form">
+          <label class="edit-label"><span id="edit-label-title"></span><input type="text" id="edit-field-title" required></label>
+          <label class="edit-label"><span id="edit-label-priority"></span><select id="edit-field-priority"></select></label>
+          <label class="edit-label"><span id="edit-label-due"></span><input type="date" id="edit-field-due"></label>
+          <label class="edit-label"><span id="edit-label-projects"></span><input type="text" id="edit-field-projects" placeholder="+project1, +project2"></label>
+          <label class="edit-label"><span id="edit-label-contexts"></span><input type="text" id="edit-field-contexts" placeholder="@work, @home"></label>
+          <div class="edit-actions">
+            <button type="button" id="edit-cancel" class="toolbar-link"></button>
+            <button type="submit" id="edit-save" class="btn-primary"></button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div id="add-task-overlay" class="edit-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="add-task-title">
+      <div class="edit-modal">
+        <h2 id="add-task-title" class="edit-modal-title"></h2>
+        <form id="add-task-form">
+          <label class="edit-label"><span id="add-label-title"></span><input type="text" id="add-field-title" required></label>
+          <label class="edit-label"><span id="add-label-priority"></span><select id="add-field-priority"></select></label>
+          <label class="edit-label"><span id="add-label-due"></span><input type="date" id="add-field-due"></label>
+          <label class="edit-label"><span id="add-label-projects"></span><input type="text" id="add-field-projects" placeholder="+project1, +project2"></label>
+          <label class="edit-label"><span id="add-label-contexts"></span><input type="text" id="add-field-contexts" placeholder="@work, @home"></label>
+          <p id="add-form-tip" class="edit-tip" style="font-size:11px; color:#666; margin:0.75rem 0 0;"></p>
+          <div class="edit-actions">
+            <button type="button" id="add-cancel" class="toolbar-link"></button>
+            <button type="submit" id="add-save" class="btn-primary"></button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
   <script src="../lib/i18nHelper.js"></script>
