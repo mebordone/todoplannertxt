@@ -37,6 +37,14 @@ function applySearch(items, query) {
   return items.filter((item) => itemSearchText(item).includes(lower));
 }
 
+function getTodayLocal() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 function isBacklogDue(due, today) {
   return !due || due < today;
 }
@@ -44,7 +52,7 @@ function isBacklogDue(due, today) {
 function matchesFilterDue(item, filterDue) {
   if (!filterDue) return true;
   const due = item.dueDate ? String(item.dueDate).slice(0, 10) : null;
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getTodayLocal();
   if (filterDue === "backlog") return isBacklogDue(due, today);
   if (filterDue === "none") return !due;
   if (!due) return false;
@@ -53,7 +61,10 @@ function matchesFilterDue(item, filterDue) {
   if (filterDue === "week") {
     const end = new Date();
     end.setDate(end.getDate() + 7);
-    const weekEnd = end.toISOString().slice(0, 10);
+    const y2 = end.getFullYear();
+    const m2 = String(end.getMonth() + 1).padStart(2, "0");
+    const d2 = String(end.getDate()).padStart(2, "0");
+    const weekEnd = `${y2}-${m2}-${d2}`;
     return due >= today && due <= weekEnd;
   }
   return true;
