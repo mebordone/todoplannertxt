@@ -25,6 +25,7 @@ let readOnlyMode = false;
 let editModalItem = null;
 let currentViewMode = "all";
 let weeklyBacklogIds = [];
+let mainPrefsCache = { weekStart: "monday" };
 
 function i18n(id, subs) {
   try {
@@ -139,7 +140,7 @@ function getPrefsFromUI() {
   return {
     sortBy: getElValue("sort-by") || "entryDate",
     sortDir: getElValue("sort-dir") || "asc",
-    groupBy: getElValue("group-by") || "project",
+    groupBy: (() => { const v = getElValue("group-by"); return v !== undefined && v !== null ? v : "project"; })(),
     filterProject: getElValue("filter-project") || "",
     filterContext: getElValue("filter-context") || "",
     filterPriority: getFilterPriorityFromUI(),
@@ -195,7 +196,7 @@ function normalizeFilterCompleted(prefs) {
 
 function migrateGroupByByView(merged) {
   if (merged.groupByByView && typeof merged.groupByByView === "object") return;
-  const legacy = merged.groupBy || "project";
+  const legacy = (merged.groupBy !== undefined && merged.groupBy !== null) ? merged.groupBy : "project";
   merged.groupByByView = {
     all: legacy,
     backlog: legacy,
@@ -231,7 +232,7 @@ function saveTabPrefs(prefs) {
         ? { ...getDefaultGroupByByView(), ...stored.groupByByView }
         : getDefaultGroupByByView();
       const viewMode = prefs.viewMode === "today" || prefs.viewMode === "backlog" || prefs.viewMode === "weekly" ? prefs.viewMode : "all";
-      groupByByView[viewMode] = prefs.groupBy || "project";
+      groupByByView[viewMode] = (prefs.groupBy !== undefined && prefs.groupBy !== null) ? prefs.groupBy : "project";
       await api.storage.local.set({ [TAB_PREFS_KEY]: { ...prefs, groupByByView } });
     })().catch(() => {});
   }, SAVE_DEBOUNCE_MS);
@@ -258,7 +259,7 @@ function resetFiltersAndRefresh() {
 async function applyAllView() {
   const prefs = await loadTabPrefs();
   const groupEl = document.getElementById("group-by");
-  if (groupEl) groupEl.value = (prefs.groupByByView && prefs.groupByByView.all) || "project";
+  if (groupEl) groupEl.value = (prefs.groupByByView && prefs.groupByByView.all !== undefined) ? prefs.groupByByView.all : "project";
   const dueEl = document.getElementById("filter-due");
   if (dueEl) dueEl.value = "";
   const compEl = document.getElementById("filter-completion");
@@ -277,7 +278,7 @@ async function applyAllView() {
 async function applyTodayView() {
   const prefs = await loadTabPrefs();
   const groupEl = document.getElementById("group-by");
-  if (groupEl) groupEl.value = (prefs.groupByByView && prefs.groupByByView.today) || "project";
+  if (groupEl) groupEl.value = (prefs.groupByByView && prefs.groupByByView.today !== undefined) ? prefs.groupByByView.today : "project";
   const dueEl = document.getElementById("filter-due");
   if (dueEl) dueEl.value = "today";
   const compEl = document.getElementById("filter-completion");
@@ -296,7 +297,7 @@ async function applyTodayView() {
 async function applyBacklogView() {
   const prefs = await loadTabPrefs();
   const groupEl = document.getElementById("group-by");
-  if (groupEl) groupEl.value = (prefs.groupByByView && prefs.groupByByView.backlog) || "project";
+  if (groupEl) groupEl.value = (prefs.groupByByView && prefs.groupByByView.backlog !== undefined) ? prefs.groupByByView.backlog : "project";
   const dueEl = document.getElementById("filter-due");
   if (dueEl) dueEl.value = "backlog";
   const compEl = document.getElementById("filter-completion");
@@ -315,7 +316,7 @@ async function applyBacklogView() {
 async function applyWeeklyView() {
   const prefs = await loadTabPrefs();
   const groupEl = document.getElementById("group-by");
-  if (groupEl) groupEl.value = (prefs.groupByByView && prefs.groupByByView.weekly) || "dueDay";
+  if (groupEl) groupEl.value = (prefs.groupByByView && prefs.groupByByView.weekly !== undefined) ? prefs.groupByByView.weekly : "dueDay";
   currentViewMode = "weekly";
   saveTabPrefs(getPrefsFromUI());
   refreshView();
@@ -333,6 +334,23 @@ function getTodayString() {
   const m = String(now.getMonth() + 1).padStart(2, "0");
   const d = String(now.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
+}
+
+const wr = (typeof globalThis !== "undefined" && globalThis.weekRange) || {};
+const getWeekRange = wr.getWeekRange || ((_, todayStr) => ({ start: todayStr, end: todayStr }));
+const isDueInWeekRange = wr.isDueInWeekRange || (() => false);
+
+function getWeeklyUnionCount(base) {
+  if (!base || base.length === 0) return Array.isArray(weeklyBacklogIds) ? weeklyBacklogIds.length : 0;
+  const weekStart = (mainPrefsCache && mainPrefsCache.weekStart === "sunday") ? "sunday" : "monday";
+  const todayStr = getTodayString();
+  const range = getWeekRange(weekStart, todayStr);
+  const weekIdSet = new Set((weeklyBacklogIds || []).map((id) => String(id)));
+  base.forEach((item) => {
+    const dueStr = item.dueDate ? String(item.dueDate).slice(0, 10) : null;
+    if (isDueInWeekRange(dueStr, range.start, range.end)) weekIdSet.add(String(item.id));
+  });
+  return weekIdSet.size;
 }
 
 function getSummaryBaseItems() {
@@ -363,7 +381,7 @@ function getViewCounts() {
       else if (dueStr < todayStr) countOverdue++;
     });
   }
-  const countWeekly = Array.isArray(weeklyBacklogIds) ? weeklyBacklogIds.length : 0;
+  const countWeekly = getWeeklyUnionCount(base);
   return { countToday, countOverdue, countBacklog, countWeekly };
 }
 
@@ -564,13 +582,16 @@ function refreshView() {
   const effectivePrefs = prefs.viewMode === "weekly" ? { ...prefs, filterDue: "" } : prefs;
   let sorted = runPipeline(fullItems, searchQuery, effectivePrefs);
   if (prefs.viewMode === "weekly") {
-    if (weeklyBacklogIds.length > 0) {
-      const idSet = new Set(weeklyBacklogIds.map((id) => String(id)));
-      sorted = sorted.filter((item) => idSet.has(String(item.id)));
-      if (fs) sorted = fs.applySort(sorted, "dueDate", "asc");
-    } else {
-      sorted = [];
-    }
+    const weekStart = (mainPrefsCache && mainPrefsCache.weekStart === "sunday") ? "sunday" : "monday";
+    const todayStr = getTodayString();
+    const range = getWeekRange(weekStart, todayStr);
+    const idSet = new Set((weeklyBacklogIds || []).map((id) => String(id)));
+    sorted.forEach((item) => {
+      const dueStr = item.dueDate ? String(item.dueDate).slice(0, 10) : null;
+      if (isDueInWeekRange(dueStr, range.start, range.end)) idSet.add(String(item.id));
+    });
+    sorted = sorted.filter((item) => idSet.has(String(item.id)));
+    if (fs) sorted = fs.applySort(sorted, "dueDate", "asc");
   }
   const countEl = document.getElementById("task-count");
   if (countEl) {
@@ -661,7 +682,7 @@ function fillSortGroupOptions() {
     groupEl.appendChild(makeOpt("priority", i18n("tab_filter_priority")));
     groupEl.appendChild(makeOpt("completion", i18n("tab_filter_completion")));
     groupEl.appendChild(makeOpt("dueDay", i18n("tab_group_by_day")));
-    groupEl.value = prefs.groupBy || "project";
+    groupEl.value = (prefs.groupBy !== undefined && prefs.groupBy !== null) ? prefs.groupBy : "project";
   }
   const sortDirEl = document.getElementById("sort-dir");
   if (sortDirEl && sortDirEl.options.length >= 2) {
@@ -767,6 +788,7 @@ async function loadItems() {
     }
     fullItems = (res && res.items) || [];
     const prefsRes = await api.runtime.sendMessage({ command: "getPrefs" });
+    mainPrefsCache = prefsRes || {};
     readOnlyMode = (prefsRes && prefsRes.readOnly) === true;
     listEl.innerHTML = "";
     if (fullItems.length === 0) {
@@ -1016,9 +1038,18 @@ function addTask() {
   const raw = input.value;
   const title = raw && raw.trim();
   if (!title) return;
-  api.runtime.sendMessage({ command: "addItem", item: { title, isCompleted: false } }).then((res) => {
+  const hasExplicitDue = /due:\s*\S+/.test(raw);
+  const item = { title, isCompleted: false };
+  if (currentViewMode === "today" && !hasExplicitDue) {
+    item.dueDate = getTodayString();
+  }
+  api.runtime.sendMessage({ command: "addItem", item }).then((res) => {
     if (res && res.error) showError(res.error);
     else {
+      if (currentViewMode === "weekly" && !hasExplicitDue && res && res.id != null) {
+        weeklyBacklogIds.push(String(res.id));
+        saveTabPrefs(getPrefsFromUI());
+      }
       input.value = "";
       showAddFeedback();
       loadItems();

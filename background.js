@@ -16,6 +16,7 @@ const DEFAULT_PREFS = {
   readOnly: false,
   displayLanguage: "browser",
   defaultViewPreset: "all",
+  weekStart: "monday",
   calendarIntegrationEnabled: false,
   calendarId: null,
   calendarSyncAuto: true

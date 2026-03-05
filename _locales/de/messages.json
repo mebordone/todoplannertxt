@@ -320,6 +320,15 @@
   "options_default_view_tooltip": {
     "message": "Mit welcher Ansicht die vollständige Aufgabenliste beim Öffnen startet: Alle, Heute, Ungeplant (ohne Datum oder überfällig) oder Diese Woche."
   },
+  "options_week_start_label": {
+    "message": "Woche beginnt am"
+  },
+  "options_week_start_monday": {
+    "message": "Montag"
+  },
+  "options_week_start_sunday": {
+    "message": "Sonntag"
+  },
   "tab_refresh": {
     "message": "Aktualisieren"
   },

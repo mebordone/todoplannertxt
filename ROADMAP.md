@@ -7,7 +7,7 @@ This document outlines planned and potential future work for the Todo.txt MailEx
 ## 1. Recommended order of implementation (future work only)
 
 Implemented milestones and details have been moved to `CHANGELOG.md`.  
-Versión actual publicada: **3.6.2** (adecuación para publicación + mejoras de UX en tab). La tabla asigna **fases próximas** a **versiones 3.6, 3.7, 3.8**, según la visión de producto (planner centrado en UX, 70% UX / 30% features, week planner después).
+Versión actual publicada: **3.6.3** (adecuación para publicación + mejoras de UX en tab). La tabla asigna **fases próximas** a **versiones 3.6, 3.7, 3.8**, según la visión de producto (planner centrado en UX, 70% UX / 30% features, week planner después).
 
 | Version | Phase | Focus | Status |
 |---------|--------|--------|--------|
@@ -174,11 +174,12 @@ Ver `CHANGELOG.md` (Phase 0b). Se mantiene aquí como referencia opcional.
 
 ## Summary
 
-- **Versión actual publicada:** 3.6.2. Lo implementado hasta 3.5 está en `CHANGELOG.md`; adecuación 3.6, mejoras 3.6.1 y pulido 3.6.2 en este release.
+- **Versión actual publicada:** 3.6.3. Lo implementado hasta 3.5 está en `CHANGELOG.md`; adecuación 3.6, mejoras 3.6.1, pulido 3.6.2 y 3.6.3 en este release.
 - **Roadmap por versión:**
   - **3.5 (Phase 8):** ✅ Implementado — UX polish y bases del daily planner (vista "Hoy", backlog sin fecha/semanal ligero, quick wins visuales).
   - **3.6:** ✅ Implementado — Adecuación para primera publicación en addons.thunderbird.net.
   - **3.6.1:** ✅ Implementado — Mejoras tab: toolbar (Todas/Sin planificar/Esta semana/Hoy), agrupar por día, grupos plegables, edición completa por modal, "Añadir con formulario", completar sin recarga, id determinista (MD5), vista semana vacía, conservar vista al cambiar agrupación/orden. Ver `CHANGELOG.md`.
   - **3.6.2:** ✅ Implementado — Pulido: descripción corta en Detalles (sin HTML), tooltip del icono localizado, docs y fallback del botón Sin planificar. Ver `CHANGELOG.md`.
+  - **3.6.3:** ✅ Implementado — Añadir según vista (Hoy → due hoy, Esta semana → flag semanal), opción inicio de semana (Lunes/Domingo), vista Esta semana = flag + due en semana, toolbar fija, fix weekRange IIFE, fix Agrupar por Ninguno. Ver `CHANGELOG.md`.
   - **3.7 (Phase 9):** Ampliaciones del formulario de tarea (recurrence, threshold, etc.).
   - **3.8 (Phase 10):** Week planner y Calendar Phase 2 (backlog → semana → día/hora, eventos de calendario visibles, drag & drop).

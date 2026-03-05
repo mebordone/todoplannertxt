@@ -320,6 +320,15 @@
   "options_default_view_tooltip": {
     "message": "Con qué vista se abre la lista completa de tareas al abrirla: Todas, Hoy, Sin planificar (sin fecha o vencidas) o Esta semana."
   },
+  "options_week_start_label": {
+    "message": "La semana empieza el"
+  },
+  "options_week_start_monday": {
+    "message": "Lunes"
+  },
+  "options_week_start_sunday": {
+    "message": "Domingo"
+  },
   "tab_refresh": {
     "message": "Actualizar"
   },

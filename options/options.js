@@ -70,6 +70,8 @@ function applyBasicPrefsToUI(prefs) {
     displayLangEl.value = (lang === "en" || lang === "es" || lang === "de" || lang === "fr") ? lang : "browser";
   }
   applyDefaultViewPresetToUI(prefs);
+  const weekStartEl = document.getElementById("week-start");
+  if (weekStartEl) weekStartEl.value = (prefs.weekStart === "sunday") ? "sunday" : "monday";
   document.getElementById("calendar-enabled").checked = prefs.calendarIntegrationEnabled === true;
   document.getElementById("calendar-sync-auto").checked = prefs.calendarSyncAuto !== false;
 }
@@ -304,6 +306,8 @@ function bindOptionListeners() {
   if (displayLangEl) displayLangEl.addEventListener("change", (e) => savePrefs({ displayLanguage: e.target.value || "browser" }));
   const defViewEl = document.getElementById("default-view-preset");
   if (defViewEl) defViewEl.addEventListener("change", (e) => savePrefs({ defaultViewPreset: e.target.value || "all" }));
+  const weekStartEl = document.getElementById("week-start");
+  if (weekStartEl) weekStartEl.addEventListener("change", (e) => savePrefs({ weekStart: e.target.value || "monday" }));
   bindCalendarListeners();
 }
 

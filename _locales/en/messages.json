@@ -320,6 +320,15 @@
   "options_default_view_tooltip": {
     "message": "Which view the full task list opens with when you open it: All tasks, Today, Unplanned (no date or overdue), or This week."
   },
+  "options_week_start_label": {
+    "message": "Week starts on"
+  },
+  "options_week_start_monday": {
+    "message": "Monday"
+  },
+  "options_week_start_sunday": {
+    "message": "Sunday"
+  },
   "tab_refresh": {
     "message": "Refresh"
   },

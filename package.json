@@ -1,6 +1,6 @@
 {
   "name": "todotxt-webext",
-  "version": "3.6.2",
+  "version": "3.6.3",
   "description": "Todo.txt Thunderbird MailExtension - tests and quality",
   "author": "Matias Bordone (based on original by Roy Kokkelkoren)",
   "private": true,

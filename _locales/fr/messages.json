@@ -320,6 +320,15 @@
   "options_default_view_tooltip": {
     "message": "Avec quelle vue s'ouvre la liste complète des tâches à l'ouverture : Toutes, Aujourd'hui, Non planifié (sans date ou en retard) ou Cette semaine."
   },
+  "options_week_start_label": {
+    "message": "La semaine commence le"
+  },
+  "options_week_start_monday": {
+    "message": "Lundi"
+  },
+  "options_week_start_sunday": {
+    "message": "Dimanche"
+  },
   "tab_refresh": {
     "message": "Actualiser"
   },

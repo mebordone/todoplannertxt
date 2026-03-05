@@ -54,7 +54,7 @@ Los builds se generan en la carpeta `dist/`. Desde la raíz del proyecto:
 ./build.sh
 ```
 
-El archivo `.xpi` quedará en `dist/` (p. ej. `dist/todotxt_3.6.2_20260304_123456.xpi`). Opción `-d` para build con logs de depuración; `-h` para ayuda.
+El archivo `.xpi` quedará en `dist/` (p. ej. `dist/todotxt_3.6.3_20260304_123456.xpi`). Opción `-d` para build con logs de depuración; `-h` para ayuda.
 
 ## Depuración remota
 

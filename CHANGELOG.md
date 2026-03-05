@@ -56,6 +56,24 @@ The roadmap now focuses only on **upcoming / planned work**.
 
 ---
 
+## Version 3.6.3 – Add-by-view, week range, fixes
+
+**Goal:** Context-aware quick add (Hoy / Esta semana), configurable week start, vista semanal unificada, and stability fixes.
+
+**Implemented:**
+
+- **Add task in view "Hoy":** When using the quick-add field ("Añadir") in the "Hoy" view, the new task gets `due` set to today if the text does not contain an explicit `due:`.
+- **Add task in view "Esta semana":** When using quick-add in the "Esta semana" view, the new task is created without due and is added to the weekly list (flag "En la semana") so it appears in that view.
+- **Options – Week starts on:** New preference "La semana empieza el" with **Lunes** (default) or **Domingo**. Used for the "Esta semana" view range and for counting tasks in that view. i18n in en, es, de, fr.
+- **Vista "Esta semana" – union:** The "Esta semana" view now shows the union of (1) tasks marked "En la semana" and (2) tasks with `due` within the current week (range from Options week start). Counter on the button reflects this union.
+- **lib/weekRange.js:** Pure helpers `getWeekRange(weekStart, todayStr)` and `isDueInWeekRange(dueStr, start, end)`; tab loads it and uses `globalThis.weekRange`. Unit tests in `test/unit/weekRange.test.js`.
+- **Sticky toolbar:** The main tab toolbar (new task + view buttons) uses `position: sticky` so it stays visible while scrolling the task list.
+- **Fix – weekRange redeclaration:** `lib/weekRange.js` wrapped in an IIFE so function names do not leak to the global scope, fixing "redeclaration of non-configurable global property getWeekRange" in the extension context (tab stuck on Loading, English).
+- **Fix – Agrupar por Ninguno:** The "Agrupar por" value "Ninguno" (`""`) is now respected: prefs and UI no longer replace it with "project", so the list renders without grouping when "Ninguno" is selected.
+- **Version:** Set to 3.6.3 in `manifest.json`, `package.json`, and `lib/build-info.js`.
+
+---
+
 ## Phase 0a–0b: Repository migration and legacy cleanup
 
 ### 0a. Repository migration (own repo, URLs, structure)
