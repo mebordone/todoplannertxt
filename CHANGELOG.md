@@ -52,6 +52,7 @@ The roadmap now focuses only on **upcoming / planned work**.
 - **Docs:** README "Backlog" → "Sin planificar"; ROADMAP summary "Todas/Backlog/…" → "Todas/Sin planificar/…"; test/README "webext" → "del proyecto"; CHANGELOG note on backlog label change.
 - **Tab:** Fallback text for the unplanned-view button in `tab/tab.html` changed from "Backlog" to "Unplanned" (and aria-label to "View unplanned tasks") so initial flash matches current UI.
 - **Version:** Set to 3.6.2 in `manifest.json` and `package.json`.
+- **View count vs displayed tasks (timezone fix):** Button counts for "Sin planificar" and "Hoy" now match the number of tasks shown when clicking. Previously, counts used local date while filtering used UTC date (`toISOString()`), causing mismatches in non-UTC timezones. `tab/filterSort.js` now uses local date (`getTodayLocal()`) for "today", "backlog", "overdue" and "week" so counts and filtering are consistent. Test `matchesFilterDue` "today" updated to use local date.
 
 ---
 

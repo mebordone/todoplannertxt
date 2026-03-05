@@ -20,7 +20,7 @@ Este documento declara cómo el código de la MailExtension Todo.txt cumple los 
 | Requisito AGENTS.md | Umbral | Configuración / Estado |
 |--------------------|--------|------------------------|
 | Cobertura global | ≥ 90% | ✅ `jest.config.js` `coverageThreshold.global`: statements 90%, lines 90%, functions 90%. Actual: ≥90% (verificar con `npm run test:coverage`). |
-| Cobertura de branches | ≥ 80% | ✅ `coverageThreshold.global.branches: 80`. Actual: ≥80%. |
+| Cobertura de branches | ≥ 80% | ✅ `coverageThreshold.global.branches: 80`. Actual: ≥80%. Filtrado por fecha (filterSort) usa fecha local; tests actualizados en consecuencia. |
 | Lógica de negocio principal | ≥ 95% | ✅ Módulos core (todotxt, todoclient, fileUtil, filterSort) cubiertos; la API pública y flujos principales están cubiertos. Cumplimiento satisfecho por umbrales globales y aprobación del resto no cubierto en helpers/validación. |
 
 - Tests con **aserciones significativas**, **casos límite**, **rutas de error** e **inputs inválidos**.
