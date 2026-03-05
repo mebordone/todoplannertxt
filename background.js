@@ -15,6 +15,7 @@ const DEFAULT_PREFS = {
   showFullTitle: false,
   readOnly: false,
   displayLanguage: "browser",
+  defaultViewPreset: "all",
   calendarIntegrationEnabled: false,
   calendarId: null,
   calendarSyncAuto: true

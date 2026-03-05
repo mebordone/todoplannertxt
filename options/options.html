@@ -24,6 +24,8 @@
     .calendar-panel { background: #fafafa; padding: 0.75rem; border-radius: 6px; margin-top: 0.5rem; }
     .calendar-panel .row { margin-top: 0.35rem; }
     .calendar-panel .checkbox { margin: 0.25rem 0; }
+    .tooltip-icon { display: inline-flex; align-items: center; justify-content: center; width: 1.1rem; height: 1.1rem; border-radius: 50%; background: #ddd; color: #444; font-size: 0.75rem; font-weight: bold; cursor: help; margin-left: 0.25rem; }
+    .tooltip-icon:hover { background: #ccc; }
   </style>
 </head>
 <body>
@@ -84,6 +86,11 @@
       </select>
     </div>
     <p class="hint" style="margin-top: 0.25rem;" data-i18n="options_displayLanguage_hint">Takes effect after reopening the popup/tab or reloading this page.</p>
+    <label for="default-view-preset" data-i18n="options_default_view">Default view</label>
+    <div class="row" style="margin-top: 0.25rem; align-items: center;">
+      <select id="default-view-preset" style="min-width: 12rem;"></select>
+      <span id="default-view-tooltip" class="tooltip-icon" role="img" aria-label="" title="">?</span>
+    </div>
   </div>
 
   <div class="group section-sep" id="calendar-group">

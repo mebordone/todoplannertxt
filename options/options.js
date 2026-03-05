@@ -29,6 +29,33 @@ function getFileLabel(prefs, folderPathKey, fileNameKey, folderIdKey) {
   return "";
 }
 
+function applyDefaultViewPresetToUI(prefs) {
+  const defViewEl = document.getElementById("default-view-preset");
+  if (defViewEl) {
+    const opts = [
+      { value: "all", labelKey: "tab_default_view_all" },
+      { value: "today", labelKey: "tab_default_view_today" },
+      { value: "backlog", labelKey: "tab_default_view_backlog" },
+      { value: "weekly", labelKey: "tab_default_view_weekly" }
+    ];
+    if (defViewEl.options.length === 0) {
+      opts.forEach((o) => {
+        const opt = document.createElement("option");
+        opt.value = o.value;
+        opt.textContent = i18n(o.labelKey);
+        defViewEl.appendChild(opt);
+      });
+    }
+    defViewEl.value = (prefs.defaultViewPreset === "today" || prefs.defaultViewPreset === "backlog" || prefs.defaultViewPreset === "weekly") ? prefs.defaultViewPreset : "all";
+  }
+  const tooltipEl = document.getElementById("default-view-tooltip");
+  if (tooltipEl) {
+    const tip = i18n("options_default_view_tooltip");
+    tooltipEl.setAttribute("title", tip);
+    tooltipEl.setAttribute("aria-label", tip);
+  }
+}
+
 function applyBasicPrefsToUI(prefs) {
   document.getElementById("todo-path").value = getFileLabel(prefs, "todoFolderPath", "todoFileName", "todoFolderId");
   document.getElementById("done-path").value = getFileLabel(prefs, "doneFolderPath", "doneFileName", "doneFolderId");
@@ -42,6 +69,7 @@ function applyBasicPrefsToUI(prefs) {
     const lang = prefs.displayLanguage;
     displayLangEl.value = (lang === "en" || lang === "es" || lang === "de" || lang === "fr") ? lang : "browser";
   }
+  applyDefaultViewPresetToUI(prefs);
   document.getElementById("calendar-enabled").checked = prefs.calendarIntegrationEnabled === true;
   document.getElementById("calendar-sync-auto").checked = prefs.calendarSyncAuto !== false;
 }
@@ -274,6 +302,8 @@ function bindOptionListeners() {
   if (readOnlyEl) readOnlyEl.addEventListener("change", (e) => savePrefs({ readOnly: e.target.checked }));
   const displayLangEl = document.getElementById("display-language");
   if (displayLangEl) displayLangEl.addEventListener("change", (e) => savePrefs({ displayLanguage: e.target.value || "browser" }));
+  const defViewEl = document.getElementById("default-view-preset");
+  if (defViewEl) defViewEl.addEventListener("change", (e) => savePrefs({ defaultViewPreset: e.target.value || "all" }));
   bindCalendarListeners();
 }
 
