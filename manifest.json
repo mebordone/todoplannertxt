@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "__MSG_extensionName__",
-  "version": "3.6.1",
+  "version": "3.6.2",
   "description": "__MSG_extensionDescription__",
   "default_locale": "en",
   "author": "Matias Bordone (based on original by Roy Kokkelkoren)",
@@ -39,7 +39,7 @@
     ]
   },
   "browser_action": {
-    "default_title": "Todo.txt",
+    "default_title": "__MSG_extensionName__",
     "default_popup": "popup/popup.html",
     "default_icon": {
       "16": "icons/16.png",
