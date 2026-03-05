@@ -93,7 +93,7 @@ function renderTask(item) {
   if (!readOnlyMode) {
     const delBtn = document.createElement("button");
     delBtn.type = "button";
-    delBtn.textContent = "×";
+    delBtn.textContent = "\u{1F5D1}";
     delBtn.title = i18n("popup_delete_task");
     delBtn.setAttribute("aria-label", i18n("popup_delete_task"));
     delBtn.className = "task-delete-btn";
