@@ -7,6 +7,7 @@
     body { margin: 0; font-family: system-ui, sans-serif; font-size: 13px; display: flex; flex-direction: column; min-height: 100vh; }
     .container { max-width: 800px; margin: 0 auto; width: 100%; padding: 0 1rem; display: flex; flex-direction: column; flex: 1; }
     .toolbar { padding: 8px 8px; border-bottom: 1px solid #ccc; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .toolbar-main { position: sticky; top: 0; z-index: 10; background: #fff; }
     .toolbar button { padding: 6px 12px; border-radius: 4px; cursor: pointer; }
     .toolbar-secondary { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-left: auto; }
     .toolbar-link { display: inline-block; border: 1px solid #ccc; border-radius: 4px; padding: 6px 12px; font-size: 13px; text-decoration: none; color: inherit; background: transparent; cursor: pointer; }
@@ -82,7 +83,7 @@
 </head>
 <body>
   <div class="container">
-    <div class="toolbar">
+    <div class="toolbar toolbar-main">
       <input type="text" id="new-task" placeholder="New task…" style="flex:1; min-width: 200px; padding: 6px 8px; font-size: 13px;">
       <button type="button" id="add-task" class="btn-primary" aria-label="Add task">Add</button>
       <button type="button" id="add-task-form-btn" class="toolbar-link" aria-label="Add task with form">Add with form</button>
