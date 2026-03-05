@@ -7,6 +7,17 @@ const fs = typeof filterSort !== "undefined" ? filterSort : null;
 
 const TAB_PREFS_KEY = "tabViewPrefs";
 const SAVE_DEBOUNCE_MS = 300;
+const DEFAULT_GROUP_BY_VIEW = { all: "project", backlog: "project", today: "project", weekly: "dueDay" };
+
+function getDefaultGroupByByView() {
+  return { ...DEFAULT_GROUP_BY_VIEW };
+}
+
+function getGroupByForView(prefs) {
+  if (prefs.groupByByView && prefs.groupByByView[prefs.viewMode] != null) return prefs.groupByByView[prefs.viewMode];
+  return prefs.viewMode === "weekly" ? "dueDay" : "project";
+}
+
 let savePrefsTimer = null;
 let fullItems = [];
 let collapsedGroupKeys = new Set();
@@ -135,7 +146,6 @@ function getPrefsFromUI() {
     filterDue: getElValue("filter-due") || "",
     filterCompleted: getElValue("filter-completion") || "open",
     filtersBarCollapsed,
-    defaultViewPreset: getElValue("default-view-preset") || "all",
     viewMode: currentViewMode,
     weeklyBacklogIds: weeklyBacklogIds.slice(),
     collapsedGroupKeys: Array.from(collapsedGroupKeys)
@@ -149,14 +159,12 @@ function applyPrefsToUI(prefs) {
   };
   set("sort-by", prefs.sortBy);
   set("sort-dir", prefs.sortDir);
-  set("group-by", prefs.groupBy);
+  set("group-by", getGroupByForView(prefs));
   set("filter-project", prefs.filterProject);
   set("filter-context", prefs.filterContext);
   set("filter-priority", prefs.filterPriority);
   set("filter-due", prefs.filterDue);
   set("filter-completion", prefs.filterCompleted);
-  const defViewEl = document.getElementById("default-view-preset");
-  if (defViewEl) defViewEl.value = prefs.defaultViewPreset || "all";
   const section = document.getElementById("filters-section");
   if (section) {
     if (prefs.filtersBarCollapsed) section.classList.add("collapsed");
@@ -169,10 +177,10 @@ function applyPrefsToUI(prefs) {
 
 function getDefaultTabPrefs() {
   const base = fs && fs.DEFAULT_PREFS ? { ...fs.DEFAULT_PREFS } : {};
-  if (!Object.prototype.hasOwnProperty.call(base, "defaultViewPreset")) base.defaultViewPreset = "all";
   if (!Object.prototype.hasOwnProperty.call(base, "viewMode")) base.viewMode = "all";
   if (!Object.prototype.hasOwnProperty.call(base, "weeklyBacklogIds")) base.weeklyBacklogIds = [];
   if (!Object.prototype.hasOwnProperty.call(base, "collapsedGroupKeys")) base.collapsedGroupKeys = [];
+  if (!Object.prototype.hasOwnProperty.call(base, "groupByByView")) base.groupByByView = getDefaultGroupByByView();
   return base;
 }
 
@@ -185,11 +193,23 @@ function normalizeFilterCompleted(prefs) {
   if (prefs && prefs.filterCompleted !== "open" && prefs.filterCompleted !== "done") prefs.filterCompleted = "all";
 }
 
+function migrateGroupByByView(merged) {
+  if (merged.groupByByView && typeof merged.groupByByView === "object") return;
+  const legacy = merged.groupBy || "project";
+  merged.groupByByView = {
+    all: legacy,
+    backlog: legacy,
+    today: legacy,
+    weekly: "dueDay"
+  };
+}
+
 async function loadTabPrefs() {
   try {
     const raw = await api.storage.local.get(TAB_PREFS_KEY);
     const stored = raw && raw[TAB_PREFS_KEY];
     const merged = mergeStoredWithDefault(stored);
+    migrateGroupByByView(merged);
     normalizeFilterCompleted(merged);
     if (Array.isArray(merged.weeklyBacklogIds)) {
       merged.weeklyBacklogIds = cleanupWeeklyBacklogIds(merged.weeklyBacklogIds, fullItems);
@@ -204,7 +224,16 @@ function saveTabPrefs(prefs) {
   if (savePrefsTimer) clearTimeout(savePrefsTimer);
   savePrefsTimer = setTimeout(() => {
     savePrefsTimer = null;
-    api.storage.local.set({ [TAB_PREFS_KEY]: prefs }).catch(() => {});
+    (async () => {
+      const raw = await api.storage.local.get(TAB_PREFS_KEY);
+      const stored = raw && raw[TAB_PREFS_KEY];
+      const groupByByView = (stored && stored.groupByByView && typeof stored.groupByByView === "object")
+        ? { ...getDefaultGroupByByView(), ...stored.groupByByView }
+        : getDefaultGroupByByView();
+      const viewMode = prefs.viewMode === "today" || prefs.viewMode === "backlog" || prefs.viewMode === "weekly" ? prefs.viewMode : "all";
+      groupByByView[viewMode] = prefs.groupBy || "project";
+      await api.storage.local.set({ [TAB_PREFS_KEY]: { ...prefs, groupByByView } });
+    })().catch(() => {});
   }, SAVE_DEBOUNCE_MS);
 }
 
@@ -226,7 +255,10 @@ function resetFiltersAndRefresh() {
   refreshView();
 }
 
-function applyAllView() {
+async function applyAllView() {
+  const prefs = await loadTabPrefs();
+  const groupEl = document.getElementById("group-by");
+  if (groupEl) groupEl.value = (prefs.groupByByView && prefs.groupByByView.all) || "project";
   const dueEl = document.getElementById("filter-due");
   if (dueEl) dueEl.value = "";
   const compEl = document.getElementById("filter-completion");
@@ -238,12 +270,14 @@ function applyAllView() {
   const searchEl = document.getElementById("search");
   if (searchEl) searchEl.value = "";
   currentViewMode = "all";
-  const prefs = getPrefsFromUI();
-  saveTabPrefs(prefs);
+  saveTabPrefs(getPrefsFromUI());
   refreshView();
 }
 
-function applyTodayView() {
+async function applyTodayView() {
+  const prefs = await loadTabPrefs();
+  const groupEl = document.getElementById("group-by");
+  if (groupEl) groupEl.value = (prefs.groupByByView && prefs.groupByByView.today) || "project";
   const dueEl = document.getElementById("filter-due");
   if (dueEl) dueEl.value = "today";
   const compEl = document.getElementById("filter-completion");
@@ -255,12 +289,14 @@ function applyTodayView() {
   const searchEl = document.getElementById("search");
   if (searchEl) searchEl.value = "";
   currentViewMode = "today";
-  const prefs = getPrefsFromUI();
-  saveTabPrefs(prefs);
+  saveTabPrefs(getPrefsFromUI());
   refreshView();
 }
 
-function applyBacklogView() {
+async function applyBacklogView() {
+  const prefs = await loadTabPrefs();
+  const groupEl = document.getElementById("group-by");
+  if (groupEl) groupEl.value = (prefs.groupByByView && prefs.groupByByView.backlog) || "project";
   const dueEl = document.getElementById("filter-due");
   if (dueEl) dueEl.value = "backlog";
   const compEl = document.getElementById("filter-completion");
@@ -272,15 +308,16 @@ function applyBacklogView() {
   const searchEl = document.getElementById("search");
   if (searchEl) searchEl.value = "";
   currentViewMode = "backlog";
-  const prefs = getPrefsFromUI();
-  saveTabPrefs(prefs);
+  saveTabPrefs(getPrefsFromUI());
   refreshView();
 }
 
-function applyWeeklyView() {
+async function applyWeeklyView() {
+  const prefs = await loadTabPrefs();
+  const groupEl = document.getElementById("group-by");
+  if (groupEl) groupEl.value = (prefs.groupByByView && prefs.groupByByView.weekly) || "dueDay";
   currentViewMode = "weekly";
-  const prefs = getPrefsFromUI();
-  saveTabPrefs(prefs);
+  saveTabPrefs(getPrefsFromUI());
   refreshView();
 }
 
@@ -435,9 +472,10 @@ function renderTask(item) {
   if (!readOnlyMode) {
     const delBtn = document.createElement("button");
     delBtn.type = "button";
-    delBtn.textContent = i18n("tab_delete_task");
+    delBtn.textContent = "\u{1F5D1}";
+    delBtn.title = i18n("tab_delete_task");
+    delBtn.setAttribute("aria-label", i18n("tab_delete_task"));
     delBtn.className = "task-delete";
-    delBtn.style.cssText = "flex-shrink:0; font-size:11px; padding:2px 6px;";
     delBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       deleteTask(item);
@@ -687,39 +725,30 @@ async function applyTabSetupAfterLoad() {
   fillFilterOptions(fullItems);
   const searchEl = document.getElementById("search");
   if (searchEl) searchEl.placeholder = i18n("tab_search_placeholder");
-  const labels = ["label-filters", "label-project", "label-context", "label-priority", "label-due", "label-completion", "label-sort", "label-group", "label-default-view"];
-  const i18nIds = ["tab_filters_view", "tab_filter_project", "tab_filter_context", "tab_filter_priority", "tab_filter_due", "tab_filter_completion", "tab_sort_by", "tab_group_by", "tab_default_view"];
+  const labels = ["label-filters", "label-project", "label-context", "label-priority", "label-due", "label-completion", "label-sort", "label-group"];
+  const i18nIds = ["tab_filters_view", "tab_filter_project", "tab_filter_context", "tab_filter_priority", "tab_filter_due", "tab_filter_completion", "tab_sort_by", "tab_group_by"];
   labels.forEach((id, i) => {
     const el = document.getElementById(id);
     if (el && i18nIds[i]) el.textContent = i18n(i18nIds[i]);
   });
   const resetFiltersBtn = document.getElementById("reset-filters-btn");
   if (resetFiltersBtn) resetFiltersBtn.textContent = i18n("tab_reset_filters");
-  const defViewEl = document.getElementById("default-view-preset");
-  if (defViewEl) {
-    defViewEl.innerHTML = "";
-    const options = [
-      { value: "all", label: i18n("tab_default_view_all") },
-      { value: "today", label: i18n("tab_default_view_today") },
-      { value: "backlog", label: i18n("tab_default_view_backlog") },
-      { value: "weekly", label: i18n("tab_default_view_weekly") }
-    ];
-    options.forEach((opt) => {
-      const o = document.createElement("option");
-      o.value = opt.value;
-      o.textContent = opt.label;
-      defViewEl.appendChild(o);
-    });
-    defViewEl.value = prefs.defaultViewPreset || "all";
-    defViewEl.addEventListener("change", () => {
-      const currentPrefs = getPrefsFromUI();
-      currentPrefs.defaultViewPreset = defViewEl.value || "all";
-      saveTabPrefs(currentPrefs);
-    });
-  }
-  if (prefs.defaultViewPreset === "today") applyTodayView();
-  else if (prefs.defaultViewPreset === "backlog") applyBacklogView();
-  else if (prefs.defaultViewPreset === "weekly") applyWeeklyView();
+  const defaultViewPreset = await resolveDefaultViewPreset(prefs);
+  await applyInitialViewPreset(defaultViewPreset);
+}
+
+function resolveDefaultViewPreset(tabPrefs) {
+  return api.runtime.sendMessage({ command: "getPrefs" }).then((mainPrefsRes) => {
+    const fromMain = mainPrefsRes && ["today", "backlog", "weekly"].includes(mainPrefsRes.defaultViewPreset) ? mainPrefsRes.defaultViewPreset : null;
+    const fromTab = tabPrefs && ["today", "backlog", "weekly"].includes(tabPrefs.defaultViewPreset) ? tabPrefs.defaultViewPreset : null;
+    return fromMain || fromTab || "all";
+  });
+}
+
+async function applyInitialViewPreset(preset) {
+  if (preset === "today") await applyTodayView();
+  else if (preset === "backlog") await applyBacklogView();
+  else if (preset === "weekly") await applyWeeklyView();
   else refreshView();
 }
 
