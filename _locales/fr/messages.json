@@ -3,7 +3,7 @@
     "message": "Todo.txt"
   },
   "extensionDescription": {
-    "message": "Extension Thunderbird pour gérer les fichiers todo.txt : tâches en texte brut, priorités, projets, contextes et échéances dans un fichier que vous contrôlez.\n\nBasée sur l'extension Todo.txt originale de Roy Kokkelkoren. La version 3.x est une réécriture complète en MailExtension pour Thunderbird 140+ et n'est pas rétrocompatible avec la v2.\n\nFlux de planification : saisissez vos idées dans un Backlog (tâches sans date). Utilisez « Ajouter à la semaine » pour choisir les tâches de la semaine. Dans la vue « Cette semaine », les tâches sans date ou en retard apparaissent en haut ; en bas, regroupées par jour pour assigner des échéances et planifier.\n\n• Aucun add-on supplémentaire : accès intégré à todo.txt et done.txt. Après installation, ouvrez Options → Parcourir pour sélectionner vos fichiers.\n• Popup : vue rapide depuis la barre d'outils ; ajouter, terminer et modifier les tâches.\n• Vue onglet complète : filtres, Aujourd'hui, En retard, Cette semaine, Backlog, tri par date ou priorité.\n• Options : chemins des fichiers, comportement, intégration optionnelle au calendrier (Lightning) pour les tâches avec échéance.\n• Syntaxe Todo.txt : priorités (A)(B)(C), projets +nom, contextes @nom, due:AAAA-MM-JJ."
+    "message": "Gérez les fichiers todo.txt depuis Thunderbird : tâches en texte brut, priorités, projets, contextes et échéances. Planifiez votre semaine avec les tâches non planifiées, « Ajouter à la semaine » et les vues par jour. Aucun add-on supplémentaire ; choisissez vos fichiers dans Options. Interface popup et onglet complet avec filtres et intégration optionnelle au calendrier (Lightning)."
   },
   "extensionSummary": {
     "message": "Gérer todo.txt depuis Thunderbird : tâches, priorités, projets et échéances en texte brut."
@@ -150,7 +150,7 @@
     "message": "Tous"
   },
   "tab_filter_backlog": {
-    "message": "Backlog"
+    "message": "Non planifié"
   },
   "tab_filter_open": {
     "message": "Ouvert"
@@ -314,6 +314,12 @@
   "options_displayLanguage_hint": {
     "message": "Pris en compte après réouverture de la fenêtre/onglet ou rechargement de cette page."
   },
+  "options_default_view": {
+    "message": "Vue par défaut"
+  },
+  "options_default_view_tooltip": {
+    "message": "Avec quelle vue s'ouvre la liste complète des tâches à l'ouverture : Toutes, Aujourd'hui, Non planifié (sans date ou en retard) ou Cette semaine."
+  },
   "tab_refresh": {
     "message": "Actualiser"
   },
@@ -465,7 +471,7 @@
     "message": "%d en retard"
   },
   "tab_view_backlog": {
-    "message": "Backlog"
+    "message": "Non planifié"
   },
   "tab_view_backlog_aria": {
     "message": "Voir les tâches sans date ou en retard"
@@ -477,7 +483,7 @@
     "message": "Voir le backlog de la semaine"
   },
   "tab_default_view_backlog": {
-    "message": "Backlog uniquement"
+    "message": "Non planifié uniquement"
   },
   "tab_default_view_weekly": {
     "message": "Cette semaine uniquement"

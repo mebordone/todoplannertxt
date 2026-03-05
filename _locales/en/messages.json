@@ -3,7 +3,7 @@
     "message": "Todo.txt"
   },
   "extensionDescription": {
-    "message": "Thunderbird extension to manage todo.txt files: plain-text tasks, priorities, projects, contexts and due dates in a file you control.\n\nBased on the original Todo.txt extension by Roy Kokkelkoren. Version 3.x is a full rewrite as a MailExtension for Thunderbird 140+ and is not backward compatible with v2.\n\nPlanning workflow: capture ideas in a Backlog (tasks without due date). Use \"Add to week\" to select which tasks you want to do this week. In the \"This week\" view, undated or overdue tasks appear at the top; below, tasks are grouped by day so you can assign due dates and plan your week.\n\n• No extra add-ons: built-in file access for todo.txt and done.txt. After install, open Options → Browse to select your files.\n• Popup: quick view from the toolbar; add, complete and edit tasks.\n• Full tab view: filters, Today, Overdue, This week, Backlog, sort by due date or priority.\n• Options: file paths, behaviour, optional Calendar (Lightning) integration for tasks with due dates.\n• Full Todo.txt syntax: priorities (A)(B)(C), projects +name, contexts @name, due:YYYY-MM-DD."
+    "message": "Manage todo.txt files from Thunderbird: plain-text tasks, priorities, projects, contexts and due dates. Plan your week with unplanned tasks, add to week, and daily views. No extra add-ons; choose your files in Options. Popup and full-tab UI with filters and optional Calendar (Lightning) integration."
   },
   "extensionSummary": {
     "message": "Manage todo.txt from Thunderbird: tasks, priorities, projects and due dates in plain text."
@@ -150,7 +150,7 @@
     "message": "All"
   },
   "tab_filter_backlog": {
-    "message": "Backlog"
+    "message": "Unplanned"
   },
   "tab_filter_open": {
     "message": "Open"
@@ -314,6 +314,12 @@
   "options_displayLanguage_hint": {
     "message": "Takes effect after reopening the popup/tab or reloading this page."
   },
+  "options_default_view": {
+    "message": "Default view"
+  },
+  "options_default_view_tooltip": {
+    "message": "Which view the full task list opens with when you open it: All tasks, Today, Unplanned (no date or overdue), or This week."
+  },
   "tab_refresh": {
     "message": "Refresh"
   },
@@ -465,7 +471,7 @@
     "message": "%d overdue"
   },
   "tab_view_backlog": {
-    "message": "Backlog"
+    "message": "Unplanned"
   },
   "tab_view_backlog_aria": {
     "message": "View tasks with no due date or overdue"
@@ -477,7 +483,7 @@
     "message": "View weekly backlog"
   },
   "tab_default_view_backlog": {
-    "message": "Backlog only"
+    "message": "Unplanned only"
   },
   "tab_default_view_weekly": {
     "message": "This week only"

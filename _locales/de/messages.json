@@ -3,7 +3,7 @@
     "message": "Todo.txt"
   },
   "extensionDescription": {
-    "message": "Thunderbird-Erweiterung zur Verwaltung von todo.txt-Dateien: Aufgaben in Klartext, Prioritäten, Projekte, Kontexte und Fälligkeitsdaten in einer Datei, die Sie kontrollieren.\n\nBasiert auf der ursprünglichen Todo.txt-Erweiterung von Roy Kokkelkoren. Version 3.x ist eine komplette Neuimplementierung als MailExtension für Thunderbird 140+ und ist nicht abwärtskompatibel mit v2.\n\nPlanungsablauf: Ideen im Backlog erfassen (Aufgaben ohne Fälligkeit). Mit „Zur Woche hinzufügen“ wählen Sie die Aufgaben für diese Woche. In der Ansicht „Diese Woche“ erscheinen undatierte oder überfällige oben; darunter gruppiert nach Wochentag, damit Sie Fälligkeiten setzen und planen können.\n\n• Keine zusätzlichen Add-ons: integrierter Dateizugriff für todo.txt und done.txt. Nach der Installation: Einstellungen → Durchsuchen, um Ihre Dateien auszuwählen.\n• Popup: Schnellansicht aus der Symbolleiste; Aufgaben hinzufügen, erledigen und bearbeiten.\n• Vollständige Tab-Ansicht: Filter, Heute, Überfällig, Diese Woche, Backlog, Sortierung nach Fälligkeit oder Priorität.\n• Einstellungen: Dateipfade, Verhalten, optionale Kalender- (Lightning-)Integration für Aufgaben mit Fälligkeitsdatum.\n• Vollständige Todo.txt-Syntax: Prioritäten (A)(B)(C), Projekte +name, Kontexte @name, due:JJJJ-MM-TT."
+    "message": "Verwalten Sie todo.txt-Dateien in Thunderbird: Aufgaben in Klartext, Prioritäten, Projekte, Kontexte und Fälligkeitsdaten. Planen Sie Ihre Woche mit ungeplanten Aufgaben, „Zur Woche hinzufügen“ und Tagesansichten. Keine zusätzlichen Add-ons; wählen Sie Ihre Dateien in den Einstellungen. Popup- und Tab-UI mit Filtern und optionaler Kalender- (Lightning-)Integration."
   },
   "extensionSummary": {
     "message": "Todo.txt in Thunderbird verwalten: Aufgaben, Prioritäten, Projekte und Fälligkeiten in Klartext."
@@ -150,7 +150,7 @@
     "message": "Alle"
   },
   "tab_filter_backlog": {
-    "message": "Backlog"
+    "message": "Ungeplant"
   },
   "tab_filter_open": {
     "message": "Offen"
@@ -314,6 +314,12 @@
   "options_displayLanguage_hint": {
     "message": "Wirkt nach dem erneuten Öffnen des Popups/Tabs oder dem Neuladen dieser Seite."
   },
+  "options_default_view": {
+    "message": "Standardansicht"
+  },
+  "options_default_view_tooltip": {
+    "message": "Mit welcher Ansicht die vollständige Aufgabenliste beim Öffnen startet: Alle, Heute, Ungeplant (ohne Datum oder überfällig) oder Diese Woche."
+  },
   "tab_refresh": {
     "message": "Aktualisieren"
   },
@@ -465,7 +471,7 @@
     "message": "%d überfällig"
   },
   "tab_view_backlog": {
-    "message": "Backlog"
+    "message": "Ungeplant"
   },
   "tab_view_backlog_aria": {
     "message": "Aufgaben ohne Fälligkeitsdatum oder überfällig anzeigen"
@@ -477,7 +483,7 @@
     "message": "Wochen-Backlog anzeigen"
   },
   "tab_default_view_backlog": {
-    "message": "Nur Backlog"
+    "message": "Nur Ungeplant"
   },
   "tab_default_view_weekly": {
     "message": "Nur diese Woche"

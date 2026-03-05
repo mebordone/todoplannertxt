@@ -3,7 +3,7 @@
     "message": "Todo.txt"
   },
   "extensionDescription": {
-    "message": "Extensión de Thunderbird para gestionar archivos todo.txt: tareas en texto plano, prioridades, proyectos, contextos y fechas en un archivo que tú controlas.\n\nBasada en la extensión original Todo.txt de Roy Kokkelkoren. La versión 3.x es una reescritura completa como MailExtension para Thunderbird 140+ y no es compatible con la v2.\n\nFlujo de planificación: captura ideas en un Backlog (tareas sin fecha). Usa «Añadir a la semana» para elegir qué tareas quieres hacer esta semana. En la vista «Esta semana», las sin fecha o vencidas aparecen arriba; abajo se agrupan por día de la semana para que puedas asignar fechas y planificar.\n\n• Sin complementos extra: acceso integrado a todo.txt y done.txt. Tras instalar, abre Opciones → Examinar para elegir tus archivos.\n• Popup: vista rápida desde la barra; añadir, completar y editar tareas.\n• Vista en pestaña: filtros, Hoy, Vencidas, Esta semana, Backlog, ordenar por fecha o prioridad.\n• Opciones: rutas de archivos, comportamiento, integración opcional con Calendario (Lightning) para tareas con fecha.\n• Sintaxis Todo.txt: prioridades (A)(B)(C), proyectos +nombre, contextos @nombre, due:AAAA-MM-DD."
+    "message": "Gestiona archivos todo.txt desde Thunderbird: tareas en texto plano, prioridades, proyectos, contextos y fechas. Planifica la semana con tareas sin planificar, añadir a la semana y vistas por día. Sin complementos extra; elige tus archivos en Opciones. Interfaz en popup y pestaña completa con filtros e integración opcional con Calendario (Lightning)."
   },
   "extensionSummary": {
     "message": "Gestiona todo.txt desde Thunderbird: tareas, prioridades, proyectos y fechas en texto plano."
@@ -150,7 +150,7 @@
     "message": "Todos"
   },
   "tab_filter_backlog": {
-    "message": "Backlog"
+    "message": "Sin planificar"
   },
   "tab_filter_open": {
     "message": "Abiertas"
@@ -314,6 +314,12 @@
   "options_displayLanguage_hint": {
     "message": "Se aplica al reabrir la ventana o pestaña, o al recargar esta página."
   },
+  "options_default_view": {
+    "message": "Vista por defecto"
+  },
+  "options_default_view_tooltip": {
+    "message": "Con qué vista se abre la lista completa de tareas al abrirla: Todas, Hoy, Sin planificar (sin fecha o vencidas) o Esta semana."
+  },
   "tab_refresh": {
     "message": "Actualizar"
   },
@@ -465,7 +471,7 @@
     "message": "%d vencidas"
   },
   "tab_view_backlog": {
-    "message": "Backlog"
+    "message": "Sin planificar"
   },
   "tab_view_backlog_aria": {
     "message": "Ver tareas sin fecha o vencidas"
@@ -477,7 +483,7 @@
     "message": "Ver backlog semanal"
   },
   "tab_default_view_backlog": {
-    "message": "Solo backlog"
+    "message": "Solo sin planificar"
   },
   "tab_default_view_weekly": {
     "message": "Solo esta semana"
