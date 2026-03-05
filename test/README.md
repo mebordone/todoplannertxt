@@ -31,7 +31,7 @@ npm install
 - **Umbrales** (en `jest.config.js`): statements, lines y functions ≥ 90%; **branches ≥ 80%**.
 - El informe HTML se genera en `test/coverage/index.html` tras `npm run test:coverage`.
 - Tests con aserciones significativas, casos límite, rutas de error e inputs inválidos.
-- Cumplimiento completo: ver `COMPLIANCE-AGENTS.md` en la raíz de `webext`.
+- Cumplimiento completo: ver `COMPLIANCE-AGENTS.md` en la raíz del proyecto.
 
 ## Complejidad ciclomática (AGENTS.md §3)
 

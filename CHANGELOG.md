@@ -37,6 +37,21 @@ The roadmap now focuses only on **upcoming / planned work**.
 - **Deterministic task id:** In `modules/todotxt.js`, task id is now a deterministic hash of the line content (MD5 when available) instead of a random UUID, so the same line keeps the same id across re-parses. Fixes "La tarea no se encontró en todo.txt" when editing after cache refresh (e.g. popup or polling). `manifest.json`: load `modules/md5.js` before `modules/todotxt.js`.
 - **Weekly view – Due filter:** In "Esta semana", pipeline runs with `filterDue: ""` so tasks that have a due date (e.g. after editing) still appear in the weekly list; only the weekly id filter is applied.
 - **Tests and AGENTS.md:** `npm run ci` passes; coverage ≥90% statements, ≥80% branches; complexity ≤10; lint clean. New tests for `filterDue === "backlog"` and `groupKeyFor(..., "dueDay")` in `filterSort.test.js`.
+- The backlog view button label was later updated to "Sin planificar" / "Unplanned" (and equivalents in DE/FR) in all locales.
+
+---
+
+## Version 3.6.2 – Polish and Details
+
+**Goal:** Improve first impression in Thunderbird Details view and align docs/UI with current terminology.
+
+**Implemented:**
+
+- **Extension description (Details view):** Replaced long `extensionDescription` (with literal `<br>`/bullets in plain-text display) with a short 2–4 sentence paragraph in all four locales (en, es, de, fr), no HTML, readable as a single block.
+- **Manifest:** `browser_action.default_title` set to `__MSG_extensionName__` so the toolbar icon tooltip uses the localized extension name.
+- **Docs:** README "Backlog" → "Sin planificar"; ROADMAP summary "Todas/Backlog/…" → "Todas/Sin planificar/…"; test/README "webext" → "del proyecto"; CHANGELOG note on backlog label change.
+- **Tab:** Fallback text for the unplanned-view button in `tab/tab.html` changed from "Backlog" to "Unplanned" (and aria-label to "View unplanned tasks") so initial flash matches current UI.
+- **Version:** Set to 3.6.2 in `manifest.json` and `package.json`.
 
 ---
 
