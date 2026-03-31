@@ -74,6 +74,22 @@ The roadmap now focuses only on **upcoming / planned work**.
 
 ---
 
+## Version 3.6.4 – Quick-add autocomplete and tab polish
+
+**Goal:** Smarter quick-add line (`+` / `@`), reliable weekly quick-add persistence, and list updates without losing scroll position.
+
+**Implemented:**
+
+- **Quick-add autocomplete:** While typing in the toolbar quick-add field, `+` suggests existing **projects** and `@` suggests **contexts** (same data as filter dropdowns). Listbox under the field; **arrow keys** to move selection; **Tab** inserts the highlighted name; **Enter** always submits the task to `addItem`; **Esc** dismisses suggestions (reopen by typing, clicking in the field, or arrow keys). `tab/quickAddToken.js` (pure parse/filter) and `tab/quickAddAutocomplete.js` (UI); unit tests in `test/unit/quickAddToken.test.js`.
+- **i18n:** `tab_quick_add_suggestions_aria`, `tab_quick_add_no_matches`, `tab_quick_add_keyboard_hint` in en, es, de, fr; `title` on `#new-task` for the keyboard hint.
+- **Tab layout:** `#new-task` wrapped in `.quick-add-wrap`; scripts `quickAddToken.js` and `quickAddAutocomplete.js` before `tab.js`; dropdown styling and overflow fixes so the list is visible above the page content.
+- **Fix – weekly quick-add persistence:** `buildTabPrefsPayload` shared by debounced and immediate save; `saveTabPrefsNow` writes `tabViewPrefs` before refresh so `weeklyBacklogIds` is not lost to a debounce race.
+- **Add / delete / form-add in place:** `refreshViewPreservingScroll()` after quick-add, form-add, and delete; `fullItems` updated in memory; delete removes the task id from `weeklyBacklogIds` when present. Enter handler uses `defaultPrevented` so autocomplete does not block add incorrectly.
+- **Autocomplete UX fixes:** Only apply `preventDefault` after a successful Tab completion; skip `keyup` refresh for arrow/Esc/Tab so selection is not reset; `suppressedSuggestionsAfterEsc` so Esc does not immediately reopen the list.
+- **Version:** Set to 3.6.4 in `manifest.json`, `package.json`, and `lib/build-info.js`.
+
+---
+
 ## Phase 0a–0b: Repository migration and legacy cleanup
 
 ### 0a. Repository migration (own repo, URLs, structure)
