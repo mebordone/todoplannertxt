@@ -5,9 +5,9 @@
   <title>Todo.txt – Full view</title>
   <style>
     body { margin: 0; font-family: system-ui, sans-serif; font-size: 13px; display: flex; flex-direction: column; min-height: 100vh; }
-    .container { max-width: 800px; margin: 0 auto; width: 100%; padding: 0 1rem; display: flex; flex-direction: column; flex: 1; }
-    .toolbar { padding: 8px 8px; border-bottom: 1px solid #ccc; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .toolbar-main { position: sticky; top: 0; z-index: 10; background: #fff; }
+    .container { max-width: 800px; margin: 0 auto; width: 100%; padding: 0 1rem; display: flex; flex-direction: column; flex: 1; overflow-x: visible; overflow-y: visible; }
+    .toolbar { padding: 8px 8px; border-bottom: 1px solid #ccc; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; overflow: visible; }
+    .toolbar-main { position: sticky; top: 0; z-index: 10; background: #fff; overflow: visible; }
     .toolbar button { padding: 6px 12px; border-radius: 4px; cursor: pointer; }
     .toolbar-secondary { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-left: auto; }
     .toolbar-link { display: inline-block; border: 1px solid #ccc; border-radius: 4px; padding: 6px 12px; font-size: 13px; text-decoration: none; color: inherit; background: transparent; cursor: pointer; }
@@ -79,12 +79,22 @@
     .edit-label > span { display: block; font-size: 11px; color: #666; margin-bottom: 2px; }
     .edit-label input, .edit-label select { width: 100%; padding: 6px 8px; font-size: 13px; box-sizing: border-box; }
     .edit-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem; }
+    .quick-add-wrap { position: relative; flex: 1; min-width: 200px; z-index: 50; overflow: visible; }
+    .quick-add-wrap input { width: 100%; padding: 6px 8px; font-size: 13px; box-sizing: border-box; }
+    .quick-add-suggestions { display: none; position: absolute; left: 0; right: 0; top: 100%; margin-top: 4px; max-height: 220px; overflow-y: auto; background: #ffffff; color: #111; border: 1px solid #bbb; border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); z-index: 200; font-size: 14px; line-height: 1.35; }
+    .quick-add-suggestion { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #e8e8e8; }
+    .quick-add-suggestion:last-child { border-bottom: none; }
+    .quick-add-suggestion:hover, .quick-add-suggestion--active { background: #cce4ff; color: #000; }
+    .quick-add-suggestion--empty { color: #555; cursor: default; font-style: italic; }
+    .quick-add-suggestion--empty:hover { background: #fff; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="toolbar toolbar-main">
-      <input type="text" id="new-task" placeholder="New task…" style="flex:1; min-width: 200px; padding: 6px 8px; font-size: 13px;">
+      <div class="quick-add-wrap">
+        <input type="text" id="new-task" placeholder="New task…" autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="quick-add-suggestions">
+      </div>
       <button type="button" id="add-task" class="btn-primary" aria-label="Add task">Add</button>
       <button type="button" id="add-task-form-btn" class="toolbar-link" aria-label="Add task with form">Add with form</button>
       <span id="add-feedback" class="toolbar-hint" style="display:none;" aria-live="polite"></span>
@@ -182,6 +192,8 @@
   <script src="../lib/priorityDisplay.js"></script>
   <script src="../lib/weekRange.js"></script>
   <script src="filterSort.js"></script>
+  <script src="quickAddToken.js"></script>
+  <script src="quickAddAutocomplete.js"></script>
   <script src="tab.js"></script>
 </body>
 </html>

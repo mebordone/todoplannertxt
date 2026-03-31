@@ -335,6 +335,15 @@
   "tab_new_task_placeholder": {
     "message": "Nouvelle tâche…"
   },
+  "tab_quick_add_suggestions_aria": {
+    "message": "Suggestions de projet ou de contexte"
+  },
+  "tab_quick_add_no_matches": {
+    "message": "Aucune correspondance"
+  },
+  "tab_quick_add_keyboard_hint": {
+    "message": "Suggestions : flèches, Tab pour insérer, Échap pour fermer ; Entrée ajoute la tâche."
+  },
   "tab_add": {
     "message": "Ajouter"
   },

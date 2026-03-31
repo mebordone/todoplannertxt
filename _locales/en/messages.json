@@ -335,6 +335,15 @@
   "tab_new_task_placeholder": {
     "message": "New task…"
   },
+  "tab_quick_add_suggestions_aria": {
+    "message": "Suggestions for project or context"
+  },
+  "tab_quick_add_no_matches": {
+    "message": "No matching names"
+  },
+  "tab_quick_add_keyboard_hint": {
+    "message": "Suggestions: arrows to move, Tab to insert, Esc to close; Enter adds the task."
+  },
   "tab_add": {
     "message": "Add"
   },

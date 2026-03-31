@@ -335,6 +335,15 @@
   "tab_new_task_placeholder": {
     "message": "Neue Aufgabe…"
   },
+  "tab_quick_add_suggestions_aria": {
+    "message": "Vorschläge für Projekt oder Kontext"
+  },
+  "tab_quick_add_no_matches": {
+    "message": "Keine Treffer"
+  },
+  "tab_quick_add_keyboard_hint": {
+    "message": "Vorschläge: Pfeile, Tab zum Einfügen, Esc schließen; Enter fügt die Aufgabe hinzu."
+  },
   "tab_add": {
     "message": "Hinzufügen"
   },

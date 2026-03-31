@@ -26,6 +26,7 @@ let editModalItem = null;
 let currentViewMode = "all";
 let weeklyBacklogIds = [];
 let mainPrefsCache = { weekStart: "monday" };
+let quickAddAutocompleteCtl = null;
 
 function i18n(id, subs) {
   try {
@@ -221,6 +222,15 @@ async function loadTabPrefs() {
   }
 }
 
+function buildTabPrefsPayload(prefs, stored) {
+  const groupByByView = (stored && stored.groupByByView && typeof stored.groupByByView === "object")
+    ? { ...getDefaultGroupByByView(), ...stored.groupByByView }
+    : getDefaultGroupByByView();
+  const viewMode = prefs.viewMode === "today" || prefs.viewMode === "backlog" || prefs.viewMode === "weekly" ? prefs.viewMode : "all";
+  groupByByView[viewMode] = (prefs.groupBy !== undefined && prefs.groupBy !== null) ? prefs.groupBy : "project";
+  return { [TAB_PREFS_KEY]: { ...prefs, groupByByView } };
+}
+
 function saveTabPrefs(prefs) {
   if (savePrefsTimer) clearTimeout(savePrefsTimer);
   savePrefsTimer = setTimeout(() => {
@@ -228,14 +238,19 @@ function saveTabPrefs(prefs) {
     (async () => {
       const raw = await api.storage.local.get(TAB_PREFS_KEY);
       const stored = raw && raw[TAB_PREFS_KEY];
-      const groupByByView = (stored && stored.groupByByView && typeof stored.groupByByView === "object")
-        ? { ...getDefaultGroupByByView(), ...stored.groupByByView }
-        : getDefaultGroupByByView();
-      const viewMode = prefs.viewMode === "today" || prefs.viewMode === "backlog" || prefs.viewMode === "weekly" ? prefs.viewMode : "all";
-      groupByByView[viewMode] = (prefs.groupBy !== undefined && prefs.groupBy !== null) ? prefs.groupBy : "project";
-      await api.storage.local.set({ [TAB_PREFS_KEY]: { ...prefs, groupByByView } });
+      await api.storage.local.set(buildTabPrefsPayload(prefs, stored));
     })().catch(() => {});
   }, SAVE_DEBOUNCE_MS);
+}
+
+async function saveTabPrefsNow(prefs) {
+  if (savePrefsTimer) {
+    clearTimeout(savePrefsTimer);
+    savePrefsTimer = null;
+  }
+  const raw = await api.storage.local.get(TAB_PREFS_KEY);
+  const stored = raw && raw[TAB_PREFS_KEY];
+  await api.storage.local.set(buildTabPrefsPayload(prefs, stored));
 }
 
 function runPipeline(items, searchQuery, prefs) {
@@ -607,6 +622,13 @@ function refreshView() {
   updateTodaySummary();
 }
 
+function refreshViewPreservingScroll() {
+  const listEl = document.getElementById("list");
+  const scrollTop = listEl ? listEl.scrollTop : 0;
+  refreshView();
+  if (listEl) listEl.scrollTop = scrollTop;
+}
+
 function makeOpt(val, label) {
   const o = document.createElement("option");
   o.value = val;
@@ -625,6 +647,23 @@ function setSelectOptions(el, choices, valueLabels, currentVal) {
   if (choices.includes(currentVal)) el.value = currentVal;
   else if (prev && choices.includes(prev)) el.value = prev;
   else if (choices[0] !== undefined) el.value = choices[0];
+}
+
+function collectProjectNamesForQuickAdd(items) {
+  const projects = new Set();
+  (items || []).forEach((item) => {
+    (item.categories || []).forEach((c) => projects.add(c));
+  });
+  return [...projects].filter(Boolean);
+}
+
+function collectContextNamesForQuickAdd(items) {
+  if (!fs || typeof fs.normalizeLocation !== "function") return [];
+  const contexts = new Set();
+  (items || []).forEach((item) => {
+    fs.normalizeLocation(item.location).forEach((c) => contexts.add(c));
+  });
+  return [...contexts].filter(Boolean);
 }
 
 function fillProjectContextOptions(items) {
@@ -806,8 +845,16 @@ async function deleteTask(item) {
   const res = await api.runtime.sendMessage({ command: "deleteItem", item });
   if (res && res.error) {
     showError(res.error);
+    return;
   }
-  loadItems();
+  fullItems = fullItems.filter((i) => String(i.id) !== String(item.id));
+  const idStr = String(item.id);
+  const idx = weeklyBacklogIds.indexOf(idStr);
+  if (idx !== -1) {
+    weeklyBacklogIds.splice(idx, 1);
+    saveTabPrefs(getPrefsFromUI());
+  }
+  refreshViewPreservingScroll();
 }
 
 async function toggleTask(item) {
@@ -1012,7 +1059,7 @@ async function handleAddFormSubmit(e) {
   }
   if (res && res.id != null) fullItems.push(res);
   closeAddModal();
-  refreshView();
+  refreshViewPreservingScroll();
   showAddFeedback();
 }
 
@@ -1043,16 +1090,17 @@ function addTask() {
   if (currentViewMode === "today" && !hasExplicitDue) {
     item.dueDate = getTodayString();
   }
-  api.runtime.sendMessage({ command: "addItem", item }).then((res) => {
+  api.runtime.sendMessage({ command: "addItem", item }).then(async (res) => {
     if (res && res.error) showError(res.error);
     else {
       if (currentViewMode === "weekly" && !hasExplicitDue && res && res.id != null) {
         weeklyBacklogIds.push(String(res.id));
-        saveTabPrefs(getPrefsFromUI());
+        await saveTabPrefsNow(getPrefsFromUI());
       }
+      if (res && res.id != null) fullItems.push(res);
       input.value = "";
       showAddFeedback();
-      loadItems();
+      refreshViewPreservingScroll();
     }
   });
 }
@@ -1124,12 +1172,25 @@ async function handleEditFormSubmit(e) {
 
 const editForm = document.getElementById("edit-task-form");
 if (editForm) editForm.addEventListener("submit", handleEditFormSubmit);
-document.getElementById("new-task").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    addTask();
+const newTaskInput = document.getElementById("new-task");
+if (newTaskInput) {
+  const qaa = typeof globalThis !== "undefined" ? globalThis.quickAddAutocomplete : null;
+  if (qaa && typeof qaa.attachQuickAddAutocomplete === "function") {
+    quickAddAutocompleteCtl = qaa.attachQuickAddAutocomplete({
+      input: newTaskInput,
+      getProjectNames: () => collectProjectNamesForQuickAdd(fullItems),
+      getContextNames: () => collectContextNamesForQuickAdd(fullItems),
+      i18n
+    });
   }
-});
+  newTaskInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      if (e.defaultPrevented) return;
+      e.preventDefault();
+      addTask();
+    }
+  });
+}
 ["search", "filter-project", "filter-context", "filter-priority", "filter-due", "filter-completion"].forEach((id) => {
   const el = document.getElementById(id);
   if (el) el.addEventListener("change", onFilterOrSortChange);
@@ -1221,7 +1282,10 @@ function setToolbarI18n() {
     refreshEl.title = refreshAria;
   }
   const newTaskEl = document.getElementById("new-task");
-  if (newTaskEl) newTaskEl.placeholder = i18n("tab_new_task_placeholder");
+  if (newTaskEl) {
+    newTaskEl.placeholder = i18n("tab_new_task_placeholder");
+    newTaskEl.title = i18n("tab_quick_add_keyboard_hint");
+  }
   const addEl = document.getElementById("add-task");
   if (addEl) {
     addEl.textContent = i18n("tab_add");
