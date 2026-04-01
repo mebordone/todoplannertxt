@@ -239,6 +239,9 @@
   "tab_delete_task": {
     "message": "Delete"
   },
+  "tab_task_due_aria": {
+    "message": "Set or change due date"
+  },
   "tab_delete_confirm": {
     "message": "Delete this task?"
   },

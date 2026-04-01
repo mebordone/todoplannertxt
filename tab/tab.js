@@ -23,6 +23,7 @@ let fullItems = [];
 let collapsedGroupKeys = new Set();
 let readOnlyMode = false;
 let editModalItem = null;
+let duePickerItem = null;
 let currentViewMode = "all";
 let weeklyBacklogIds = [];
 let mainPrefsCache = { weekStart: "monday" };
@@ -503,6 +504,17 @@ function renderTask(item) {
   });
   div.appendChild(weekBtn);
   if (!readOnlyMode) {
+    const dueBtn = document.createElement("button");
+    dueBtn.type = "button";
+    dueBtn.textContent = "\uD83D\uDCC5";
+    dueBtn.title = i18n("tab_task_due_aria");
+    dueBtn.setAttribute("aria-label", i18n("tab_task_due_aria"));
+    dueBtn.className = "task-due-btn";
+    dueBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openTaskDuePicker(item, dueBtn);
+    });
+    div.appendChild(dueBtn);
     const delBtn = document.createElement("button");
     delBtn.type = "button";
     delBtn.textContent = "\u{1F5D1}";
@@ -981,6 +993,86 @@ function closeEditModal() {
   if (overlay) overlay.style.display = "none";
 }
 
+function resetTaskDuePickerPosition(input) {
+  if (!input) return;
+  input.style.left = "-9999px";
+  input.style.top = "0";
+  input.style.width = "1px";
+  input.style.height = "1px";
+  input.style.zIndex = "-1";
+}
+
+function positionTaskDuePickerNearAnchor(input, anchorEl) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  let anchorRect = null;
+  if (anchorEl && typeof anchorEl.getBoundingClientRect === "function") {
+    anchorRect = anchorEl.getBoundingClientRect();
+  }
+  const box = globalThis.computeTaskDuePickerLayout(anchorRect, vw, vh);
+  input.style.left = box.left + "px";
+  input.style.top = box.top + "px";
+  input.style.width = box.width + "px";
+  input.style.height = box.height + "px";
+  input.style.zIndex = "2147483646";
+}
+
+function openTaskDuePicker(item, anchorEl) {
+  if (readOnlyMode || !item) return;
+  const input = document.getElementById("task-due-picker");
+  if (!input) return;
+  duePickerItem = item;
+  input.value = item.dueDate ? String(item.dueDate).slice(0, 10) : "";
+  positionTaskDuePickerNearAnchor(input, anchorEl);
+  try {
+    if (typeof input.showPicker === "function") {
+      input.showPicker();
+      return;
+    }
+  } catch (_) {
+    /* showPicker puede fallar sin gesto de usuario; el click del botón debería bastar */
+  }
+  input.focus();
+  try {
+    input.click();
+  } catch (_) {}
+}
+
+async function onTaskDuePickerChange() {
+  const item = duePickerItem;
+  const input = document.getElementById("task-due-picker");
+  if (!item || !input) return;
+  duePickerItem = null;
+  const newItem = globalThis.buildPlainItemWithDueDate(item, input.value);
+  const res = await api.runtime.sendMessage({ command: "modifyItem", oldItem: item, newItem });
+  if (res && res.error) {
+    showError(res.error);
+    resetTaskDuePickerPosition(input);
+    return;
+  }
+  const updatedItem = res && res.id != null ? res : newItem;
+  const idx = fullItems.findIndex((i) => String(i.id) === String(item.id));
+  if (idx >= 0) fullItems[idx] = updatedItem;
+  refreshViewPreservingScroll();
+  resetTaskDuePickerPosition(input);
+}
+
+function initTaskDuePickerInput() {
+  const input = document.getElementById("task-due-picker");
+  if (!input || input.dataset.duePickerBound === "1") return;
+  input.dataset.duePickerBound = "1";
+  const label = i18n("tab_task_due_aria");
+  input.setAttribute("aria-label", label);
+  input.title = label;
+  input.addEventListener("change", () => { onTaskDuePickerChange(); });
+  input.addEventListener("cancel", () => {
+    duePickerItem = null;
+    resetTaskDuePickerPosition(input);
+  });
+  resetTaskDuePickerPosition(input);
+}
+
+
 function setAddModalLabels() {
   document.getElementById("add-task-title").textContent = i18n("tab_add_task_title");
   document.getElementById("add-label-title").textContent = i18n("tab_edit_label_title");
@@ -1172,6 +1264,7 @@ async function handleEditFormSubmit(e) {
 
 const editForm = document.getElementById("edit-task-form");
 if (editForm) editForm.addEventListener("submit", handleEditFormSubmit);
+
 const newTaskInput = document.getElementById("new-task");
 if (newTaskInput) {
   const qaa = typeof globalThis !== "undefined" ? globalThis.quickAddAutocomplete : null;
@@ -1372,6 +1465,7 @@ function initSyntaxUi() {
     if (typeof i18nHelper !== "undefined" && i18nHelper.init) await i18nHelper.init();
   } catch (_) {}
   setToolbarI18n();
+  initTaskDuePickerInput();
   initSyntaxUi();
   loadItems();
 })();

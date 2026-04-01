@@ -12,6 +12,8 @@ module.exports = {
     "modules/fileUtil.js",
     "modules/todoclient.js",
     "lib/pendingOnlyFilter.js",
+    "lib/plainItemDueUpdate.js",
+    "lib/taskDuePickerLayout.js",
     "background/calendarMappings.js",
     "tab/filterSort.js"
   ],

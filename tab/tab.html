@@ -64,9 +64,12 @@
     .syntax-more-link { font-size: 11px; }
     .task-week-btn { color: #666; border: 1px solid #ddd; background: transparent; border-radius: 3px; cursor: pointer; }
     .task-week-btn:hover { background: #f0f0f0; color: #333; }
-    .task-delete { flex-shrink: 0; width: 26px; height: 26px; padding: 0; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; color: #666; display: inline-flex; align-items: center; justify-content: center; font-size: 1.1em; line-height: 1; }
+    .task-delete, .task-due-btn { flex-shrink: 0; width: 26px; height: 26px; padding: 0; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; color: #666; display: inline-flex; align-items: center; justify-content: center; font-size: 1.1em; line-height: 1; }
+    .task-delete { margin-left: 4px; }
+    .task-due-btn { margin-left: 4px; }
     .task-delete:hover { background: #fee; color: #c00; border-color: #c00; }
-    .task-delete:focus { outline: 1px solid #0a84ff; outline-offset: 1px; }
+    .task-due-btn:hover { background: #eef6ff; color: #0a54c2; border-color: #8ab4f8; }
+    .task-delete:focus, .task-due-btn:focus { outline: 1px solid #0a84ff; outline-offset: 1px; }
     .group-container { margin-top: 8px; }
     .group-container .group-heading { display: flex; align-items: center; gap: 6px; width: 100%; padding: 6px 8px; margin: 0 0 4px; font-weight: 600; font-size: 13px; color: #555; background: #f5f5f5; border: none; border-radius: 4px; cursor: pointer; text-align: left; }
     .group-container .group-heading:hover { background: #eee; }
@@ -87,6 +90,7 @@
     .quick-add-suggestion:hover, .quick-add-suggestion--active { background: #cce4ff; color: #000; }
     .quick-add-suggestion--empty { color: #555; cursor: default; font-style: italic; }
     .quick-add-suggestion--empty:hover { background: #fff; }
+    .task-due-picker-hidden { position: fixed; margin: 0; padding: 0; border: 0; box-sizing: border-box; font-size: 13px; opacity: 0.04; }
   </style>
 </head>
 <body>
@@ -187,8 +191,11 @@
         </form>
       </div>
     </div>
+    <input type="date" id="task-due-picker" class="task-due-picker-hidden" tabindex="-1" title="">
   </div>
   <script src="../lib/i18nHelper.js"></script>
+  <script src="../lib/plainItemDueUpdate.js"></script>
+  <script src="../lib/taskDuePickerLayout.js"></script>
   <script src="../lib/priorityDisplay.js"></script>
   <script src="../lib/weekRange.js"></script>
   <script src="filterSort.js"></script>
