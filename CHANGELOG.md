@@ -12,6 +12,8 @@ The roadmap now focuses only on **upcoming / planned work**.
 - Calendar control per row (next to delete) opens the **native date picker** via `showPicker()` on a hidden `input type="date"`, anchored near the row using `lib/taskDuePickerLayout.js` (`computeTaskDuePickerLayout`).
 - Persisting the chosen or cleared date uses `lib/plainItemDueUpdate.js` and `modifyItem`; list refresh preserves scroll where applicable.
 - **Tests:** `test/unit/taskDuePickerLayout.test.js`, `test/unit/plainItemDueUpdate.test.js`; both modules are in `jest.config.js` `collectCoverageFrom`. **Docs:** `COMPLIANCE-AGENTS.md` §2 notes how this satisfies **AGENTS.md** for testable logic vs. tab orchestration.
+- **Monochrome calendar icon:** `lib/monochromeCalendarIcon.js` + `test/unit/monochromeCalendarIcon.test.js` (SVG spec and DOM build with injectable `createElementNS`).
+- **Same-tab Options ↔ full view:** `lib/extensionUiRoutes.js` + `test/unit/extensionUiRoutes.test.js` (`optionsPageRelativePath`, `tabPageRelativePath`, `extensionPageUrl`). Tab toolbar Options and Options “Open full view” use `location.assign` in the current tab.
 
 ---
 

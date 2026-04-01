@@ -23,6 +23,8 @@ Este documento declara cómo el código de la MailExtension Todo.txt cumple los 
 | Cobertura de branches | ≥ 80% | ✅ `coverageThreshold.global.branches: 80`. Actual: ≥80%. Filtrado por fecha (filterSort) usa fecha local; tests actualizados en consecuencia. |
 | Lógica de negocio principal | ≥ 95% | ✅ Módulos core (todotxt, todoclient, fileUtil, filterSort) cubiertos; la API pública y flujos principales están cubiertos. Cumplimiento satisfecho por umbrales globales y aprobación del resto no cubierto en helpers/validación. |
 | UI tab (fecha desde la lista) | Tests unitarios | ✅ La lógica testeable está en `lib/plainItemDueUpdate.js` (actualizar `dueDate` en el ítem plano) y `lib/taskDuePickerLayout.js` (posición del `input type="date"` para anclar el calendario nativo). Ambos en `collectCoverageFrom` con `test/unit/*.test.js`. `tab/tab.js` solo orquesta DOM, `showPicker()` y mensajes a background; no está en cobertura Jest (runtime Thunderbird). |
+| Icono calendario monocromo (fila / meta) | Tests unitarios | ✅ Geometría y construcción del SVG en `lib/monochromeCalendarIcon.js` (`getMonochromeCalendarIconSpec`, `buildMonochromeCalendarSvg`, helpers); `test/unit/monochromeCalendarIcon.test.js`. El tab solo enlaza `document.createElementNS`. |
+| Rutas vista completa ↔ opciones (misma pestaña) | Tests unitarios | ✅ Rutas relativas y `extensionPageUrl` en `lib/extensionUiRoutes.js`; `test/unit/extensionUiRoutes.test.js`. Tab y options llaman `runtime.getURL` + `location.assign` (orquestación sin Jest). |
 
 - Tests con **aserciones significativas**, **casos límite**, **rutas de error** e **inputs inválidos**.
 - Código que reduzca la cobertura global **debe rechazarse**.
