@@ -333,10 +333,7 @@ async function handleExportIcsClick() {
 }
 
 function openFullView() {
-  const url = api.runtime.getURL("tab/tab.html");
-  if (api.tabs && api.tabs.create) {
-    api.tabs.create({ url });
-  }
+  window.location.assign(api.runtime.getURL(globalThis.tabPageRelativePath()));
 }
 
 async function initOptionsPage() {

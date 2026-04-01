@@ -38,6 +38,14 @@ function i18n(id, subs) {
   }
 }
 
+function openOptionsInSameTab() {
+  window.location.assign(api.runtime.getURL(globalThis.optionsPageRelativePath()));
+}
+
+function createMonochromeCalendarSvg(sizePx) {
+  return globalThis.buildMonochromeCalendarSvg(sizePx, document.createElementNS.bind(document));
+}
+
 function showError(msg, showOptionsLink) {
   const el = document.getElementById("error");
   if (!el) return;
@@ -51,9 +59,7 @@ function showError(msg, showOptionsLink) {
       link.style.marginLeft = "8px";
       link.addEventListener("click", (e) => {
         e.preventDefault();
-        const url = api.runtime.getURL("options/options.html");
-        if (api.tabs && api.tabs.create) api.tabs.create({ url });
-        else api.runtime.openOptionsPage?.();
+        openOptionsInSameTab();
       });
       el.appendChild(link);
     }
@@ -109,9 +115,7 @@ function renderWelcomeNoPaths(listEl) {
   optionsLink.style.marginLeft = "8px";
   optionsLink.addEventListener("click", (e) => {
     e.preventDefault();
-    const url = api.runtime.getURL("options/options.html");
-    if (api.tabs && api.tabs.create) api.tabs.create({ url });
-    else api.runtime.openOptionsPage?.();
+    openOptionsInSameTab();
   });
   wrap.appendChild(document.createTextNode(" "));
   wrap.appendChild(optionsLink);
@@ -461,8 +465,9 @@ function createTaskMeta(item) {
     const dueIcon = document.createElement("span");
     dueIcon.className = "task-due-icon";
     dueIcon.setAttribute("aria-hidden", "true");
-    dueIcon.textContent = "\uD83D\uDCC5 ";
+    dueIcon.appendChild(createMonochromeCalendarSvg(11));
     meta.appendChild(dueIcon);
+    meta.appendChild(document.createTextNode(" "));
   }
   meta.appendChild(document.createTextNode(parts.join(" · ")));
   return meta;
@@ -506,7 +511,7 @@ function renderTask(item) {
   if (!readOnlyMode) {
     const dueBtn = document.createElement("button");
     dueBtn.type = "button";
-    dueBtn.textContent = "\uD83D\uDCC5";
+    dueBtn.appendChild(createMonochromeCalendarSvg(14));
     dueBtn.title = i18n("tab_task_due_aria");
     dueBtn.setAttribute("aria-label", i18n("tab_task_due_aria"));
     dueBtn.className = "task-due-btn";
@@ -778,9 +783,7 @@ function renderEmptyNoConfig(listEl) {
   optionsLink.textContent = i18n("tab_open_options");
   optionsLink.addEventListener("click", (e) => {
     e.preventDefault();
-    const url = api.runtime.getURL("options/options.html");
-    if (api.tabs && api.tabs.create) api.tabs.create({ url });
-    else api.runtime.openOptionsPage?.();
+    openOptionsInSameTab();
   });
   emptyWrap.appendChild(optionsLink);
   listEl.innerHTML = "";
@@ -1300,12 +1303,7 @@ if (toolbarResetEl) toolbarResetEl.addEventListener("click", resetFiltersAndRefr
 
 document.getElementById("open-options").addEventListener("click", (e) => {
   e.preventDefault();
-  const url = api.runtime.getURL("options/options.html");
-  if (api.tabs && api.tabs.create) {
-    api.tabs.create({ url });
-  } else {
-    api.runtime.openOptionsPage?.();
-  }
+  openOptionsInSameTab();
 });
 
 const viewAllEl = document.getElementById("view-all");

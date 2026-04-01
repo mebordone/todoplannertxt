@@ -14,6 +14,8 @@ module.exports = {
     "lib/pendingOnlyFilter.js",
     "lib/plainItemDueUpdate.js",
     "lib/taskDuePickerLayout.js",
+    "lib/monochromeCalendarIcon.js",
+    "lib/extensionUiRoutes.js",
     "background/calendarMappings.js",
     "tab/filterSort.js"
   ],

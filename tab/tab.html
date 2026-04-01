@@ -68,7 +68,9 @@
     .task-delete { margin-left: 4px; }
     .task-due-btn { margin-left: 4px; }
     .task-delete:hover { background: #fee; color: #c00; border-color: #c00; }
-    .task-due-btn:hover { background: #eef6ff; color: #0a54c2; border-color: #8ab4f8; }
+    .task-due-btn:hover { background: #f0f0f0; color: #333; border-color: #bbb; }
+    .task-due-btn svg { flex-shrink: 0; }
+    .task-due-icon { display: inline-flex; align-items: center; vertical-align: middle; margin-right: 1px; color: #888; }
     .task-delete:focus, .task-due-btn:focus { outline: 1px solid #0a84ff; outline-offset: 1px; }
     .group-container { margin-top: 8px; }
     .group-container .group-heading { display: flex; align-items: center; gap: 6px; width: 100%; padding: 6px 8px; margin: 0 0 4px; font-weight: 600; font-size: 13px; color: #555; background: #f5f5f5; border: none; border-radius: 4px; cursor: pointer; text-align: left; }
@@ -194,6 +196,8 @@
     <input type="date" id="task-due-picker" class="task-due-picker-hidden" tabindex="-1" title="">
   </div>
   <script src="../lib/i18nHelper.js"></script>
+  <script src="../lib/extensionUiRoutes.js"></script>
+  <script src="../lib/monochromeCalendarIcon.js"></script>
   <script src="../lib/plainItemDueUpdate.js"></script>
   <script src="../lib/taskDuePickerLayout.js"></script>
   <script src="../lib/priorityDisplay.js"></script>
