@@ -44,7 +44,7 @@ npm run lint           # ESLint (incluye regla de complejidad)
 npm run ci             # cobertura + lint + complejidad (validación tipo CI)
 ```
 
-Ver `test/README.md` para detalles. El proyecto cumple los criterios de **AGENTS.md** (§1–§12); ver `COMPLIANCE-AGENTS.md`. Cobertura ≥90% global y ≥80% branches (módulos y `lib/` bajo `collectCoverageFrom`, p. ej. `plainItemDueUpdate`, `taskDuePickerLayout`, `filterSort`); complejidad ≤10; `npm run ci` falla si no se cumplen umbrales o lint.
+Ver `test/README.md` para detalles. El proyecto cumple los criterios de **AGENTS.md** (§1–§12); ver `COMPLIANCE-AGENTS.md`. Cobertura ≥90% global y ≥80% branches (módulos y `lib/` bajo `collectCoverageFrom`, p. ej. `plainItemDueUpdate`, `taskDuePickerLayout`, `monochromeCalendarIcon`, `extensionUiRoutes`, `filterSort`); complejidad ≤10; `npm run ci` falla si no se cumplen umbrales o lint.
 
 ## Construcción
 
