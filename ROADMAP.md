@@ -8,6 +8,8 @@ This document outlines **planned** work for the Todo.txt MailExtension. **Shippe
 
 **Versión actual publicada:** **3.6.4** — ver [CHANGELOG.md](CHANGELOG.md) (Version 3.6.4 en adelante y releases anteriores: 3.6.3, 3.6, 3.6.1, 3.6.2, Phase 8 / Version 3.5, etc.).
 
+**Nota:** Mejoras de UX recientes en la vista pestaña (p. ej. **fecha de vencimiento desde el icono de calendario en la fila**, calendario nativo anclado a la tarea) pueden figurar en **Unreleased** del CHANGELOG hasta la siguiente versión etiquetada en `manifest.json`.
+
 ---
 
 ## Recommended order of implementation (future only)

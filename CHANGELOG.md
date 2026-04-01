@@ -5,6 +5,16 @@ The roadmap now focuses only on **upcoming / planned work**.
 
 ---
 
+## Unreleased
+
+**Tab – due date from task row**
+
+- Calendar control per row (next to delete) opens the **native date picker** via `showPicker()` on a hidden `input type="date"`, anchored near the row using `lib/taskDuePickerLayout.js` (`computeTaskDuePickerLayout`).
+- Persisting the chosen or cleared date uses `lib/plainItemDueUpdate.js` and `modifyItem`; list refresh preserves scroll where applicable.
+- **Tests:** `test/unit/taskDuePickerLayout.test.js`, `test/unit/plainItemDueUpdate.test.js`; both modules are in `jest.config.js` `collectCoverageFrom`. **Docs:** `COMPLIANCE-AGENTS.md` §2 notes how this satisfies **AGENTS.md** for testable logic vs. tab orchestration.
+
+---
+
 ## Version 3.6 – Adequacy for first publication
 
 **Goal:** Prepare the extension for first submission to addons.thunderbird.net.

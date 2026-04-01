@@ -4,7 +4,7 @@ Carpeta de tests: **funcionales**, **integración**, **cobertura** y **complejid
 
 ## Estructura
 
-- **test/unit/** – Tests funcionales por módulo (todotxt, util, md5, exception, fileUtil).
+- **test/unit/** – Tests funcionales por módulo (todotxt, util, md5, exception, fileUtil) y por helpers de `lib/` incluidos en cobertura (p. ej. `plainItemDueUpdate`, `taskDuePickerLayout`, `priorityDisplay`, `weekRange`, `quickAddToken`, `pendingOnlyFilter`).
 - **test/integration/** – Tests de integración (todoclient con FSA y prefs mockeados).
 - **test/coverage/** – Salida de cobertura (generada por Jest).
 - **test/setup.js** – Setup global (globalThis, mock de `browser`).
