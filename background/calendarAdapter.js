@@ -38,6 +38,21 @@
   function getVtodoIcalFromCalendarItem(item) {
     return mappings ? mappings.getVtodoIcalFromCalendarItem(item) : (item && typeof item.item === "string" && item.item.indexOf("VTODO") >= 0 ? item.item : null);
   }
+
+  /**
+   * Plain item for calendar→todo sync: prefer metadata.todoLineId over ICAL UID when present.
+   * @param {object} item calendar API payload (item + optional metadata)
+   * @returns {object|null}
+   */
+  function calendarItemToTodoPlain(item) {
+    const icalStr = getVtodoIcalFromCalendarItem(item);
+    if (!icalStr) return null;
+    const plain = vtodoIcalToTodoPlain(icalStr);
+    if (mappings && typeof mappings.applyTodoLineIdFromMetadata === "function") {
+      return mappings.applyTodoLineIdFromMetadata(plain, item && item.metadata);
+    }
+    return plain;
+  }
   function fallbackTodoPlainToVtodoIcal(plainItem) {
     const uid = plainItem.id || "todotxt-" + Math.random().toString(36).slice(2) + "-" + Date.now();
     const esc = (s) => (s == null || typeof s !== "string") ? "" : s.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
@@ -216,6 +231,7 @@
     todoPlainToVtodoIcal,
     vtodoIcalToTodoPlain,
     getVtodoIcalFromCalendarItem,
+    calendarItemToTodoPlain,
     exportTodoToIcsAsync,
   };
 

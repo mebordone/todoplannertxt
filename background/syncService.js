@@ -149,9 +149,14 @@
   }
 
   async function handleCalendarCreatedOrUpdated(event, payload) {
-    const icalStr = self.calendarAdapter.getVtodoIcalFromCalendarItem(payload);
-    if (!icalStr) return;
-    const plain = self.calendarAdapter.vtodoIcalToTodoPlain(icalStr);
+    let plain = self.calendarAdapter.calendarItemToTodoPlain
+      ? self.calendarAdapter.calendarItemToTodoPlain(payload)
+      : null;
+    if (!plain) {
+      const icalStr = self.calendarAdapter.getVtodoIcalFromCalendarItem(payload);
+      if (!icalStr) return;
+      plain = self.calendarAdapter.vtodoIcalToTodoPlain(icalStr);
+    }
     if (!plain.dueDate) return;
     if (event === "created") {
       await handleCalendarCreated(plain);

@@ -128,4 +128,20 @@ describe("calendarMappings", () => {
       expect(calendarMappings.getVtodoIcalFromCalendarItem({ item: "BEGIN:VCALENDAR\r\nEND:VCALENDAR" })).toBe(null);
     });
   });
+
+  describe("applyTodoLineIdFromMetadata", () => {
+    it("returns plain unchanged when metadata missing or todoLineId empty", () => {
+      const plain = { id: "uid-from-ical", title: "t", dueDate: "2026-04-02" };
+      expect(calendarMappings.applyTodoLineIdFromMetadata(plain, null)).toBe(plain);
+      expect(calendarMappings.applyTodoLineIdFromMetadata(plain, {})).toBe(plain);
+      expect(calendarMappings.applyTodoLineIdFromMetadata(plain, { todoLineId: "  " })).toBe(plain);
+    });
+    it("replaces id with trimmed todoLineId", () => {
+      const plain = { id: "tb-internal-uid", title: "t", dueDate: "2026-04-02" };
+      const out = calendarMappings.applyTodoLineIdFromMetadata(plain, { todoLineId: "  md5abc  " });
+      expect(out).not.toBe(plain);
+      expect(out.id).toBe("md5abc");
+      expect(out.title).toBe("t");
+    });
+  });
 });

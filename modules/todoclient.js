@@ -146,31 +146,45 @@ const todoclient = (function() {
     },
 
     async modifyItem(fsaApi, prefs, oldItem, newItem) {
-      const todo = await this.getTodo(fsaApi, prefs, false);
-      const todoItems = todo.items({}, "priority");
-      for (let i = 0; i < todoItems.length; i++) {
-        const todoItem = todoItems[i];
-        if (todoItem.id() === oldItem.id) {
-          applyModification(todoItem, newItem, prefs);
-          await fileUtil.writeTodo(fsaApi, prefs, todo);
-          cachedTodo = todo;
-          return todoItemToPlain(todoItem, prefs);
+      const targetId = String(oldItem.id);
+      const tryModify = async (refresh) => {
+        const todo = await this.getTodo(fsaApi, prefs, refresh);
+        const todoItems = todo.items({}, "priority");
+        for (let i = 0; i < todoItems.length; i++) {
+          const todoItem = todoItems[i];
+          if (String(todoItem.id()) === targetId) {
+            applyModification(todoItem, newItem, prefs);
+            await fileUtil.writeTodo(fsaApi, prefs, todo);
+            cachedTodo = todo;
+            return todoItemToPlain(todoItem, prefs);
+          }
         }
-      }
+        return null;
+      };
+      let out = await tryModify(false);
+      if (out) return out;
+      out = await tryModify(true);
+      if (out) return out;
       throw exception.ITEM_NOT_FOUND();
     },
 
     async deleteItem(fsaApi, prefs, item) {
-      const todo = await this.getTodo(fsaApi, prefs, false);
-      const todoItems = todo.items({}, "priority");
-      for (let i = 0; i < todoItems.length; i++) {
-        if (todoItems[i].id() === item.id) {
-          todo.removeItem(todoItems[i], false);
-          await fileUtil.writeTodo(fsaApi, prefs, todo);
-          cachedTodo = todo;
-          return;
+      const targetId = String(item.id);
+      const tryDelete = async (refresh) => {
+        const todo = await this.getTodo(fsaApi, prefs, refresh);
+        const todoItems = todo.items({}, "priority");
+        for (let i = 0; i < todoItems.length; i++) {
+          if (String(todoItems[i].id()) === targetId) {
+            todo.removeItem(todoItems[i], false);
+            await fileUtil.writeTodo(fsaApi, prefs, todo);
+            cachedTodo = todo;
+            return true;
+          }
         }
-      }
+        return false;
+      };
+      if (await tryDelete(false)) return;
+      if (await tryDelete(true)) return;
       throw exception.ITEM_NOT_FOUND();
     }
   };

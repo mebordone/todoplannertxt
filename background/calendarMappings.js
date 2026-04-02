@@ -90,12 +90,28 @@
     return null;
   }
 
+  /**
+   * Thunderbird may rewrite VTODO UID; we store the todo.txt line id in metadata.todoLineId on sync.
+   * @param {object} plain from vtodoIcalToTodoPlain
+   * @param {object} [metadata] calendar item metadata
+   * @returns {object} plain with id replaced when todoLineId is present
+   */
+  function applyTodoLineIdFromMetadata(plain, metadata) {
+    if (!plain || typeof plain !== "object") return plain;
+    const lineId = metadata && typeof metadata === "object" && typeof metadata.todoLineId === "string"
+      ? metadata.todoLineId.trim()
+      : "";
+    if (!lineId) return plain;
+    return Object.assign({}, plain, { id: lineId });
+  }
+
   const api = {
     escapeIcalText,
     toIcalDate,
     todoPlainToVtodoIcal,
     vtodoIcalToTodoPlain,
     getVtodoIcalFromCalendarItem,
+    applyTodoLineIdFromMetadata,
   };
 
   if (typeof module !== "undefined" && module.exports) {
