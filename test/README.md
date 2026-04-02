@@ -43,3 +43,4 @@ npm install
 - Los módulos se cargan en Node con `module.exports` cuando existe `module` (solo en tests).
 - `lib/fsa.js` depende del runtime de Thunderbird y no se incluye en cobertura.
 - `logger.js` no está en `collectCoverageFrom` (principalmente I/O y notificaciones).
+- **Integración `todoclient`:** el mock de `readFile` debe devolver contenido vacío para `done.txt`, porque `fileUtil.readTodo` concatena todo + done; si ambos archivos devolvieran el mismo texto de prueba, las líneas se duplicarían y los conteos de ítems serían incorrectos.

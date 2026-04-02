@@ -15,6 +15,7 @@ The roadmap now focuses only on **upcoming / planned work**.
 - **Monochrome calendar icon:** `lib/monochromeCalendarIcon.js` + `test/unit/monochromeCalendarIcon.test.js` (SVG spec and DOM build with injectable `createElementNS`).
 - **Same-tab Options ↔ full view:** `lib/extensionUiRoutes.js` + `test/unit/extensionUiRoutes.test.js` (`optionsPageRelativePath`, `tabPageRelativePath`, `extensionPageUrl`). Tab toolbar Options and Options “Open full view” use `location.assign` in the current tab.
 - **Fix “task not found” when saving edits (calendar sync):** Calendar→todo updates now resolve the todo.txt line id via `metadata.todoLineId` when Thunderbird’s VTODO UID differs from the deterministic line hash (`calendarMappings.applyTodoLineIdFromMetadata`, `calendarAdapter.calendarItemToTodoPlain`). `todoclient.modifyItem` / `deleteItem` compare ids with `String(...)` and retry once after refreshing the file from disk if the first pass misses (stale cache).
+- **Tests:** `calendarMappings.calendarItemPayloadToTodoPlain`; integration tests for modify/delete after emptying cache; `todoclient` FSA mock returns empty `done.txt` so `readTodo` matches production (no duplicate todo content).
 
 ---
 
