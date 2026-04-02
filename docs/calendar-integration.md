@@ -65,7 +65,7 @@ flowchart LR
 - **syncService.js**: decide si la sincronización está activa (preferencias), evita bucles (marcando origen del cambio) y llama a todoclient o al adapter según el origen.
 - **background.js**: arranca el polling, detecta cambios en todo.txt y llama a `syncService.onTodoTxtFileChanged()`; arranca `syncService.start()` cuando la integración está activada.
 
-- **Identidad estable todo.txt ↔ calendario:** Al sincronizar hacia Lightning se guarda en metadata del ítem el id de línea de todo.txt (`todoLineId`). Cuando el calendario devuelve un VTODO, el UID interno puede diferir del hash de la línea; al aplicar cambios de vuelta a todo.txt se usa `metadata.todoLineId` cuando existe, para que **modificar / borrar** en la extensión sigan encontrando la tarea correcta.
+- **Identidad estable todo.txt ↔ calendario:** Al sincronizar hacia Lightning se guarda en metadata del ítem el id de línea de todo.txt (`todoLineId`). Cuando el calendario devuelve un VTODO, el UID interno puede diferir del hash de la línea; al aplicar cambios de vuelta a todo.txt se usa `metadata.todoLineId` cuando existe, para que **modificar / borrar** en la extensión sigan encontrando la tarea correcta. La composición ICAL + metadata está centralizada en `calendarMappings.calendarItemPayloadToTodoPlain` (tests en Jest); el adapter la delega.
 
 ## Limitaciones conocidas
 

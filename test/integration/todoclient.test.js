@@ -24,11 +24,13 @@ describe("todoclient (integration)", () => {
   beforeEach(() => {
     readContent = "(A) First task\ndone task";
     mockFsa = {
-      readFile: jest.fn((folderId, fileName) =>
-        Promise.resolve({
-          file: { text: () => Promise.resolve(readContent + "\n") }
-        })
-      ),
+      readFile: jest.fn((folderId, fileName) => {
+        const name = fileName == null ? "" : String(fileName);
+        const body = /done\.txt/i.test(name) ? "" : readContent + "\n";
+        return Promise.resolve({
+          file: { text: () => Promise.resolve(body) }
+        });
+      }),
       writeFile: jest.fn(() => Promise.resolve())
     };
   });
@@ -95,6 +97,33 @@ describe("todoclient (integration)", () => {
     await expect(
       todoclient.modifyItem(mockFsa, defaultPrefs, fakeOld, fakeNew)
     ).rejects.toMatchObject({ code: "ITEM_NOT_FOUND" });
+  });
+
+  test("modifyItem re-reads disk when cache omits task but file still has line", async () => {
+    readContent = "(B) Cache miss retry line\n";
+    const items = await todoclient.getItems(mockFsa, defaultPrefs, true);
+    expect(items.length).toBe(1);
+    const oldItem = items[0];
+    const { TodoTxt } = require("../../modules/todotxt.js");
+    todoclient.setCachedTodo(TodoTxt.parseFile(""));
+    const readsBeforeModify = mockFsa.readFile.mock.calls.length;
+    const newItem = { ...oldItem, title: "After cache cleared" };
+    await todoclient.modifyItem(mockFsa, defaultPrefs, oldItem, newItem);
+    expect(mockFsa.readFile.mock.calls.length).toBeGreaterThan(readsBeforeModify);
+    expect(mockFsa.writeFile).toHaveBeenCalled();
+  });
+
+  test("deleteItem re-reads disk when cache omits task but file still has line", async () => {
+    readContent = "(C) Delete retry line\n";
+    const items = await todoclient.getItems(mockFsa, defaultPrefs, true);
+    expect(items.length).toBe(1);
+    const target = items[0];
+    const { TodoTxt } = require("../../modules/todotxt.js");
+    todoclient.setCachedTodo(TodoTxt.parseFile(""));
+    const readsBefore = mockFsa.readFile.mock.calls.length;
+    await todoclient.deleteItem(mockFsa, defaultPrefs, target);
+    expect(mockFsa.readFile.mock.calls.length).toBeGreaterThan(readsBefore);
+    expect(mockFsa.writeFile).toHaveBeenCalled();
   });
 
   test("getItems with due date and useCreation exposes dueDate and entryDate", async () => {

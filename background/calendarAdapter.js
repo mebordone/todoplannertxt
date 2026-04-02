@@ -45,13 +45,12 @@
    * @returns {object|null}
    */
   function calendarItemToTodoPlain(item) {
+    if (mappings && typeof mappings.calendarItemPayloadToTodoPlain === "function") {
+      return mappings.calendarItemPayloadToTodoPlain(item);
+    }
     const icalStr = getVtodoIcalFromCalendarItem(item);
     if (!icalStr) return null;
-    const plain = vtodoIcalToTodoPlain(icalStr);
-    if (mappings && typeof mappings.applyTodoLineIdFromMetadata === "function") {
-      return mappings.applyTodoLineIdFromMetadata(plain, item && item.metadata);
-    }
-    return plain;
+    return vtodoIcalToTodoPlain(icalStr);
   }
   function fallbackTodoPlainToVtodoIcal(plainItem) {
     const uid = plainItem.id || "todotxt-" + Math.random().toString(36).slice(2) + "-" + Date.now();

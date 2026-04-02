@@ -129,6 +129,38 @@ describe("calendarMappings", () => {
     });
   });
 
+  describe("calendarItemPayloadToTodoPlain", () => {
+    const minimalIcal = [
+      "BEGIN:VCALENDAR",
+      "BEGIN:VTODO",
+      "UID:lightning-internal-99",
+      "SUMMARY:Renovar dominio",
+      "DUE;VALUE=DATE:20260402",
+      "STATUS:NEEDS-ACTION",
+      "END:VTODO",
+      "END:VCALENDAR"
+    ].join("\r\n");
+
+    it("returns null for null or non-vtodo payload", () => {
+      expect(calendarMappings.calendarItemPayloadToTodoPlain(null)).toBe(null);
+      expect(calendarMappings.calendarItemPayloadToTodoPlain({ item: "BEGIN:VCALENDAR\r\nEND:VCALENDAR" })).toBe(null);
+    });
+    it("parses plain from payload and overrides id from metadata.todoLineId", () => {
+      const plain = calendarMappings.calendarItemPayloadToTodoPlain({
+        item: minimalIcal,
+        metadata: { todoLineId: "deadbeefdeadbeefdeadbeefdeadbeef" }
+      });
+      expect(plain).not.toBe(null);
+      expect(plain.id).toBe("deadbeefdeadbeefdeadbeefdeadbeef");
+      expect(plain.title).toBe("Renovar dominio");
+      expect(plain.dueDate).toBe("2026-04-02");
+    });
+    it("keeps UID as id when metadata has no todoLineId", () => {
+      const plain = calendarMappings.calendarItemPayloadToTodoPlain({ item: minimalIcal });
+      expect(plain.id).toBe("lightning-internal-99");
+    });
+  });
+
   describe("applyTodoLineIdFromMetadata", () => {
     it("returns plain unchanged when metadata missing or todoLineId empty", () => {
       const plain = { id: "uid-from-ical", title: "t", dueDate: "2026-04-02" };

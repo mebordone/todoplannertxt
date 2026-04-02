@@ -105,6 +105,18 @@
     return Object.assign({}, plain, { id: lineId });
   }
 
+  /**
+   * Same logic as calendarAdapter.calendarItemToTodoPlain (testable in Node).
+   * @param {{ item?: string, metadata?: object }|null} payload
+   * @returns {object|null}
+   */
+  function calendarItemPayloadToTodoPlain(payload) {
+    const icalStr = getVtodoIcalFromCalendarItem(payload);
+    if (!icalStr) return null;
+    const plain = vtodoIcalToTodoPlain(icalStr);
+    return applyTodoLineIdFromMetadata(plain, payload && payload.metadata);
+  }
+
   const api = {
     escapeIcalText,
     toIcalDate,
@@ -112,6 +124,7 @@
     vtodoIcalToTodoPlain,
     getVtodoIcalFromCalendarItem,
     applyTodoLineIdFromMetadata,
+    calendarItemPayloadToTodoPlain,
   };
 
   if (typeof module !== "undefined" && module.exports) {
